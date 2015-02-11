@@ -4,12 +4,11 @@ $(document).ready(function (e) {
     $('#search_button').click(function () {
 
         // create main GraphHopper Matrix object which handles the API requests
-        var ghm = new GraphHopperMatrix();
+        var ghm = new GraphHopperMatrix({"key": "YOUR_KEY", "vehicle": "car"});
 
         // possible out_array options are: weights, distances, times, paths
         ghm.addOutArray("distances");
         ghm.addOutArray("times");
-        ghm.setKey("YOUR_KEY");
 
         $('.point').each(function (idx, div) {
             // parse the input strings and adds it as from_point and to_point

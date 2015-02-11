@@ -1,12 +1,5 @@
-GraphHopperMatrix = function (host) {
-    if (host)
-        this.host = host;
-    else
-        this.host = "https://graphhopper.com/api/1";
-
-    this.vehicle = "car";
-    this.debug = false;
-    this.dataType = "json";
+GraphHopperMatrix = function (args) {
+    this.setProperties(args);
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
@@ -14,8 +7,29 @@ GraphHopperMatrix = function (host) {
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
 };
 
-GraphHopperMatrix.prototype.setKey = function (key) {
-    this.key = key;
+GraphHopperMatrix.prototype.setProperties = function (args) {
+    if (args.host)
+        this.host = args.host;
+    else
+        this.host = "https://graphhopper.com/api/1";
+
+    if (args.vehicle)
+        this.vehicle = args.vehicle;
+    else
+        this.vehicle = "car";
+
+    if (args.key)
+        this.key = args.key;
+
+    if (args.debug)
+        this.debug = args.debug;
+    else
+        this.debug = false;
+
+    if (args.data_type)
+        this.data_type = args.data_type;
+    else
+        this.data_type = "json";
 };
 
 GraphHopperMatrix.prototype.addPoint = function (latlon) {
@@ -35,12 +49,11 @@ GraphHopperMatrix.prototype.addOutArray = function (type) {
     this.out_arrays.push(type);
 };
 
-GraphHopperMatrix.prototype.setVehicle = function (vehicle) {
-    this.vehicle = vehicle;
-};
-
-GraphHopperMatrix.prototype.doRequest = function (callback) {
+GraphHopperMatrix.prototype.doRequest = function (callback, args) {
     var that = this;
+    if (args)
+        that.setProperties(args);
+
     var url = this.host + "/matrix?vehicle=" + this.vehicle + "&key=" + this.key;
 
     for (var idx in this.from_points) {
@@ -66,7 +79,7 @@ GraphHopperMatrix.prototype.doRequest = function (callback) {
         timeout: 30000,
         url: url,
         type: "GET",
-        dataType: this.dataType,
+        dataType: this.data_type,
         crossDomain: true
     }).done(function (json) {
         callback(json);
@@ -121,51 +134,4 @@ GraphHopperMatrix.prototype.toHtmlTable = function (doubleArray) {
     }
     htmlOut += "</table>";
     return htmlOut;
-};
-
-GHInput = function (input) {
-    this.set(input);
-};
-
-GHInput.prototype.round = function (val, precision) {
-    if (precision === undefined)
-        precision = 1e6;
-    return Math.round(val * precision) / precision;
-};
-
-GHInput.prototype.setCoord = function (lat, lng) {
-    this.lat = this.round(lat);
-    this.lng = this.round(lng);
-    this.input = this.toString();
-};
-
-GHInput.isObject = function (value) {
-    var stringValue = Object.prototype.toString.call(value);
-    return (stringValue.toLowerCase() === "[object object]");
-};
-
-GHInput.isString = function (value) {
-    var stringValue = Object.prototype.toString.call(value);
-    return (stringValue.toLowerCase() === "[object string]");
-};
-
-GHInput.prototype.set = function (strOrObject) {
-    // either text or coordinates or object
-    this.input = strOrObject;
-
-    if (GHInput.isObject(strOrObject)) {
-        this.setCoord(strOrObject.lat, strOrObject.lng);
-    } else if (GHInput.isString(strOrObject)) {
-        var index = strOrObject.indexOf(",");
-        if (index >= 0) {
-            this.lat = this.round(parseFloat(strOrObject.substr(0, index)));
-            this.lng = this.round(parseFloat(strOrObject.substr(index + 1)));
-        }
-    }
-};
-
-GHInput.prototype.toString = function () {
-    if (this.lat !== undefined && this.lng !== undefined)
-        return this.lat + "," + this.lng;
-    return undefined;
 };
