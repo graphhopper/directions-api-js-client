@@ -3,12 +3,11 @@
 Get this repository:
 
 ```bash
-git clone https://github.com/graphhopper/web-api/
+git clone https://github.com/graphhopper/directions-api-js-client/
 ```
 
 Then:
 
- * go to web-api/matrix-clients
  * edit main.js and replace YOUR_KEY with your own API key
  * open index.html in the browser 
  * press 'Search' to see the result
