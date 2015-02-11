@@ -1,6 +1,6 @@
 $(document).ready(function (e) {
     jQuery.support.cors = true;
-    var args = {key: "dec20006-84da-4df1-b30d-4d9c80283598",
+    var args = {key: "YOUR_KEY",
         vehicle: "car",
         elevation: false};
 
