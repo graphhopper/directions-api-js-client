@@ -8,7 +8,7 @@ git clone https://github.com/graphhopper/directions-api-js-client/
 
 ## Dependencies
 
-Currently all JavaScript clients require jQuery (Tested with 2.1.0) and the
+Currently all JavaScript clients require jQuery (tested with 2.1.0) and the
 small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
 
 ## GraphHopper Routing API
@@ -21,8 +21,8 @@ Run a simple demo with your own key via:
  2. open index-routing.html in the browser
  3. click on the map to create routes
 
-Also see how we integrated our API to build a fully featured web application 
-called [GraphHopper Maps](https://graphhopper.com/maps/)
+Also see how we integrated our API to build a fully featured maps application 
+based on our API called [GraphHopper Maps](https://graphhopper.com/maps/)
 
 ![GraphHopper Routing API screenshot](./screenshot-routing.png)
 
