@@ -4,23 +4,25 @@
         <title>GraphHopper Routing API JavaScript example</title>
         <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>        
         <script type="text/javascript" src="js/GHUtil.js"></script>
-        <script type="text/javascript" src="js/GraphHopperRouting.js"></script>
+        <script type="text/javascript" src="js/GraphHopperGeocoding.js"></script>
         
         <link rel="stylesheet" href="css/leaflet.css?v=0.7.3" />
         <script type="text/javascript" src="js/leaflet.js?v=0.7.3"></script>        
-        <script type="text/javascript" src="js/demo-routing.js"></script>
+        <script type="text/javascript" src="js/demo-geocoding.js"></script>
     </head>
     <body>
         <div style="margin: auto; width: 800px;">
-            <h2>GraphHopper Routing API JavaScript example</h2>
+            <h2>GraphHopper Geocoding API JavaScript example</h2>            
 
-            <div>Click on the map!</div>
-      
-            <div id="response" style="float: right; padding-left: 20px;">
-
+            <input id="text_field" type="text" placeholder="Your address"/>
+            <input id="search_button" type="button" value="Search"/>
+            <div id="message">
+                
             </div>
-
-            <div id="map" style="cursor: default; height:600px; width: 800px;"></div>
+            <div id="results">
+                
+            </div>
+            
         </div>
     </body>
 

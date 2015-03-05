@@ -17,18 +17,18 @@ small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
 
 Run a simple demo with your own key via:
 
- 1. edit main-routing.js and replace YOUR_KEY with your own API key
+ 1. edit demo-routing.js and replace YOUR_KEY with your own API key
  2. open index-routing.html in the browser
  3. click on the map to create routes
 
-Also see how we integrated our API to build a fully featured maps application 
-based on our API called [GraphHopper Maps](https://graphhopper.com/maps/)
+Also see how we integrated this API to build a fully featured maps application 
+called [GraphHopper Maps](https://graphhopper.com/maps/)
 
 ![GraphHopper Routing API screenshot](./screenshot-routing.png)
 
 ### Integrate the Routing API client in your products                
 
-You need [the routing client](./js/GraphHopper.js). See main-routing.js on how
+You need [the routing client](./js/GraphHopper.js). See demo-routing.js on how
 to integrate and use it.
 
 ## GraphHopper Matrix API
@@ -37,7 +37,7 @@ to integrate and use it.
 
 Run a simple demo with your own key via:
 
- 1. edit main-matrix.js and replace YOUR_KEY with your own API key
+ 1. edit demo-matrix.js and replace YOUR_KEY with your own API key
  2. open index-matrix.html in the browser 
  3. press 'Search' to see the result
  4. click on one matrix entry to see the full route on GraphHopper Maps
@@ -46,7 +46,27 @@ Run a simple demo with your own key via:
 
 ### Integrate the Matrix API client in your products
 
-You need [the matrix client](./js/GraphHopperMatrix.js). See main-matrix.js on how
+You need [the matrix client](./js/GraphHopperMatrix.js). See demo-matrix.js on how
+to integrate and use it.
+
+## GraphHopper Geocoding API
+
+### Demo
+
+Run a simple demo with your own key via:
+
+ 1. edit demo-geocode.js and replace YOUR_KEY with your own API key
+ 2. open index-geocode.html in the browser
+ 3. type something and hit enter
+
+Also see how we integrated this API to build a fully featured maps application 
+called [GraphHopper Maps](https://graphhopper.com/maps/)
+
+![GraphHopper Geocoding API screenshot](./screenshot-geocoding.png)
+
+### Integrate the Geocoding API client in your products                
+
+You need [the geocoding client](./js/GraphHopperGeocoding.js). See demo-geocoding.js on how
 to integrate and use it.
 
 ## License
