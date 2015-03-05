@@ -24,7 +24,7 @@ Run a simple demo with your own key via:
 Also see how we integrated this API to build a fully featured maps application 
 called [GraphHopper Maps](https://graphhopper.com/maps/)
 
-![GraphHopper Routing API screenshot](./screenshot-routing.png)
+![GraphHopper Routing API screenshot](./img/screenshot-routing.png)
 
 ### Integrate the Routing API client in your products                
 
@@ -42,7 +42,7 @@ Run a simple demo with your own key via:
  3. press 'Search' to see the result
  4. click on one matrix entry to see the full route on GraphHopper Maps
 
-![GraphHopper Matrix API screenshot](./screenshot-matrix.png)
+![GraphHopper Matrix API screenshot](./img/screenshot-matrix.png)
 
 ### Integrate the Matrix API client in your products
 
@@ -62,7 +62,7 @@ Run a simple demo with your own key via:
 Also see how we integrated this API to build a fully featured maps application 
 called [GraphHopper Maps](https://graphhopper.com/maps/)
 
-![GraphHopper Geocoding API screenshot](./screenshot-geocoding.png)
+![GraphHopper Geocoding API screenshot](./img/screenshot-geocoding.png)
 
 ### Integrate the Geocoding API client in your products                
 
