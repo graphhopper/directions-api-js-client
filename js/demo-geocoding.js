@@ -1,7 +1,10 @@
 $(document).ready(function (e) {
     jQuery.support.cors = true;
 
-    var args = {key: "YOUR_KEY", limit: 8};
+    var args = {key: "YOUR_KEY",
+        limit: 8,
+        // currently fr, en, de and it are explicitely supported
+        locale: "en"};
 
     var ghGeocoding = new GraphHopperGeocoding(args);
 
