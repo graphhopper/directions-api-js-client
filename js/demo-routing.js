@@ -61,8 +61,25 @@ $(document).ready(function (e) {
                         map.fitBounds(tmpB);
                     }
 
+                    var instructionsDiv = $("#instructions");
+                    instructionsDiv.empty();
                     if (path.instructions) {
-                        // TODO: display instructions
+                        var allPoints = path.points.coordinates;
+                        var listUL = $("<ol>");
+                        instructionsDiv.append(listUL);
+                        for (var idx in path.instructions) {
+                            var instr = path.instructions[idx];
+                            
+                            // use 'interval' to find the geometry (list of points) until the next instruction
+                            var instruction_points = allPoints.slice(instr.interval[0], instr.interval[1]);
+                            
+                            // use 'sign' to display e.g. equally named images
+
+                            $("<li>" + instr.text + " <small>(" + ghRouting.getTurnText(instr.sign) + ")</small>"
+                                    + " for " + instr.distance + "m and " + Math.round(instr.time / 1000) + "sec"
+                                    + ", geometry points:" + instruction_points.length + "</li>").
+                                    appendTo(listUL);
+                        }
                     }
                 }
             });

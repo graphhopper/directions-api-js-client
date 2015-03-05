@@ -3,6 +3,20 @@ GraphHopperRouting = function (args) {
     this.points = [];
 
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
+    // TODO use the i18n text provided by api/1/i18n in over 25 languages
+    this.turn_sign_map = {
+        "-6": "leave roundabout",
+        "-3": "turn sharp left",
+        "-2": "turn left",
+        "-1": "turn slight left",
+        0: "continue",
+        1: "turn slight right",
+        2: "turn right",
+        3: "turn sharp right",
+        4: "finish",
+        5: "reached via point",
+        6: "enter roundabout"
+    };
 };
 
 GraphHopperRouting.prototype.setProperties = function (args) {
@@ -143,4 +157,8 @@ GraphHopperRouting.prototype.doRequest = function (callback, args) {
 
 GraphHopperRouting.prototype.getGraphHopperMapsLink = function () {
     return this.graphhopper_maps_host + this.getParametersAsQueryString();
+};
+
+GraphHopperRouting.prototype.getTurnText = function (sign) {
+    return this.turn_sign_map[sign];
 };
