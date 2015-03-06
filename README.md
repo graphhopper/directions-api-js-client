@@ -31,6 +31,8 @@ called [GraphHopper Maps](https://graphhopper.com/maps/)
 You need [the routing client](./js/GraphHopper.js). See demo-routing.js on how
 to integrate and use it.
 
+There is also a different client developed from the community [here](https://www.npmjs.com/package/lrm-graphhopper).
+
 ## GraphHopper Matrix API
 
 ### Demo
