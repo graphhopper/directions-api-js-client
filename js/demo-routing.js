@@ -12,14 +12,13 @@ $(document).ready(function (e) {
     //  Map Setup
     // ***********
     var osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-    var tp = L.Browser.retina ? "lr" : "ls";
-    var lyrk = L.tileLayer('https://tiles.lyrk.org/' + tp + '/{z}/{x}/{y}?apikey=6e8cfef737a140e2a58c8122aaa26077', {
-        attribution: osmAttr + ', <a href="https://geodienste.lyrk.de/">Lyrk</a>',
-        subdomains: ['a', 'b', 'c']
+    var mapquest = L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+        attribution: osmAttr + ', <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>',
+        subdomains: ['otile1', 'otile2', 'otile3', 'otile4']
     });
 
-    var map = L.map('map', {layers: [lyrk]});
-    map.setView([51.505, -0.09], 13);
+    var map = L.map('map', {layers: [mapquest]});
+    map.setView([52.521235, 13.3992], 12);
     var iconObject = L.icon({
         iconUrl: './img/marker-icon.png',
         shadowSize: [50, 64],
@@ -39,8 +38,13 @@ $(document).ready(function (e) {
             //  Calculate route! 
             // ******************
             ghRouting.doRequest(function (json) {
-                if (json.info && json.info.errors) {
-                    $("#response").text("An error occured: " + json.info.errors[0].message);
+                if (json.message) {
+                    var str = "An error occured: " + json.message;
+                    if (json.hints)
+                        str += json.hints;
+
+                    $("#response").text(str);
+
                 } else {
                     var path = json.paths[0];
                     routingLayer.addData({
@@ -69,10 +73,10 @@ $(document).ready(function (e) {
                         instructionsDiv.append(listUL);
                         for (var idx in path.instructions) {
                             var instr = path.instructions[idx];
-                            
+
                             // use 'interval' to find the geometry (list of points) until the next instruction
                             var instruction_points = allPoints.slice(instr.interval[0], instr.interval[1]);
-                            
+
                             // use 'sign' to display e.g. equally named images
 
                             $("<li>" + instr.text + " <small>(" + ghRouting.getTurnText(instr.sign) + ")</small>"

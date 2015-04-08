@@ -137,21 +137,16 @@ GraphHopperRouting.prototype.doRequest = function (callback, args) {
         callback(json);
 
     }).fail(function (jqXHR) {
-        var msg = "Unknown error";
 
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message)
-            msg = jqXHR.responseJSON.message;
-
-        var details = "Error for " + url;
-        var json = {
-            "info": {
-                "errors": [{
-                        "message": msg,
-                        "details": details
-                    }]
-            }
-        };
-        callback(json);
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+            callback(jqXHR.responseJSON);
+            
+        } else {
+            callback({
+                "message": "Unknown error",
+                "details": "Error for " + url
+            });
+        }
     });
 };
 

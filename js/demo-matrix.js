@@ -4,7 +4,8 @@ $(document).ready(function (e) {
     $('#search_button').click(function () {
 
         // create main GraphHopper Matrix object which handles the API requests
-        var ghm = new GraphHopperMatrix({"key": "YOUR_KEY", "vehicle": "car"});
+        var ghm = new GraphHopperMatrix({"key": "YOUR_KEY",
+            "vehicle": "car"});
 
         // possible out_array options are: weights, distances, times, paths
         ghm.addOutArray("distances");
@@ -21,8 +22,12 @@ $(document).ready(function (e) {
         });
 
         ghm.doRequest(function (json) {
-            if (json.info && json.info.errors) {
-                $("#response").text("An error occured: " + json.info.errors[0].message);
+            if (json.message) {
+                var str = "An error occured: " + json.message;
+                if (json.hints)
+                    str += json.hints;
+
+                $("#response").text(str);
             } else {
                 var outHtml = "Distances in meters: <br/>" + ghm.toHtmlTable(json.distances);
                 outHtml += "<br/><br/>Times in seconds: <br/>" + ghm.toHtmlTable(json.times);
