@@ -103,6 +103,9 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function () {
 
     if (this.elevation)
         qString += "&elevation=" + this.elevation;
+    
+    if (this.vehicle)
+        qString += "&vehicle=" + this.vehicle;
 
     return qString;
 };
