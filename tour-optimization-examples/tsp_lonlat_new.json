@@ -1,0 +1,107 @@
+{
+    "vehicles" : [{
+      "vehicle_id" : "vehicle1",
+      "start_address" : {
+          "location_id" : "v1_startLoc",
+          "lon": 9.797058,
+          "lat": 52.375599
+      },
+      "type_id" : "vehicle_type_1"
+    }],
+    "vehicle_types" : [{
+      "type_id" : "vehicle_type_1",
+      "profile" : "car",
+      "distance_dependent_costs": 1.0,
+      "time_dependent_costs": 0.0
+    }],
+    "services" : [
+      {
+        "id": "b1",
+        "name": "drink_bionade_in_rostock",
+        "address": {
+          "location_id": "loc_b1",
+          "lon": 12.1333333,
+          "lat": 54.0833333
+        },
+        "time_windows" : [ {
+          "earliest": 20000,
+          "latest": 50000
+        } ]
+      },
+      {
+        "id": "b2",
+        "name": "drink_cola_in_berlin",
+        "address": {
+          "location_id": "loc_b2",
+          "lon": 13.354568,
+          "lat": 52.514549
+        }
+      },
+      {
+        "id": "b3",
+        "name": "drink_juice_in_ulm",
+        "address": {
+          "location_id": "loc_b3",
+          "lon": 9.990692,
+          "lat": 48.398209
+        }
+      },
+      {
+        "id": "b4",
+        "name": "drink_nothing_in_dresden",
+        "address": {
+          "location_id": "loc_b4",
+          "lon": 13.738403,
+          "lat": 51.050028
+        }
+      },
+      {
+        "id": "b5",
+        "name": "drink_wine_in_kassel",
+        "address": {
+          "location_id": "loc_b5",
+          "lon": 9.486694,
+          "lat": 51.31173
+        },
+        "time_windows" : [ {
+          "earliest": 0,
+          "latest": 30000
+        } ]
+      },
+      {
+        "id": "b6",
+        "name": "drink_beer_in_dortmund",
+        "address": {
+          "location_id": "loc_b6",
+          "lon": 7.500916,
+          "lat": 51.508742
+        },
+        "time_windows" : [ {
+          "earliest": 0,
+          "latest": 30000
+        } ]
+      },
+      {
+        "id": "b7",
+        "name": "drink_water_in_karlsruhe",
+        "address": {
+          "location_id": "loc_b7",
+          "lon" : 8.3858333,
+          "lat" : 49.0047222
+        }
+      },
+      {
+        "id": "b8",
+        "name": "drink_fish_in_bremen",
+        "address": {
+          "location_id": "loc_b8",
+          "lon": 8.822021,
+          "lat": 53.041213
+        },
+        "time_windows" : [ {
+          "earliest": 20000,
+          "latest": 40000
+        } ]
+      }
+  ]
+}

@@ -54,6 +54,16 @@ GHInput.prototype.toString = function () {
     return undefined;
 };
 
+GHUtil.prototype.clone = function (obj) {
+    var newObj = {};
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            newObj[prop] = obj[prop];
+        }
+    }
+    return newObj;
+};
+
 GHUtil.prototype.decodePath = function (encoded, is3D) {
     var len = encoded.length;
     var index = 0;

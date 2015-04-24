@@ -1,5 +1,5 @@
 GraphHopperMatrix = function (args) {
-    this.setProperties(args);
+    this.copyProperties(args, this);
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
@@ -7,29 +7,34 @@ GraphHopperMatrix = function (args) {
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
 };
 
-GraphHopperMatrix.prototype.setProperties = function (args) {
+GraphHopperMatrix.prototype.copyProperties = function (args, argsInto) {
+    if (!args)
+        return argsInto;
+
     if (args.host)
-        this.host = args.host;
+        argsInto.host = args.host;
     else
-        this.host = "https://graphhopper.com/api/1";
+        argsInto.host = "https://graphhopper.com/api/1";
 
     if (args.vehicle)
-        this.vehicle = args.vehicle;
+        argsInto.vehicle = args.vehicle;
     else
-        this.vehicle = "car";
+        argsInto.vehicle = "car";
 
     if (args.key)
-        this.key = args.key;
+        argsInto.key = args.key;
 
     if (args.debug)
-        this.debug = args.debug;
+        argsInto.debug = args.debug;
     else
-        this.debug = false;
+        argsInto.debug = false;
 
     if (args.data_type)
-        this.data_type = args.data_type;
+        argsInto.data_type = args.data_type;
     else
-        this.data_type = "json";
+        argsInto.data_type = "json";
+
+    return argsInto;
 };
 
 GraphHopperMatrix.prototype.addPoint = function (latlon) {
@@ -45,50 +50,53 @@ GraphHopperMatrix.prototype.addToPoint = function (latlon) {
     this.to_points.push(latlon);
 };
 
+GraphHopperMatrix.prototype.clearPoints = function () {
+    this.from_points.length = 0;
+    this.to_points.length = 0;
+};
+
 GraphHopperMatrix.prototype.addOutArray = function (type) {
     this.out_arrays.push(type);
 };
 
 GraphHopperMatrix.prototype.doRequest = function (callback, args) {
     var that = this;
-    if (args)
-        that.setProperties(args);
+    args = that.copyProperties(args, graphhopper.util.clone(that));
+    var url = args.host + "/matrix?vehicle=" + args.vehicle + "&key=" + args.key;
 
-    var url = this.host + "/matrix?vehicle=" + this.vehicle + "&key=" + this.key;
-
-    for (var idx in this.from_points) {
-        var p = this.from_points[idx];
+    for (var idx in args.from_points) {
+        var p = args.from_points[idx];
         url += "&from_point=" + encodeURIComponent(p.toString());
     }
-    for (var idx in this.to_points) {
-        var p = this.to_points[idx];
+    for (var idx in args.to_points) {
+        var p = args.to_points[idx];
         url += "&to_point=" + encodeURIComponent(p.toString());
     }
 
-    if (this.out_arrays) {
-        for (var idx in this.out_arrays) {
-            var type = this.out_arrays[idx];
+    if (args.out_arrays) {
+        for (var idx in args.out_arrays) {
+            var type = args.out_arrays[idx];
             url += "&out_array=" + type;
         }
     }
 
-    if (this.debug)
+    if (args.debug)
         url += "&debug=true";
 
     $.ajax({
         timeout: 30000,
         url: url,
         type: "GET",
-        dataType: this.data_type,
+        dataType: args.data_type,
         crossDomain: true
     }).done(function (json) {
         callback(json);
 
     }).fail(function (jqXHR) {
-        
+
         if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
             callback(jqXHR.responseJSON);
-            
+
         } else {
             callback({
                 "message": "Unknown error",

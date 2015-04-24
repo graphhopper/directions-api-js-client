@@ -4,71 +4,74 @@ GraphHopperGeocoding = function (args) {
     // the query
     this.query;
 
-    this.setProperties(args);
+    this.copyProperties(args, this);
 };
 
 GraphHopperGeocoding.prototype.clearLocation = function () {
     this.location_bias = undefined;
 };
 
-GraphHopperGeocoding.prototype.setProperties = function (args) {
+GraphHopperGeocoding.prototype.copyProperties = function (args, intoArgs) {
+    if (!args)
+        return argsInto;
+
     if (args.host)
-        this.host = args.host;
+        intoArgs.host = args.host;
     else
-        this.host = "https://graphhopper.com/api/1";
+        intoArgs.host = "https://graphhopper.com/api/1";
 
     if (args.key)
-        this.key = args.key;
+        intoArgs.key = args.key;
 
     if (args.debug)
-        this.debug = args.debug;
+        intoArgs.debug = args.debug;
     else
-        this.debug = false;
+        intoArgs.debug = false;
 
     if (args.locale)
-        this.locale = args.locale;
+        intoArgs.locale = args.locale;
     else
-        this.locale = "en";
+        intoArgs.locale = "en";
 
     if (args.query)
-        this.query = args.query;
+        intoArgs.query = args.query;
 
     if (args.location_bias)
-        this.location_bias = args.location_bias;
-    
+        intoArgs.location_bias = args.location_bias;
+
     if (args.limit)
-        this.limit = args.limit;
+        intoArgs.limit = args.limit;
+    
+    return intoArgs;
 };
 
-GraphHopperGeocoding.prototype.getParametersAsQueryString = function () {
-    var qString = "locale=" + this.locale;
+GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
+    var qString = "locale=" + args.locale;
 
-    qString += "&q=" + encodeURIComponent(this.query);
+    qString += "&q=" + encodeURIComponent(args.query);
 
-    if (this.location_bias)
-        qString += "&point=" + encodeURIComponent(this.location_bias.toString());
+    if (args.location_bias)
+        qString += "&point=" + encodeURIComponent(args.location_bias.toString());
 
-    if (this.debug)
+    if (args.debug)
         qString += "&debug=true";
-    
-    if (this.limit)
-        qString += "&limit=" + this.limit;
+
+    if (args.limit)
+        qString += "&limit=" + args.limit;
 
     return qString;
 };
 
 GraphHopperGeocoding.prototype.doRequest = function (callback, args) {
     var that = this;
-    if (args)
-        that.setProperties(args);
-
-    var url = this.host + "/geocode?" + this.getParametersAsQueryString() + "&key=" + this.key;
+    args = that.copyProperties(args, graphhopper.util.clone(that));
+    var url = args.host + "/geocode?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({
         timeout: 5000,
         url: url,
         type: "GET",
-        dataType: this.data_type,
+        dataType: args.data_type,
         crossDomain: true
     }).done(function (json) {
         callback(json);

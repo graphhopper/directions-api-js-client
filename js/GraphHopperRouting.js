@@ -1,5 +1,5 @@
 GraphHopperRouting = function (args) {
-    this.setProperties(args);
+    this.copyProperties(args, this);
     this.points = [];
 
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
@@ -19,49 +19,52 @@ GraphHopperRouting = function (args) {
     };
 };
 
-GraphHopperRouting.prototype.setProperties = function (args) {
+GraphHopperRouting.prototype.copyProperties = function (args, argsInto) {
+    if (!args)
+        return argsInto;
+
     if (args.host)
-        this.host = args.host;
+        argsInto.host = args.host;
     else
-        this.host = "https://graphhopper.com/api/1";
+        argsInto.host = "https://graphhopper.com/api/1";
 
     if (args.vehicle)
-        this.vehicle = args.vehicle;
+        argsInto.vehicle = args.vehicle;
     else
-        this.vehicle = "car";
+        argsInto.vehicle = "car";
 
     if (args.key)
-        this.key = args.key;
+        argsInto.key = args.key;
 
     if (args.debug)
-        this.debug = args.debug;
+        argsInto.debug = args.debug;
     else
-        this.debug = false;
+        argsInto.debug = false;
 
     if (args.data_type)
-        this.data_type = args.data_type;
+        argsInto.data_type = args.data_type;
     else
-        this.data_type = "json";
+        argsInto.data_type = "json";
 
     if (args.locale)
-        this.locale = args.locale;
+        argsInto.locale = args.locale;
     else
-        this.locale = "en";
+        argsInto.locale = "en";
 
     if (args.instructions)
-        this.instructions = args.instructions;
+        argsInto.instructions = args.instructions;
     else
-        this.instructions = true;
+        argsInto.instructions = true;
 
     if (args.points_encoded)
-        this.points_encoded = args.points_encoded;
+        argsInto.points_encoded = args.points_encoded;
     else
-        this.points_encoded = true;
+        argsInto.points_encoded = true;
 
     if (args.elevation)
-        this.elevation = args.elevation;
+        argsInto.elevation = args.elevation;
     else
-        this.elevation = false;
+        argsInto.elevation = false;
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
@@ -72,6 +75,8 @@ GraphHopperRouting.prototype.setProperties = function (args) {
 //        else
 //            this.elevation = true;
 //    }
+
+    return argsInto;
 };
 
 GraphHopperRouting.prototype.clearPoints = function () {
@@ -82,46 +87,44 @@ GraphHopperRouting.prototype.addPoint = function (latlon) {
     this.points.push(latlon);
 };
 
-GraphHopperRouting.prototype.getParametersAsQueryString = function () {
-    var qString = "locale=" + this.locale;
+GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
+    var qString = "locale=" + args.locale;
 
-    for (var idx in this.points) {
-        var p = this.points[idx];
+    for (var idx in args.points) {
+        var p = args.points[idx];
         qString += "&point=" + encodeURIComponent(p.toString());
     }
 
-    if (this.debug)
+    if (args.debug)
         qString += "&debug=true";
 
-    qString += "&type=" + this.data_type;
+    qString += "&type=" + args.data_type;
 
-    if (this.instructions)
-        qString += "&instructions=" + this.instructions;
+    if (args.instructions)
+        qString += "&instructions=" + args.instructions;
 
-    if (this.points_encoded)
-        qString += "&points_encoded=" + this.points_encoded;
+    if (args.points_encoded)
+        qString += "&points_encoded=" + args.points_encoded;
 
-    if (this.elevation)
-        qString += "&elevation=" + this.elevation;
-    
-    if (this.vehicle)
-        qString += "&vehicle=" + this.vehicle;
+    if (args.elevation)
+        qString += "&elevation=" + args.elevation;
+
+    if (args.vehicle)
+        qString += "&vehicle=" + args.vehicle;
 
     return qString;
 };
 
 GraphHopperRouting.prototype.doRequest = function (callback, args) {
     var that = this;
-    if (args)
-        that.setProperties(args);
-
-    var url = this.host + "/route?" + this.getParametersAsQueryString() + "&key=" + this.key;
+    args = that.copyProperties(args, graphhopper.util.clone(that));
+    var url = args.host + "/route?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({
         timeout: 5000,
         url: url,
         type: "GET",
-        dataType: this.data_type,
+        dataType: args.data_type,
         crossDomain: true
     }).done(function (json) {
         if (json.paths) {
@@ -143,7 +146,7 @@ GraphHopperRouting.prototype.doRequest = function (callback, args) {
 
         if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
             callback(jqXHR.responseJSON);
-            
+
         } else {
             callback({
                 "message": "Unknown error",
@@ -154,7 +157,7 @@ GraphHopperRouting.prototype.doRequest = function (callback, args) {
 };
 
 GraphHopperRouting.prototype.getGraphHopperMapsLink = function () {
-    return this.graphhopper_maps_host + this.getParametersAsQueryString();
+    return this.graphhopper_maps_host + this.getParametersAsQueryString(this);
 };
 
 GraphHopperRouting.prototype.getTurnText = function (sign) {

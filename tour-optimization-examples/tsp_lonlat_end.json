@@ -1,0 +1,106 @@
+{
+    "vehicles" : [{
+      "vehicle_id" : "vehicle1",
+      "start_address" : {
+          "location_id" : "v1_gera",
+          "lon": 12.076721,
+          "lat": 50.877044
+      },
+      "end_address" : {
+        "location_id" : "v1_muenchen",
+        "lon": 11.58,
+        "lat": 48.135
+      },
+      "type_id" : "vehicle_type_1",
+      "return_to_depot" : true
+    }],
+    "vehicle_types" : [{
+      "type_id" : "vehicle_type_1",
+      "profile" : "car",
+      "distance_dependent_costs": 1.0,
+      "time_dependent_costs": 0.0
+    }],
+    "services" : [
+      {
+        "id": "deliver_bionade_in_rostock",
+        "name": "deliver_bionade_in_rostock",
+        "address": {
+          "location_id": "loc_b1",
+          "lon": 12.1333333,
+          "lat": 54.0833333
+        }
+      },
+      {
+        "id": "deliver_cola_in_berlin",
+        "name": "deliver_cola_in_berlin",
+        "address": {
+          "location_id": "loc_b2",
+          "lon": 13.354568,
+          "lat": 52.514549
+        }
+      },
+      {
+        "id": "deliver_juice_in_ulm",
+        "name": "deliver_juice_in_ulm",
+        "address": {
+          "location_id": "loc_b3",
+          "lon": 9.990692,
+          "lat": 48.398209
+        }
+      },
+      {
+        "id": "deliver_beer_in_dresden",
+        "name": "deliver_beer_in_dresden",
+        "address": {
+          "location_id": "loc_b4",
+          "lon": 13.738403,
+          "lat": 51.050028
+        }
+      },
+      {
+        "id": "deliver_wine_in_kassel",
+        "name": "deliver_wine_in_kassel",
+        "address": {
+          "location_id": "loc_b5",
+          "lon": 9.486694,
+          "lat": 51.31173
+        }
+      },
+      {
+        "id": "deliver_beer_in_dortmund",
+        "name": "deliver_beer_in_dortmund",
+        "address": {
+          "location_id": "loc_b6",
+          "lon": 7.500916,
+          "lat": 51.508742
+        }
+      },
+      {
+        "id": "deliver_water_in_karlsruhe",
+        "name": "deliver_water_in_karlsruhe",
+        "address": {
+          "location_id": "loc_b7",
+          "lon" : 8.3858333,
+          "lat" : 49.0047222
+        }
+      },
+      {
+        "id": "deliver_fish_in_bremen",
+        "name": "deliver_fish_in_bremen",
+        "address": {
+          "location_id": "loc_b8",
+          "lon": 8.822021,
+          "lat": 53.041213
+        }
+      },
+      {
+        "id": "deliver_somethingelse_in_hof",
+        "name": "deliver_somethingelse_in_hof",
+        "address": {
+          "location_id": "loc_b9",
+          "lon": 11.8927,
+          "lat": 50.310392
+        }
+      }
+  ]
+}

@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>JavaScript examples for the GraphHopper Directions API </title>
+        <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>                
+
+        <link rel="stylesheet" href="css/leaflet.css?v=0.7.3" />
+        <script type="text/javascript" src="js/leaflet.js?v=0.7.3"></script>        
+
+        <link rel="stylesheet" href="css/style.css" />
+
+        <script type="text/javascript" src="js/GHUtil.js"></script>
+        <script type="text/javascript" src="js/GraphHopperRouting.js"></script>
+        <script type="text/javascript" src="js/GraphHopperMatrix.js"></script>
+        <script type="text/javascript" src="js/GraphHopperGeocoding.js"></script>        
+
+        <!-- swagger is currently only required for GraphHopperOptimization -->
+        <script type="text/javascript" src="js/swagger-client.min.js"></script>
+        <script type="text/javascript" src="js/GraphHopperOptimization.js"></script>
+
+        <script type="text/javascript" src="js/demo.js"></script>
+    </head>
+    <body>        
+        <div id="main">
+            <div id="logo">
+                <img src="https://graphhopper.com/img/header.png" alt="GraphHopper Logo"/>                                   
+
+                <div id="enter_key">
+                    <div>
+                        <img id="custom_key_enabled" class="hide" src="img/included.png" alt="using custom API key"/>
+                        <input id="custom_key_input" placeholder="Enter your API key"/>
+                        <button id="custom_key_button">Set</button>
+                    </div>
+                    <div id="get_key_link">
+                        <a href="https://graphhopper.com/#directions-api">Get an API key here!</a>
+                    </div>
+                </div>
+
+            </div>            
+
+            <div class="left horizontal"> 
+                Documentation:
+                <ul>
+                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation</a></li>                    
+                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md#api-clients-and-examples">API Clients</a></li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+            <div class="horizontal">
+                Live Examples:
+                <ul class="tabs-menu">
+                    <li class="current"><a href="#routing">Routing API</a></li>
+                    <li><a href="#optimization">Tour Optimization API</a></li>
+                    <li><a href="#matrix">Matrix API</a></li>
+                    <li><a href="#geocoding">Geocoding API</a></li>                    
+                </ul>
+            </div>
+
+            <div id="routing" class="tab-content">
+                <h2>Routing API</h2>
+
+                <div>Click on the map!</div>
+
+                <div id="routing-response" style="float: right; padding-left: 20px;">
+
+                </div>
+                <div id="routing-error" style="float: right; padding-left: 20px;">
+                </div>
+
+                <div id="routing-map" style="cursor: default; height:600px; width: 800px;"></div>
+
+                <div id="instructions-header">
+                    Click to see instructions for route
+                    <div id="instructions" class="hide"></div>
+                </div>
+
+            </div>
+
+            <div id="optimization" class="tab-content">
+                <h2>Tour Optimization API</h2>                
+
+                <div id="button-list">                
+                    <div>Click on the map to add a location</div>
+                    <button id="optimize_button">Optimize</button>
+                    <button id="vrp_clear_button">Clear</button>
+                </div>
+
+                <div id="example-list">
+                    Or try one of these examples:
+                    <div>
+                        <button id="set_example_vrp">Set Vehicle Routing</button>                
+                    </div>
+                    <div>
+                        <button id="set_example_tsp">Set Salesman</button>       
+                    </div>
+                    <div>
+                        <button id="set_example_tsp2">Set Open Salesman</button>       
+                    </div>
+                    <div>
+                        <button id="set_example_us_tour">Set Beauty US Tour</button>
+                    </div>
+                </div>                
+
+                <div id="vrp-map" style="cursor: default; height:600px; width: 800px;"></div>            
+
+                <div id="vrp-response" style="float: right; padding-left: 20px;">
+                </div>
+                <div id="vrp-error" style="float: right; padding-left: 20px;">
+                </div>
+            </div>
+
+            <div id="geocoding" class="tab-content">
+                <h2>Geocoding API</h2>            
+
+                <input id="geocoding_text_field" type="text" placeholder="Your address"/>
+                <input id="geocoding_search_button" type="button" value="Search"/>
+                <div id="geocoding-error">
+
+                </div>
+                <div id="geocoding-response">
+
+                </div>
+
+            </div>
+
+            <div id="matrix" class="tab-content">
+                <h2>Matrix API</h2>
+
+                <form>
+                    <div>
+                        <input class="point" type="text" value="52.651395,13.15567">
+                    </div>
+                    <div>
+                        <input class="point" type="text" value="52.432572,13.143539">
+                    </div>
+                    <div>
+                        <input class="point" type="text" value="52.43299,13.461571">
+                    </div>
+                    <div>
+                        <input class="point" type="text" value="52.622226,13.381233">
+                    </div>
+
+                    <input id="matrix_search_button" type="button" value="Search">
+                </form>
+
+                <div id="matrix-response">
+                </div>
+
+                <div id="matrix-error">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
