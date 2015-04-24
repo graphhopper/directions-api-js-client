@@ -359,7 +359,7 @@ function setupGeocodingAPI(ghGeocoding) {
                 $("#geocoding-error").text("An error occured: " + json.info.errors[0].message);
             } else {
                 var listUL = $("<ol>");
-                $("#geocoding-response").append(listUL);
+                $("#geocoding-response").append("Locale:" + ghGeocoding.locale + "<br/>").append(listUL);
                 for (var hitIdx in json.hits) {
                     var hit = json.hits[hitIdx];
 
