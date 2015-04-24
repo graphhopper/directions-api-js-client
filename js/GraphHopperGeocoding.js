@@ -3,46 +3,15 @@ GraphHopperGeocoding = function (args) {
     this.location_bias;
     // the query
     this.query;
+    this.host = "https://graphhopper.com/api/1";
+    this.debug = false;
+    this.locale = "en";
 
-    this.copyProperties(args, this);
+    graphhopper.util.copyProperties(args, this);
 };
 
 GraphHopperGeocoding.prototype.clearLocation = function () {
     this.location_bias = undefined;
-};
-
-GraphHopperGeocoding.prototype.copyProperties = function (args, intoArgs) {
-    if (!args)
-        return argsInto;
-
-    if (args.host)
-        intoArgs.host = args.host;
-    else
-        intoArgs.host = "https://graphhopper.com/api/1";
-
-    if (args.key)
-        intoArgs.key = args.key;
-
-    if (args.debug)
-        intoArgs.debug = args.debug;
-    else
-        intoArgs.debug = false;
-
-    if (args.locale)
-        intoArgs.locale = args.locale;
-    else
-        intoArgs.locale = "en";
-
-    if (args.query)
-        intoArgs.query = args.query;
-
-    if (args.location_bias)
-        intoArgs.location_bias = args.location_bias;
-
-    if (args.limit)
-        intoArgs.limit = args.limit;
-    
-    return intoArgs;
 };
 
 GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
@@ -62,10 +31,13 @@ GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
     return qString;
 };
 
-GraphHopperGeocoding.prototype.doRequest = function (callback, args) {
+GraphHopperGeocoding.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    args = that.copyProperties(args, graphhopper.util.clone(that));
-    var url = args.host + "/geocode?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+    var args = graphhopper.util.clone(that);
+    if (reqArgs)
+        args = graphhopper.util.copyProperties(reqArgs, args);
+
+    var url = args.host + "/geocode?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({
         timeout: 5000,

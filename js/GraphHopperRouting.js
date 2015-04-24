@@ -1,6 +1,23 @@
 GraphHopperRouting = function (args) {
-    this.copyProperties(args, this);
     this.points = [];
+    this.host = "https://graphhopper.com/api/1";
+    this.vehicle = "car";
+    this.debug = false;
+    this.data_type = 'json';
+    this.locale = 'en';
+    this.points_encoded = true;
+    this.instructions = true;
+    this.elevation = false;    
+
+// TODO make reading of /api/1/info/ possible
+//    this.elevation = false;
+//    var featureSet = this.features[this.vehicle];
+//    if (featureSet && featureSet.elevation) {
+//        if ('elevation' in params)
+//            this.elevation = params.elevation;
+//        else
+//            this.elevation = true;
+//    }
 
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
     // TODO use the i18n text provided by api/1/i18n in over 25 languages
@@ -17,66 +34,8 @@ GraphHopperRouting = function (args) {
         5: "reached via point",
         6: "enter roundabout"
     };
-};
 
-GraphHopperRouting.prototype.copyProperties = function (args, argsInto) {
-    if (!args)
-        return argsInto;
-
-    if (args.host)
-        argsInto.host = args.host;
-    else
-        argsInto.host = "https://graphhopper.com/api/1";
-
-    if (args.vehicle)
-        argsInto.vehicle = args.vehicle;
-    else
-        argsInto.vehicle = "car";
-
-    if (args.key)
-        argsInto.key = args.key;
-
-    if (args.debug)
-        argsInto.debug = args.debug;
-    else
-        argsInto.debug = false;
-
-    if (args.data_type)
-        argsInto.data_type = args.data_type;
-    else
-        argsInto.data_type = "json";
-
-    if (args.locale)
-        argsInto.locale = args.locale;
-    else
-        argsInto.locale = "en";
-
-    if (args.instructions)
-        argsInto.instructions = args.instructions;
-    else
-        argsInto.instructions = true;
-
-    if (args.points_encoded)
-        argsInto.points_encoded = args.points_encoded;
-    else
-        argsInto.points_encoded = true;
-
-    if (args.elevation)
-        argsInto.elevation = args.elevation;
-    else
-        argsInto.elevation = false;
-
-// TODO make reading of /api/1/info/ possible
-//    this.elevation = false;
-//    var featureSet = this.features[this.vehicle];
-//    if (featureSet && featureSet.elevation) {
-//        if ('elevation' in params)
-//            this.elevation = params.elevation;
-//        else
-//            this.elevation = true;
-//    }
-
-    return argsInto;
+    graphhopper.util.copyProperties(args, this);
 };
 
 GraphHopperRouting.prototype.clearPoints = function () {
@@ -115,9 +74,12 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
     return qString;
 };
 
-GraphHopperRouting.prototype.doRequest = function (callback, args) {
+GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    args = that.copyProperties(args, graphhopper.util.clone(that));
+    var args = graphhopper.util.clone(that);
+    if (reqArgs)
+        args = graphhopper.util.copyProperties(reqArgs, args);
+
     var url = args.host + "/route?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({

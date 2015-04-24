@@ -1,40 +1,15 @@
 GraphHopperMatrix = function (args) {
-    this.copyProperties(args, this);
+    this.host = "https://graphhopper.com/api/1";
+    vehicle = "car";
+    debug = false;
+    data_type = "json";
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
 
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
-};
 
-GraphHopperMatrix.prototype.copyProperties = function (args, argsInto) {
-    if (!args)
-        return argsInto;
-
-    if (args.host)
-        argsInto.host = args.host;
-    else
-        argsInto.host = "https://graphhopper.com/api/1";
-
-    if (args.vehicle)
-        argsInto.vehicle = args.vehicle;
-    else
-        argsInto.vehicle = "car";
-
-    if (args.key)
-        argsInto.key = args.key;
-
-    if (args.debug)
-        argsInto.debug = args.debug;
-    else
-        argsInto.debug = false;
-
-    if (args.data_type)
-        argsInto.data_type = args.data_type;
-    else
-        argsInto.data_type = "json";
-
-    return argsInto;
+    graphhopper.util.copyProperties(args, this);
 };
 
 GraphHopperMatrix.prototype.addPoint = function (latlon) {
@@ -59,9 +34,12 @@ GraphHopperMatrix.prototype.addOutArray = function (type) {
     this.out_arrays.push(type);
 };
 
-GraphHopperMatrix.prototype.doRequest = function (callback, args) {
+GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    args = that.copyProperties(args, graphhopper.util.clone(that));
+    var args = graphhopper.util.clone(that);
+    if (reqArgs)
+        args = graphhopper.util.copyProperties(reqArgs, args);
+
     var url = args.host + "/matrix?vehicle=" + args.vehicle + "&key=" + args.key;
 
     for (var idx in args.from_points) {

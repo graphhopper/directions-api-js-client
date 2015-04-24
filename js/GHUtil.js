@@ -64,6 +64,19 @@ GHUtil.prototype.clone = function (obj) {
     return newObj;
 };
 
+GHUtil.prototype.copyProperties = function (args, argsInto) {
+    if (!args)
+        return argsInto;
+
+    for (var prop in args) {
+        if (args.hasOwnProperty(prop)) {
+            argsInto[prop] = args[prop];
+        }
+    }
+
+    return argsInto;
+};
+
 GHUtil.prototype.decodePath = function (encoded, is3D) {
     var len = encoded.length;
     var index = 0;

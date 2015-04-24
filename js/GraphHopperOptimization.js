@@ -1,52 +1,10 @@
 GraphHopperOptimization = function (args) {
     this.points = [];
-    
-    if (args.host)
-        this.host = args.host;
-    else
-        this.host = "http://localhost:8080";
-    
-    if (args.basePath)
-        this.basePath = args.basePath;
-    else
-        this.basePath = "/vrp";
-
+    this.host = "https://graphhopper.com/api/1";
+    this.key = args.key;
     this.profile = args.profile;
 
-    if (args.swagger_spec_url)
-        this.swagger_spec_url = args.swagger_spec_url;
-    else {
-        if (this.host.indexOf("localhost") > 0)
-            this.swagger_spec_url = "http://localhost:8080/doc/swagger.json"
-        else
-            this.swagger_spec_url = "https://graphhopper.com/api/1/vrp/swagger.json";
-    }
-
-    // console.log(this.swagger_spec_url);
-    var that = this;
-    $.ajax({
-        dataType: "json",
-        url: this.swagger_spec_url,
-        async: false,
-        success: function (json) {
-            if (that.host.indexOf("localhost") > 0) {
-                json.host = "localhost:8080";
-                json.basePath = this.basePath;
-                json.schemes = ["http"];
-            }
-
-            that.api = new SwaggerClient({
-                spec: json,
-                success: function () {
-                    console.log("api ready " + that.api.host);
-                }});
-            that.setKey(args.key);
-        }
-    });
-};
-
-GraphHopperOptimization.prototype.setKey = function (key) {
-    this.api.clientAuthorizations.add("apiKey", new SwaggerClient.ApiKeyAuthorization("key", key, "query"));
+    graphhopper.util.copyProperties(args, this);
 };
 
 GraphHopperOptimization.prototype.addPoint = function (input) {
@@ -102,8 +60,14 @@ GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
     that.doRequest(jsonInput, callback);
 };
 
-GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback) {
+GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
     var that = this;
+    var args = graphhopper.util.clone(that);
+    if (reqArgs)
+        args = graphhopper.util.copyProperties(reqArgs, args);
+
+    var url = args.host + "/vrp/optimize?key=" + args.key;
+    
     var locationMap = {};
     for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
         var service = jsonInput.services[serviceIndex];
@@ -119,13 +83,27 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback) {
             locationMap[vehicle.end_address.location_id] = vehicle.end_address;
     }
 
-    that.api.vrp.postVrp({body: jsonInput}, function (data) {
-        var id = data.obj.job_id;
-        var timerRet = setInterval(function () {
-            console.log("poll solution " + id);
-            that.api.solution.getSolution({jobId: id}, function (data) {
+    $.ajax({
+        timeout: 5000,
+        url: url,
+        type: "POST",
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(jsonInput),
+        dataType: "json",
+        crossDomain: true
+    }).done(function (data) {
+        var solutionUrl = args.host + "/vrp/solution/" + data.job_id + "?key=" + args.key;
 
-                var json = data.obj;
+        var timerRet = setInterval(function () {
+
+            console.log("poll solution " + solutionUrl);
+            $.ajax({
+                timeout: 5000,
+                url: solutionUrl,
+                type: "GET",
+                dataType: "json",
+                crossDomain: true
+            }).done(function (json) {
                 console.log(json);
                 if (json.status === "finished") {
                     console.log("finished");
@@ -156,7 +134,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback) {
 
             });
         }, 1000);
-    }, function (resp) {
+    }).error(function (resp) {
         // console.log("error: " + JSON.stringify(resp));
         var json = {
             "message": "unknown error - server on " + that.host + " does not respond"

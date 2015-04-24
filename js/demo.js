@@ -48,9 +48,7 @@ $(document).ready(function (e) {
             ghRouting.key = key;
             ghMatrix.key = key;
             ghGeocoding.key = key;
-
-            // TODO make identical
-            ghOptimization.setKey(key);
+            ghOptimization.key = key;
         } else {
             $("#custom_key_enabled").hide();
         }
