@@ -211,7 +211,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         routingLayer.clearLayers();
         ghRouting.clearPoints();
         $("#vrp-response").text(" ");
-        $("#error-response").text(" ");
+        $("#vrp-error").text(" ");
     };
 
     var optimizeResponse = function (json) {
