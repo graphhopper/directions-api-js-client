@@ -7,7 +7,8 @@ GraphHopperRouting = function (args) {
     this.locale = 'en';
     this.points_encoded = true;
     this.instructions = true;
-    this.elevation = false;    
+    this.elevation = false;
+    this.basePath = '/route';
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
@@ -80,7 +81,7 @@ GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
-    var url = args.host + "/route?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+    var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({
         timeout: 5000,

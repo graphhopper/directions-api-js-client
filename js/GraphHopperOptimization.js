@@ -3,6 +3,7 @@ GraphHopperOptimization = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.key = args.key;
     this.profile = args.profile;
+    this.basePath = '/vrp';
 
     graphhopper.util.copyProperties(args, this);
 };
@@ -66,8 +67,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
-    var url = args.host + "/vrp/optimize?key=" + args.key;
-    
+    var url = args.host + args.basePath + "/optimize?key=" + args.key;
+
     var locationMap = {};
     for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
         var service = jsonInput.services[serviceIndex];
@@ -92,7 +93,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         dataType: "json",
         crossDomain: true
     }).done(function (data) {
-        var solutionUrl = args.host + "/vrp/solution/" + data.job_id + "?key=" + args.key;
+        var solutionUrl = args.host + args.basePath + "/solution/" + data.job_id + "?key=" + args.key;
 
         var timerRet = setInterval(function () {
 

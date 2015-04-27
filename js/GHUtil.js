@@ -69,7 +69,7 @@ GHUtil.prototype.copyProperties = function (args, argsInto) {
         return argsInto;
 
     for (var prop in args) {
-        if (args.hasOwnProperty(prop)) {
+        if (args.hasOwnProperty(prop) && args[prop] !== undefined) {
             argsInto[prop] = args[prop];
         }
     }

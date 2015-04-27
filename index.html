@@ -98,10 +98,10 @@
                         <button id="set_example_us_tour">Set Beauty US Tour</button>
                     </div>
                 </div>                
-                
+
                 <div id="vrp-error" style="float: right; padding-left: 20px;">
                 </div>
-                
+
                 <div id="vrp-map" style="cursor: default; height:600px; width: 800px;"></div>            
 
                 <div id="vrp-response" style="float: right; padding-left: 20px;">
@@ -149,5 +149,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- Piwik -->
+        <script type="text/javascript">
+            PIWIK = false;
+            if (PIWIK) {
+                var _paq = _paq || [];
+                _paq.push(['trackPageView']);
+                _paq.push(['enableLinkTracking']);
+                (function () {
+                    var u = (("https:" == document.location.protocol) ? "https" : "http") + "://graphhopper.com/piwik/";
+                    _paq.push(['setTrackerUrl', u + 'piwik.php']);
+                    _paq.push(['setSiteId', 1]);
+                    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                    g.type = 'text/javascript';
+                    g.defer = true;
+                    g.async = true;
+                    g.src = u + 'piwik.js';
+                    s.parentNode.insertBefore(g, s);
+                })();
+            }
+        </script>
+        <noscript><p><img src="https://graphhopper.com/piwik/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
     </body>
 </html>

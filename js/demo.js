@@ -15,15 +15,7 @@ $(document).ready(function (e) {
         vrpMap.invalidateSize(false);
     });
 
-    var host = "https://graphhopper.com/api/1";
-
-    if (!host) {
-        if (location.port === '') {
-            host = location.protocol + '//' + location.hostname;
-        } else {
-            host = location.protocol + '//' + location.hostname + ":" + location.port;
-        }
-    }
+    var host;
 
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
@@ -33,12 +25,13 @@ $(document).ready(function (e) {
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
     var ghRouting = new GraphHopperRouting({key: defaultKey, host: host, vehicle: profile, elevation: false});
-
-    var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
-
     var ghGeocoding = new GraphHopperGeocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
-
     var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
+    var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
+    if (location.protocol === "file:") {
+        ghOptimization.host = 'http://localhost:8080';
+        ghOptimization.basePath = '';
+    }
 
     var overwriteExistingKey = function () {
         var key = $("#custom_key_input").val();
@@ -355,8 +348,8 @@ function setupGeocodingAPI(ghGeocoding) {
 
         $("#geocoding-response").empty();
         ghGeocoding.doRequest(function (json) {
-            if (json.info && json.info.errors) {
-                $("#geocoding-error").text("An error occured: " + json.info.errors[0].message);
+            if (json.message) {
+                $("#geocoding-error").text("An error occured: " + json.message);
             } else {
                 var listUL = $("<ol>");
                 $("#geocoding-response").append("Locale:" + ghGeocoding.locale + "<br/>").append(listUL);

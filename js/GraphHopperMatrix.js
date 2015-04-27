@@ -6,7 +6,7 @@ GraphHopperMatrix = function (args) {
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
-
+    this.basePath = "/matrix";
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
 
     graphhopper.util.copyProperties(args, this);
@@ -40,7 +40,7 @@ GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
-    var url = args.host + "/matrix?vehicle=" + args.vehicle + "&key=" + args.key;
+    var url = args.host + args.basePath + "?vehicle=" + args.vehicle + "&key=" + args.key;
 
     for (var idx in args.from_points) {
         var p = args.from_points[idx];

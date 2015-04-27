@@ -6,6 +6,7 @@ GraphHopperGeocoding = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.debug = false;
     this.locale = "en";
+    this.basePath = '/geocode';
 
     graphhopper.util.copyProperties(args, this);
 };
@@ -37,7 +38,7 @@ GraphHopperGeocoding.prototype.doRequest = function (callback, reqArgs) {
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
-    var url = args.host + "/geocode?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
+    var url = args.host + args.basePath + "?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
 
     $.ajax({
         timeout: 5000,
@@ -56,12 +57,8 @@ GraphHopperGeocoding.prototype.doRequest = function (callback, reqArgs) {
 
         var details = "Error for " + url;
         var json = {
-            "info": {
-                "errors": [{
-                        "message": msg,
-                        "details": details
-                    }]
-            }
+            "message": msg,
+            "details": details
         };
         callback(json);
     });
