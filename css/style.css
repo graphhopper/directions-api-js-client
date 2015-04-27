@@ -4,7 +4,7 @@ body {
     font-size: 20px;    
 }
 
-#main {
+#main, #vrp-map-wrapper {
     margin: auto; 
     width: 800px;
 }
@@ -21,7 +21,7 @@ a:hover {
     color: #3091f7;
 }
 
-#button-list, #example-list {
+#button-list {
     padding: 10px;
 }
 
@@ -31,10 +31,12 @@ a:hover {
 
 #example-list {
     float: left;
-    width: 200px;
-    height: 70px;
-    overflow: auto;
-    margin: 20px;
+    max-width: 190px;    
+    margin-top: 10px;    
+}
+
+#vrp-map {
+    float: right;
 }
 
 .right {
@@ -72,6 +74,10 @@ a:hover {
 #vrp-error {
     color: red;
     font-weight: bold;
+}
+
+#vrp-error, #vrp-response {
+    padding: 10px;
 }
 
 .clear {

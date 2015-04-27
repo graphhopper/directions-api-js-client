@@ -22,7 +22,7 @@
             <div id="logo" class="left">
                 <img src="https://graphhopper.com/img/header.png" alt="GraphHopper Logo"/>                                   
             </div>                        
-            
+
             <div id="enter_key">
                 <div>
                     <img id="custom_key_enabled" class="hide" src="img/included.png" alt="using custom API key"/>
@@ -31,12 +31,13 @@
                 </div>
                 <ul id="custom_key_desc" class="small right">
                     <li><a href="https://graphhopper.com/#directions-api">Get an API key here!</a></li>
-                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation and Clients</a></li>                    
+                    <li><a href="https://github.com/graphhopper/directions-api-js-client">Fork this at Github</a></li>
+                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation and Clients</a></li>
                 </ul>
             </div>
-            
+
             <h2 class="left">Directions API Live Examples</h2>
-            
+
             <div class="clear"></div>
             <div class="horizontal">                
                 <ul id="mynavigation" class="tabs-menu">
@@ -67,36 +68,41 @@
             </div>
 
             <div id="optimization" class="tab-content">
-                <div>Click on one of the examples or on the map to add locations</div>
-                <div id="example-list">
-                    <div>
-                        <button id="set_example_vrp">Set Vehicle Routing</button>                
-                    </div>
-                    <div>
-                        <button id="set_example_tsp">Set Salesman</button>       
-                    </div>
-                    <div>
-                        <button id="set_example_tsp2">Set Open Salesman</button>       
-                    </div>
-                    <div>
-                        <button id="set_example_us_tour">Set Beauty US Tour</button>
-                    </div>
-                    <div>
-                        <button id="set_example_uk_tour">Set Beauty UK Tour</button>
-                    </div>
-                </div> 
+                <div class="left">Click on one of the examples or on the map to add locations</div>
+
                 <div id="button-list" class="right">
                     <button id="optimize_button">Optimize</button>
                     <button id="vrp_clear_button">Clear</button>
                 </div>
 
+                <div class="clear"></div>
+                <div id="vrp-map-wrapper">
+                    <div id="vrp-map" style="cursor: default; height:550px; width: 600px;"></div>
+
+                    <div id="example-list">
+                        <div>
+                            <button id="set_example_vrp">Set Vehicle Routing</button>                
+                        </div>
+                        <div>
+                            <button id="set_example_tsp">Set Salesman</button>       
+                        </div>
+                        <div>
+                            <button id="set_example_tsp2">Set Open Salesman</button>       
+                        </div>
+                        <div>
+                            <button id="set_example_us_tour">Set Beauty US Tour</button>
+                        </div>
+                        <div>
+                            <button id="set_example_uk_tour">Set Election Campaign UK</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
                 <div id="vrp-error" style="float: right; padding-left: 20px;">
                 </div>
 
                 <div id="vrp-response" style="float: right; padding-left: 20px;">
                 </div>
-
-                <div id="vrp-map" style="cursor: default; height:600px; width: 800px;"></div>                            
             </div>
 
             <div id="geocoding" class="tab-content">
