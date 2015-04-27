@@ -63,9 +63,11 @@ $(document).ready(function (e) {
 
     setupMatrixAPI(ghMatrix);
 
-    if (window.location.hash) {
-        showTab($(".tabs-menu li > a[href='" + window.location.hash + "']"));
-    }
+    var tmpTab = window.location.hash;
+    if (!tmpTab)
+        tmpTab = "#routing";
+
+    showTab($(".tabs-menu li > a[href='" + tmpTab + "']"));
 });
 
 function setupRoutingAPI(map, ghRouting) {
