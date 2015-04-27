@@ -19,40 +19,37 @@
     </head>
     <body>        
         <div id="main">
-            <div id="logo">
+            <div id="logo" class="left">
                 <img src="https://graphhopper.com/img/header.png" alt="GraphHopper Logo"/>                                   
-
-                <div id="enter_key">
-                    <div>
-                        <img id="custom_key_enabled" class="hide" src="img/included.png" alt="using custom API key"/>
-                        <input id="custom_key_input" placeholder="Enter your API key"/>
-                        <button id="custom_key_button">Set</button>
-                    </div>
-                    <div id="get_key_link">
-                        <a href="https://graphhopper.com/#directions-api">Get an API key here!</a>
-                    </div>
+            </div>                        
+            
+            <div id="enter_key">
+                <div>
+                    <img id="custom_key_enabled" class="hide" src="img/included.png" alt="using custom API key"/>
+                    <input id="custom_key_input" placeholder="Enter your API key"/>
+                    <button id="custom_key_button">Set</button>
                 </div>
-
+                <ul id="custom_key_desc" class="small right">
+                    <li><a href="https://graphhopper.com/#directions-api">Get an API key here!</a></li>
+                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation and Clients</a></li>                    
+                </ul>
             </div>
-
+            
+            <h2 class="left">Directions API Live Examples</h2>
+            
             <div class="clear"></div>
-            <div class="horizontal">
-                Live Examples for every part of the Directions API:
-                <ul class="tabs-menu">
+            <div class="horizontal">                
+                <ul id="mynavigation" class="tabs-menu">
                     <li class="current"><a href="#routing">Routing API</a></li>
                     <li><a href="#optimization">Tour Optimization API</a></li>
                     <li><a href="#matrix">Matrix API</a></li>
                     <li><a href="#geocoding">Geocoding API</a></li>                    
-                </ul>
-                <ul>
-                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation and Clients</a></li>
-                </ul>
+                </ul>                
             </div>
 
             <div id="routing" class="tab-content">
-                <h2>Routing API</h2>
 
-                <div>Click on the map!</div>
+                <div style="padding-bottom: 10px;">Calculate a route via clicking on the map!</div>
 
                 <div id="routing-response" style="float: right; padding-left: 20px;">
 
@@ -70,8 +67,7 @@
             </div>
 
             <div id="optimization" class="tab-content">
-                <h2>Tour Optimization API</h2>                
-                <div>Click on of the examples or on the map to add locations</div>
+                <div>Click on one of the examples or on the map to add locations</div>
                 <div id="example-list">
                     <div>
                         <button id="set_example_vrp">Set Vehicle Routing</button>                
@@ -99,12 +95,11 @@
 
                 <div id="vrp-response" style="float: right; padding-left: 20px;">
                 </div>
-                
+
                 <div id="vrp-map" style="cursor: default; height:600px; width: 800px;"></div>                            
             </div>
 
             <div id="geocoding" class="tab-content">
-                <h2>Geocoding API</h2>            
 
                 <input id="geocoding_text_field" type="text" placeholder="Your address"/>
                 <input id="geocoding_search_button" type="button" value="Search"/>
@@ -118,7 +113,6 @@
             </div>
 
             <div id="matrix" class="tab-content">
-                <h2>Matrix API</h2>
 
                 <form>
                     <div>
