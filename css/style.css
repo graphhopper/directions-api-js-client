@@ -31,6 +31,10 @@ a:hover {
 
 #example-list {
     float: left;
+    width: 200px;
+    height: 100px;
+    overflow: auto;
+    margin: 20px;
 }
 
 .right {

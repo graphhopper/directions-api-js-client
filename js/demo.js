@@ -4,16 +4,20 @@ $(document).ready(function (e) {
     $(".tab-content").css("display", "none");
     $(".tabs-menu a").click(function (event) {
         // event.preventDefault();
-        $(this).parent().addClass("current");
-        $(this).parent().siblings().removeClass("current");
-        var tab = $(this).attr("href");
+        showTab($(this));
+    });
+
+    function showTab(thisDiv) {
+        thisDiv.parent().addClass("current");
+        thisDiv.parent().siblings().removeClass("current");
+        var tab = thisDiv.attr("href");
         $(".tab-content").not(tab).css("display", "none");
         $(tab).fadeIn();
 
         // a bit hackish to refresh the map
         routingMap.invalidateSize(false);
         vrpMap.invalidateSize(false);
-    });
+    }
 
     var host;
 
@@ -28,7 +32,7 @@ $(document).ready(function (e) {
     var ghGeocoding = new GraphHopperGeocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
     var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
     var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
-    if (location.protocol === "file:") {
+    if (location.protocol === "fle:") {
         ghOptimization.host = 'http://localhost:8080';
         ghOptimization.basePath = '';
     }
@@ -58,6 +62,10 @@ $(document).ready(function (e) {
     setupGeocodingAPI(ghGeocoding);
 
     setupMatrixAPI(ghMatrix);
+
+    if (window.location.hash) {
+        showTab($(".tabs-menu li > a[href='" + window.location.hash + "']"));
+    }
 });
 
 function setupRoutingAPI(map, ghRouting) {
@@ -258,7 +266,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     var eqAddress = function (add1, add2) {
         return add1 && add2
                 && Math.floor(add1.lat * 1000000) === Math.floor(add2.lat * 1000000)
-                && Math.floor(add1.lon * 1000000) === Math.floor(add2.lon * 1000000)
+                && Math.floor(add1.lon * 1000000) === Math.floor(add2.lon * 1000000);
     };
 
     var createGHCallback = function (routeStyle) {
@@ -321,6 +329,16 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
 
             clearMap();
             map.setView([38.754083, -101.074219], 4);
+            $("#vrp-response").text("Calculating ...");
+            ghOptimization.doRequest(jsonData, optimizeResponse);
+        });
+    });
+
+    $("#set_example_uk_tour").click(function () {
+        $.getJSON("tour-optimization-examples/uk50.json", function (jsonData) {
+
+            clearMap();
+            map.setView([54.136696, -4.592285], 6);
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData, optimizeResponse);
         });

@@ -45,7 +45,7 @@
 
             <div class="clear"></div>
             <div class="horizontal">
-                Live Examples:
+                Live Examples for every part of the Directions API:
                 <ul class="tabs-menu">
                     <li class="current"><a href="#routing">Routing API</a></li>
                     <li><a href="#optimization">Tour Optimization API</a></li>
@@ -76,15 +76,8 @@
 
             <div id="optimization" class="tab-content">
                 <h2>Tour Optimization API</h2>                
-
-                <div id="button-list">                
-                    <div>Click on the map to add a location</div>
-                    <button id="optimize_button">Optimize</button>
-                    <button id="vrp_clear_button">Clear</button>
-                </div>
-
+                <div>Click on of the examples or on the map to add locations</div>
                 <div id="example-list">
-                    Or try one of these examples:
                     <div>
                         <button id="set_example_vrp">Set Vehicle Routing</button>                
                     </div>
@@ -97,7 +90,14 @@
                     <div>
                         <button id="set_example_us_tour">Set Beauty US Tour</button>
                     </div>
-                </div>                
+                    <div>
+                        <button id="set_example_uk_tour">Set Beauty UK Tour</button>
+                    </div>
+                </div> 
+                <div id="button-list" class="right">
+                    <button id="optimize_button">Optimize</button>
+                    <button id="vrp_clear_button">Clear</button>
+                </div>
 
                 <div id="vrp-error" style="float: right; padding-left: 20px;">
                 </div>

@@ -140,8 +140,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         var json = {
             "message": "unknown error - server on " + that.host + " does not respond"
         };
-        if (resp.statusText && resp.statusText.indexOf('{') === 0)
-            json = JSON.parse(resp.statusText);
+        if (resp.responseJSON)
+            json = resp.responseJSON;
         callback(json);
     });
 };

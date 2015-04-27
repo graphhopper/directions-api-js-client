@@ -1,0 +1,410 @@
+{
+  "vehicles" : [ {
+    "vehicle_id" : "traveling_salesman",
+    "start_address" : {
+      "location_id" : "1",
+      "lon" : -0.08921,
+      "lat" : 51.5054092
+    },
+    "type_id" : "default"
+  } ],
+  "vehicle_types" : [ {
+    "type_id" : "default",
+    "profile" : "car",
+    "distance_dependent_costs" : 0.0,
+    "time_dependent_costs" : 1.0
+  } ],
+  "services" : [ {
+    "id" : "44",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "44",
+      "lon" : -1.78205,
+      "lat" : 51.5584793
+    }
+  }, {
+    "id" : "45",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "45",
+      "lon" : -0.73815,
+      "lat" : 51.9989319
+    }
+  }, {
+    "id" : "46",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "46",
+      "lon" : -0.07226,
+      "lat" : 52.3230095
+    }
+  }, {
+    "id" : "47",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "47",
+      "lon" : -0.20299,
+      "lat" : 51.9011993
+    }
+  }, {
+    "id" : "48",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "48",
+      "lon" : -0.40412,
+      "lat" : 51.6598015
+    }
+  }, {
+    "id" : "49",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "49",
+      "lon" : -0.3206,
+      "lat" : 51.6287994
+    }
+  }, {
+    "id" : "50",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "50",
+      "lon" : -0.30551,
+      "lat" : 51.5110397
+    }
+  }, {
+    "id" : "10",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "10",
+      "lon" : -0.08146,
+      "lat" : 53.5651398
+    }
+  }, {
+    "id" : "11",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "11",
+      "lon" : -0.43936,
+      "lat" : 53.685595
+    }
+  }, {
+    "id" : "12",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "12",
+      "lon" : -1.5400175,
+      "lat" : 53.4048617
+    }
+  }, {
+    "id" : "13",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "13",
+      "lon" : -1.92636,
+      "lat" : 53.6005783
+    }
+  }, {
+    "id" : "14",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "14",
+      "lon" : -2.2077999,
+      "lat" : 53.6936684
+    }
+  }, {
+    "id" : "15",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "15",
+      "lon" : -2.17769,
+      "lat" : 53.8553696
+    }
+  }, {
+    "id" : "16",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "16",
+      "lon" : -1.67989,
+      "lat" : 53.8069801
+    }
+  }, {
+    "id" : "17",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "17",
+      "lon" : -1.3433,
+      "lat" : 54.5714111
+    }
+  }, {
+    "id" : "18",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "18",
+      "lon" : -2.0041001,
+      "lat" : 55.7700691
+    }
+  }, {
+    "id" : "19",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "19",
+      "lon" : -2.7867586,
+      "lat" : 55.4227586
+    }
+  }, {
+    "id" : "2",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "2",
+      "lon" : -0.05895690000000001,
+      "lat" : 50.8039108
+    }
+  }, {
+    "id" : "3",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "3",
+      "lon" : 1.3110267,
+      "lat" : 51.1269357
+    }
+  }, {
+    "id" : "4",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "4",
+      "lon" : 1.33866,
+      "lat" : 51.274929
+    }
+  }, {
+    "id" : "5",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "5",
+      "lon" : 1.38274,
+      "lat" : 51.3917999
+    }
+  }, {
+    "id" : "6",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "6",
+      "lon" : 0.5941,
+      "lat" : 51.5231514
+    }
+  }, {
+    "id" : "7",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "7",
+      "lon" : 1.72535,
+      "lat" : 52.6060486
+    }
+  }, {
+    "id" : "8",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "8",
+      "lon" : 1.2979,
+      "lat" : 52.6488419
+    }
+  }, {
+    "id" : "9",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "9",
+      "lon" : -0.08474,
+      "lat" : 52.9091492
+    }
+  }, {
+    "id" : "20",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "20",
+      "lon" : -3.17061,
+      "lat" : 56.1968994
+    }
+  }, {
+    "id" : "21",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "21",
+      "lon" : -5.5134602,
+      "lat" : 57.2769203
+    }
+  }, {
+    "id" : "22",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "22",
+      "lon" : -4.756129,
+      "lat" : 55.9471344
+    }
+  }, {
+    "id" : "23",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "23",
+      "lon" : -4.3119189,
+      "lat" : 55.852812
+    }
+  }, {
+    "id" : "24",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "24",
+      "lon" : -4.2140624,
+      "lat" : 55.82852459999999
+    }
+  }, {
+    "id" : "25",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "25",
+      "lon" : -4.0426408,
+      "lat" : 55.8689133
+    }
+  }, {
+    "id" : "26",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "26",
+      "lon" : -4.33915,
+      "lat" : 55.76891
+    }
+  }, {
+    "id" : "27",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "27",
+      "lon" : -4.1657901,
+      "lat" : 55.1071587
+    }
+  }, {
+    "id" : "28",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "28",
+      "lon" : -3.355446,
+      "lat" : 55.1215189
+    }
+  }, {
+    "id" : "29",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "29",
+      "lon" : -2.88047,
+      "lat" : 54.0665703
+    }
+  }, {
+    "id" : "30",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "30",
+      "lon" : -3.174976,
+      "lat" : 53.39854
+    }
+  }, {
+    "id" : "31",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "31",
+      "lon" : -2.1643955,
+      "lat" : 53.3629916
+    }
+  }, {
+    "id" : "32",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "32",
+      "lon" : -1.91392,
+      "lat" : 53.2569084
+    }
+  }, {
+    "id" : "33",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "33",
+      "lon" : -1.40799,
+      "lat" : 53.050499
+    }
+  }, {
+    "id" : "34",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "34",
+      "lon" : -1.8140399,
+      "lat" : 52.4739609
+    }
+  }, {
+    "id" : "35",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "35",
+      "lon" : -2.05071,
+      "lat" : 52.4484215
+    }
+  }, {
+    "id" : "36",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "36",
+      "lon" : -2.1633999,
+      "lat" : 52.4976807
+    }
+  }, {
+    "id" : "37",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "37",
+      "lon" : -2.2206399,
+      "lat" : 52.1913109
+    }
+  }, {
+    "id" : "38",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "38",
+      "lon" : -3.39148,
+      "lat" : 51.9482994
+    }
+  }, {
+    "id" : "39",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "39",
+      "lon" : -3.53159,
+      "lat" : 50.4689598
+    }
+  }, {
+    "id" : "40",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "40",
+      "lon" : -4.9367199,
+      "lat" : 50.5391617
+    }
+  }, {
+    "id" : "41",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "41",
+      "lon" : -2.48386,
+      "lat" : 51.2852707
+    }
+  }, {
+    "id" : "42",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "42",
+      "lon" : -2.6004901,
+      "lat" : 51.4519806
+    }
+  }, {
+    "id" : "43",
+    "name" : "no-name",
+    "address" : {
+      "location_id" : "43",
+      "lon" : -2.243834,
+      "lat" : 51.864107
+    }
+  } ]
+}
