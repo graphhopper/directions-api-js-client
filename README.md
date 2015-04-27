@@ -1,6 +1,10 @@
 # JavaScript client for the Directions API
 
-Try the live demos [here](https://graphhopper.com/api/1/examples/). Also see how we integrated the Routing and the Geocoding API to build a fully featured maps application called [GraphHopper Maps](https://graphhopper.com/maps/)
+This project offers JavaScript clients and examples for the [GraphHopper Directions API](https://graphhopper.com).
+
+**Try the live examples [here](https://graphhopper.com/api/1/examples/).**
+
+Also see how we integrated the Routing and the Geocoding API to build a fully featured maps application called [GraphHopper Maps](https://graphhopper.com/maps/)
 
 First step to play with the code is to get this repository:
 
