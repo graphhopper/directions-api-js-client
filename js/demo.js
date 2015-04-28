@@ -457,12 +457,12 @@ function createMap(divId) {
         attribution: osmAttr + ', <a href="http://openmapsurfer.uni-hd.de/contact.html">GIScience Heidelberg</a>'
     });
 
-    var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/peter-d693a656/tile', {
+    var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/graphhp-7ae5b6f7/tile', {
         layers: 'osm',
         attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
     });
 
-    var map = L.map(divId, {layers: [mapquest]});
+    var map = L.map(divId, {layers: [omniscale]});
     L.control.layers({"MapQuest": mapquest,
         "Omniscale": omniscale,
         "OpenMapSurfer": openMapSurfer, }).addTo(map);
