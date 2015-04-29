@@ -187,13 +187,17 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     var addPointToMap = function (lat, lng, index) {
         index = parseInt(index);
         if (index === 0) {
-            new L.Marker([lat, lng],
-                    {icon: new L.NumberedDivIcon({iconUrl: './img/marker-icon-green.png', number: '1'})}).
-                    addTo(routingLayer);
+            new L.Marker([lat, lng], {
+                icon: new L.NumberedDivIcon({iconUrl: './img/marker-icon-green.png', number: '1'}),
+                bounceOnAdd: true,
+                bounceOnAddOptions: {duration: 800, height: 200}
+            }).addTo(routingLayer);
         } else {
-            new L.Marker([lat, lng],
-                    {icon: new L.NumberedDivIcon({number: '' + (index + 1)})}).
-                    addTo(routingLayer);
+            new L.Marker([lat, lng], {
+                icon: new L.NumberedDivIcon({number: '' + (index + 1)}),
+                bounceOnAdd: true,
+                bounceOnAddOptions: {duration: 800, height: 200},
+            }).addTo(routingLayer);
         }
     };
 
@@ -310,7 +314,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         $.getJSON("tour-optimization-examples/vrp_lonlat_new.json", function (jsonData) {
 
             clearMap();
-            map.setView([50.352471, 10.623779], 6);
+            map.setView([51, 10], 6);
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData, optimizeResponse);
         });
@@ -320,7 +324,17 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         $.getJSON("tour-optimization-examples/tsp_lonlat_new.json", function (jsonData) {
 
             clearMap();
-            map.setView([50.352471, 10.623779], 6);
+            map.setView([51, 10], 6);
+            $("#vrp-response").text("Calculating ...");
+            ghOptimization.doRequest(jsonData, optimizeResponse);
+        });
+    });
+
+    $("#set_example_tsp2").click(function () {
+        $.getJSON("tour-optimization-examples/tsp_lonlat_end.json", function (jsonData) {
+
+            clearMap();
+            map.setView([51, 10], 6);
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData, optimizeResponse);
         });
@@ -341,16 +355,6 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
 
             clearMap();
             map.setView([54.136696, -4.592285], 6);
-            $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
-        });
-    });
-
-    $("#set_example_tsp2").click(function () {
-        $.getJSON("tour-optimization-examples/tsp_lonlat_end.json", function (jsonData) {
-
-            clearMap();
-            map.setView([50.352471, 10.623779], 6);
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData, optimizeResponse);
         });
