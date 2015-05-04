@@ -22,11 +22,7 @@
           "location_id": "loc_b1",
           "lon": 12.1333333,
           "lat": 54.0833333
-        },
-        "time_windows" : [ {
-          "earliest": 20000,
-          "latest": 50000
-        } ]
+        }
       },
       {
         "id": "b2",
@@ -62,11 +58,7 @@
           "location_id": "loc_b5",
           "lon": 9.486694,
           "lat": 51.31173
-        },
-        "time_windows" : [ {
-          "earliest": 0,
-          "latest": 30000
-        } ]
+        }
       },
       {
         "id": "b6",
@@ -75,11 +67,7 @@
           "location_id": "loc_b6",
           "lon": 7.500916,
           "lat": 51.508742
-        },
-        "time_windows" : [ {
-          "earliest": 0,
-          "latest": 30000
-        } ]
+        }
       },
       {
         "id": "b7",
@@ -97,11 +85,7 @@
           "location_id": "loc_b8",
           "lon": 8.822021,
           "lat": 53.041213
-        },
-        "time_windows" : [ {
-          "earliest": 20000,
-          "latest": 40000
-        } ]
+        }
       }
   ]
 }
