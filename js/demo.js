@@ -231,7 +231,9 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
             return;
 
         $("#vrp-response").text("Solution found for " + sol.routes.length + " vehicle(s)! "
-                + "Distance: " + Math.floor(sol.distance / 1000) + "km, costs: " + sol.costs);
+                + "Distance: " + Math.floor(sol.distance / 1000) + "km "
+                + ", time: " + Math.floor(sol.distance / 60 / 1000) + "min "
+                + ", costs: " + sol.costs);
 
         var no_unassigned = sol.unassigned.services.length + sol.unassigned.shipments.length;
         if (no_unassigned > 0)
