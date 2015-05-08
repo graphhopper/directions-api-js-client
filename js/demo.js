@@ -215,14 +215,27 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         ghOptimization.clear();
         routingLayer.clearLayers();
         ghRouting.clearPoints();
-        $("#vrp-response").text(" ");
-        $("#vrp-error").text(" ");
+        $("#vrp-response").empty();
+        $("#vrp-error").empty();
+    };
+
+    var createSignupSteps = function () {
+        return "<div style='color:black'>To test this example <br/>"
+                + "1. <a href='https://graphhopper.com/#directions-api'>sign up for free</a>,<br/>"
+                + "2. log in and request a free standard package then <br/>"
+                + "3. copy the API key to the text field in the upper right corner<div>";
     };
 
     var optimizeResponse = function (json) {
         if (json.message) {
-            $("#vrp-error").text("An error occured: " + json.message);
             $("#vrp-response").text(" ");
+
+            if (json.message.indexOf("Too many locations") >= 0) {
+                $("#vrp-error").empty();
+                $("#vrp-error").append(createSignupSteps());
+            } else {
+                $("#vrp-error").text("An error occured: " + json.message);
+            }
             console.log(JSON.stringify(json));
             return;
         }
