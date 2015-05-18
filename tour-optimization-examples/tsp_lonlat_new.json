@@ -10,9 +10,7 @@
     }],
     "vehicle_types" : [{
       "type_id" : "vehicle_type_1",
-      "profile" : "car",
-      "distance_dependent_costs": 1.0,
-      "time_dependent_costs": 0.0
+      "profile" : "car"
     }],
     "services" : [
       {
