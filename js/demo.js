@@ -325,8 +325,11 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
 
     $("#vrp_clear_button").click(clearMap);
 
+    // Increase version if one of the examples change, see #2
+    var exampleVersion = 1;
+
     $("#set_example_vrp").click(function () {
-        $.getJSON("tour-optimization-examples/vrp_lonlat_new.json", function (jsonData) {
+        $.getJSON("tour-optimization-examples/vrp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -336,7 +339,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_tsp").click(function () {
-        $.getJSON("tour-optimization-examples/tsp_lonlat_new.json", function (jsonData) {
+        $.getJSON("tour-optimization-examples/tsp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -346,7 +349,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_tsp2").click(function () {
-        $.getJSON("tour-optimization-examples/tsp_lonlat_end.json", function (jsonData) {
+        $.getJSON("tour-optimization-examples/tsp_lonlat_end.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -356,7 +359,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_us_tour").click(function () {
-        $.getJSON("tour-optimization-examples/american_road_trip.json", function (jsonData) {
+        $.getJSON("tour-optimization-examples/american_road_trip.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([38.754083, -101.074219], 4);
@@ -366,7 +369,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_uk_tour").click(function () {
-        $.getJSON("tour-optimization-examples/uk50.json", function (jsonData) {
+        $.getJSON("tour-optimization-examples/uk50.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([54.136696, -4.592285], 6);
