@@ -49,9 +49,7 @@ GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
             }],
         "vehicle_types": [{
                 "type_id": "tsp_type_1",
-                "profile": this.profile,
-                "distance_dependent_costs": 1.0,
-                "time_dependent_costs": 0.0
+                "profile": this.profile
             }],
         "services": servicesArray
 
