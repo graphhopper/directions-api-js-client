@@ -57,7 +57,7 @@ $(document).ready(function (e) {
     setupRoutingAPI(routingMap, ghRouting);
 
     var vrpMap = createMap('vrp-map');
-    setupTourOptimizationAPI(vrpMap, ghOptimization, ghRouting);
+    setupRouteOptimizationAPI(vrpMap, ghOptimization, ghRouting);
 
     setupGeocodingAPI(ghGeocoding);
 
@@ -154,7 +154,7 @@ function setupRoutingAPI(map, ghRouting) {
     };
 }
 
-function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
+function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     map.setView([51.505, -0.09], 13);
 
     L.NumberedDivIcon = L.Icon.extend({
@@ -314,7 +314,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         };
     };
 
-    var optimizeTour = function () {
+    var optimizeRoute = function () {
         if (ghOptimization.points.length < 3) {
             $("#vrp-response").text("At least 3 points required but was: " + ghOptimization.points.length);
             return;
@@ -329,7 +329,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     var exampleVersion = 1;
 
     $("#set_example_vrp").click(function () {
-        $.getJSON("tour-optimization-examples/vrp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
+        $.getJSON("route-optimization-examples/vrp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -339,7 +339,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_tsp").click(function () {
-        $.getJSON("tour-optimization-examples/tsp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
+        $.getJSON("route-optimization-examples/tsp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -349,7 +349,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_tsp2").click(function () {
-        $.getJSON("tour-optimization-examples/tsp_lonlat_end.json?v=" + exampleVersion, function (jsonData) {
+        $.getJSON("route-optimization-examples/tsp_lonlat_end.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([51, 10], 6);
@@ -359,7 +359,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_us_tour").click(function () {
-        $.getJSON("tour-optimization-examples/american_road_trip.json?v=" + exampleVersion, function (jsonData) {
+        $.getJSON("route-optimization-examples/american_road_trip.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([38.754083, -101.074219], 4);
@@ -369,7 +369,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
     });
 
     $("#set_example_uk_tour").click(function () {
-        $.getJSON("tour-optimization-examples/uk50.json?v=" + exampleVersion, function (jsonData) {
+        $.getJSON("route-optimization-examples/uk50.json?v=" + exampleVersion, function (jsonData) {
 
             clearMap();
             map.setView([54.136696, -4.592285], 6);
@@ -378,7 +378,7 @@ function setupTourOptimizationAPI(map, ghOptimization, ghRouting) {
         });
     });
 
-    $("#optimize_button").click(optimizeTour);
+    $("#optimize_button").click(optimizeRoute);
 }
 
 function setupGeocodingAPI(ghGeocoding) {

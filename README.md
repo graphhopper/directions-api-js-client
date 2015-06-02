@@ -29,9 +29,9 @@ You need [the routing client](./js/GraphHopperRouting.js).
 
 There is also a different client developed from the community [here](https://www.npmjs.com/package/lrm-graphhopper).
 
-### GraphHopper Tour Optimization API
+### GraphHopper Route Optimization API
 
-![Tour Optimization API screenshot](./img/screenshot-vrp.png)
+![Route Optimization API screenshot](./img/screenshot-vrp.png)
 
 You need [the optimization client](./js/GraphHopperOptimization.js).
 
