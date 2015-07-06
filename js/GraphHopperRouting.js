@@ -8,6 +8,7 @@ GraphHopperRouting = function (args) {
     this.points_encoded = true;
     this.instructions = true;
     this.elevation = false;
+    this.optimize = 'false';
     this.basePath = '/route';
 
 // TODO make reading of /api/1/info/ possible
@@ -68,6 +69,9 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
 
     if (args.elevation)
         qString += "&elevation=" + args.elevation;
+    
+    if (args.optimize)
+        qString += "&optimize=" + args.optimize;
 
     if (args.vehicle)
         qString += "&vehicle=" + args.vehicle;
