@@ -4,7 +4,8 @@ describe("js-client", function () {
     var fixtures;
 
     beforeEach(function () {
-        fixtures = loadJSONFixtures('response1.json', 'response1-transformed.json');
+        // load multiple json fixtures via comma separated
+        fixtures = loadJSONFixtures('response1.json');
 
         jasmine.Ajax.install();
         ghOptimization = new GraphHopperOptimization({key: "defaultKey", profile: "car", waitInMillis: 0});
