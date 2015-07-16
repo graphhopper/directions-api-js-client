@@ -132,8 +132,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         locationMap[service.address.location_id] = service.address;
     }
 
-    for (var serviceIndex = 0; serviceIndex < jsonInput.vehicles.length; serviceIndex++) {
-        var vehicle = jsonInput.vehicles[serviceIndex];
+    for (var vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
+        var vehicle = jsonInput.vehicles[vehicleIndex];
         if (vehicle.start_address)
             locationMap[vehicle.start_address.location_id] = vehicle.start_address;
 
