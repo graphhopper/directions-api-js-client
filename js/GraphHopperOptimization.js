@@ -134,8 +134,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
             });
         };
 
-        if (this.waitInMillis > 0)
-            timerRet = setInterval(pollTrigger, this.waitInMillis);
+        if (that.waitInMillis > 0)
+            timerRet = setInterval(pollTrigger, that.waitInMillis);
         else
             pollTrigger();
 
