@@ -1,0 +1,44 @@
+{
+    "job_id": "018a5181-d893-4373-a7de-ebdc38617fcb",
+    "status": "finished",
+    "waiting_time_in_queue": 0,
+    "processing_time": 57,
+    "solution": {
+        "costs": 28133,
+        "distance": 834252,
+        "time": 28133,
+        "no_unassigned": 0,
+        "routes": [{
+                "vehicle_id": "vehicle1",
+                "activities": [{
+                        "type": "start",
+                        "location_id": "v1_startLoc",
+                        "end_time": 0,
+                        "distance": 0
+                    }, {
+                        "type": "service",
+                        "id": "b1",
+                        "location_id": "loc_b1",
+                        "arr_time": 11027,
+                        "end_time": 11027,
+                        "distance": 327531
+                    }, {
+                        "type": "service",
+                        "id": "b2",
+                        "location_id": "loc_b2",
+                        "arr_time": 18891,
+                        "end_time": 18891,
+                        "distance": 554393
+                    }, {
+                        "type": "end",
+                        "location_id": "v1_startLoc",
+                        "arr_time": 28133,
+                        "distance": 834252
+                    }]
+            }],
+        "unassigned": {
+            "services": [],
+            "shipments": []
+        }
+    }
+}

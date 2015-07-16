@@ -4,7 +4,7 @@ GraphHopperOptimization = function (args) {
     this.key = args.key;
     this.profile = args.profile;
     this.basePath = '/vrp';
-
+    this.waitInMillis = 1000;
     graphhopper.util.copyProperties(args, this);
 };
 
@@ -92,9 +92,9 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         crossDomain: true
     }).done(function (data) {
         var solutionUrl = args.host + args.basePath + "/solution/" + data.job_id + "?key=" + args.key;
-
-        var timerRet = setInterval(function () {
-
+        var timerRet;
+        
+        var pollTrigger = function () {
             console.log("poll solution " + solutionUrl);
             $.ajax({
                 timeout: 5000,
@@ -132,7 +132,13 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
                 }
 
             });
-        }, 1000);
+        };
+
+        if (this.waitInMillis > 0)
+            timerRet = setInterval(pollTrigger, this.waitInMillis);
+        else
+            pollTrigger();
+
     }).error(function (resp) {
         // console.log("error: " + JSON.stringify(resp));
         var json = {
