@@ -59,28 +59,13 @@ GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
     that.doRequest(jsonInput, callback);
 };
 
-GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
+GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, reqArgs) {
     var that = this;
     var args = graphhopper.util.clone(that);
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "/optimize?key=" + args.key;
-
-    var locationMap = {};
-    for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
-        var service = jsonInput.services[serviceIndex];
-        locationMap[service.address.location_id] = service.address;
-    }
-
-    for (var serviceIndex = 0; serviceIndex < jsonInput.vehicles.length; serviceIndex++) {
-        var vehicle = jsonInput.vehicles[serviceIndex];
-        if (vehicle.start_address)
-            locationMap[vehicle.start_address.location_id] = vehicle.start_address;
-
-        if (vehicle.end_address)
-            locationMap[vehicle.end_address.location_id] = vehicle.end_address;
-    }
 
     $.ajax({
         timeout: 5000,
@@ -93,7 +78,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
     }).done(function (data) {
         var solutionUrl = args.host + args.basePath + "/solution/" + data.job_id + "?key=" + args.key;
         var timerRet;
-        
+
         var pollTrigger = function () {
             console.log("poll solution " + solutionUrl);
             $.ajax({
@@ -107,16 +92,6 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
                 if (json.status === "finished") {
                     console.log("finished");
                     clearInterval(timerRet);
-                    if (json.solution) {
-                        var sol = json.solution;
-                        for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
-                            var route = sol.routes[routeIndex];
-                            for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
-                                var act = route.activities[actIndex];
-                                act["address"] = locationMap[act.location_id];
-                            }
-                        }
-                    }
                     callback(json);
                 }
                 else if (json.message) {
@@ -148,4 +123,37 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
             json = resp.responseJSON;
         callback(json);
     });
+};
+
+GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
+    var locationMap = {};
+    for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
+        var service = jsonInput.services[serviceIndex];
+        locationMap[service.address.location_id] = service.address;
+    }
+
+    for (var serviceIndex = 0; serviceIndex < jsonInput.vehicles.length; serviceIndex++) {
+        var vehicle = jsonInput.vehicles[serviceIndex];
+        if (vehicle.start_address)
+            locationMap[vehicle.start_address.location_id] = vehicle.start_address;
+
+        if (vehicle.end_address)
+            locationMap[vehicle.end_address.location_id] = vehicle.end_address;
+    }
+
+    var tempCallback = function (json) {
+        if (json.solution) {
+            var sol = json.solution;
+            for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
+                var route = sol.routes[routeIndex];
+                for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
+                    var act = route.activities[actIndex];
+                    act["address"] = locationMap[act.location_id];
+                }
+            }
+        }
+        callback(json);
+    };
+
+    this.doRawRequest(jsonInput, tempCallback, reqArgs);
 };
