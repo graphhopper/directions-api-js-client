@@ -126,14 +126,48 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
 };
 
 GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
+
+    var vehicleTypeMap = {};
+    if(jsonInput.vehicle_types) {
+        for (var typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
+            var type = jsonInput.vehicle_types[typeIndex];
+            vehicleTypeMap[type.type_id] = type.profile;
+        }
+    }
+
+    var vehicleProfileMap = {};
+    var serviceMap = {};
+    var shipmentMap = {};
     var locationMap = {};
+
+    if(jsonInput.services != null){
     for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
         var service = jsonInput.services[serviceIndex];
         locationMap[service.address.location_id] = service.address;
+        serviceMap[service.id] = service;
+    }
+    }
+
+    if(jsonInput.shipments != null) {
+        for (var shipmentIndex = 0; shipmentIndex < jsonInput.shipments.length; shipmentIndex++) {
+            var shipment = jsonInput.shipments[shipmentIndex];
+            locationMap[shipment.pickup.address.location_id] = shipment.pickup.address;
+            locationMap[shipment.delivery.address.location_id] = shipment.delivery.address;
+            shipmentMap[shipment.id] = shipment;
+        }
     }
 
     for (var vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
         var vehicle = jsonInput.vehicles[vehicleIndex];
+        var profile = null;
+        if(vehicle.type_id != null){
+            profile = vehicleTypeMap[vehicle.type_id];
+            if(profile != null){
+                vehicleProfileMap[vehicle.vehicle_id] = profile;
+            }
+            else vehicleProfileMap[vehicle.vehicle_id] = "car";
+        }
+        else vehicleProfileMap[vehicle.vehicle_id] = "car";
         if (vehicle.start_address)
             locationMap[vehicle.start_address.location_id] = vehicle.start_address;
 
@@ -146,11 +180,26 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
             var sol = json.solution;
             for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
                 var route = sol.routes[routeIndex];
+                var profile = vehicleProfileMap[route.vehicle_id];
+                route["profile"] = profile;
                 for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
                     var act = route.activities[actIndex];
                     act["address"] = locationMap[act.location_id];
                 }
             }
+            var unassignedServices = new Array();
+            for(var i=0;i<sol.unassigned.services.length;i++){
+                var serviceId = sol.unassigned.services[i];
+                unassignedServices.push(serviceMap[serviceId]);
+            }
+            sol["unassigned_services"] = unassignedServices;
+
+            var unassignedShipments = new Array();
+            for(var i=0;i<sol.unassigned.shipments.length;i++){
+                var shipmentId = sol.unassigned.shipments[i];
+                unassignedShipments.push(shipmentMap[shipmentId]);
+            }
+            sol["unassigned_shipments"] = unassignedShipments;
         }
         callback(json);
     };
