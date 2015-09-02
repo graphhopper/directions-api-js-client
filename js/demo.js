@@ -32,9 +32,9 @@ $(document).ready(function (e) {
     var ghGeocoding = new GraphHopperGeocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
     var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
     var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
-    if (location.protocol === "fle:") {
-        ghOptimization.host = 'http://localhost:8080';
-        ghOptimization.basePath = '';
+    if (location.protocol === "file:") {
+        ghOptimization.host = 'http://localhost:9000/api/1';
+        ghOptimization.basePath = '/vrp';
     }
 
     var overwriteExistingKey = function () {
@@ -382,9 +382,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
 }
 
 function setupGeocodingAPI(ghGeocoding) {
-    //  Find address
-    var textField = $("#geocoding_text_field");
-    $("#geocoding_search_button").click(function () {
+    //  Find address    
+
+    var mysubmit = function () {
         $("#geocoding-results").empty();
         $("#geocoding-error").empty();
 
@@ -402,8 +402,17 @@ function setupGeocodingAPI(ghGeocoding) {
                 }
             }
         }, {query: textField.val()});
+    }
+
+    var textField = $("#geocoding_text_field");
+    textField.keypress(function (e) {
+        if (e.which === 13) {
+            mysubmit();
+            return false;
+        }
     });
 
+    $("#geocoding_search_button").click(mysubmit);
 
     function dataToText(data) {
         var text = "";

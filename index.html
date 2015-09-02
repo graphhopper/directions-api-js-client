@@ -55,10 +55,12 @@
             <div id="routing" class="tab-content">
 
                 <div style="padding-bottom: 10px;">
-                    Try <a href="https://graphhopper.com/maps">GraphHopper Maps</a> for a more advanced 
-                    routing demo. <br/>
-                    Calculate a route via clicking on the map!
+                    The Routing API calculates the best path between two or more locations. 
+                    Calculate your own route via clicking on the map and try 
+                    <a href="https://graphhopper.com/maps">GraphHopper Maps</a> for a more advanced 
+                    routing demo.
                 </div>
+                <br/>
 
                 <div id="routing-response" style="float: right; padding-left: 20px;">
 
@@ -76,7 +78,11 @@
             </div>
 
             <div id="optimization" class="tab-content">
-                <div class="left">Click on one of the examples or on the map to add locations</div>
+                <div>
+                    The Route Optimization API gets several locations and vehicles as input and calculates the best
+                    route for every of the vehicles, where several constraints like capacity or time windows can be added.
+                    Click on the map to add locations and then click 'optimize' or just on one of the examples.
+                </div>
 
                 <div id="button-list" class="right">
                     <button id="optimize_button">Optimize</button>
@@ -114,7 +120,10 @@
             </div>
 
             <div id="geocoding" class="tab-content">
-
+                <div>
+                    The Geocoding API converts address text into coordinates.
+                </div>
+                <br/>
                 <input id="geocoding_text_field" type="text" placeholder="Your address"/>
                 <input id="geocoding_search_button" type="button" value="Search"/>
                 <div id="geocoding-error">
@@ -127,7 +136,11 @@
             </div>
 
             <div id="matrix" class="tab-content">
-
+                <div>
+                    The Matrix API calculates distances or times between many locations E.g. 1 to 5 or 4 to 4 like in the following example.
+                    Click on the produced links to see the actual route on GraphHopper Maps.
+                </div>
+                <br/>
                 <form>
                     <div>
                         <input class="point" type="text" value="52.651395,13.15567">
