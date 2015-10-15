@@ -128,27 +128,27 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
 GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
 
     var vehicleTypeMap = {};
-    if(jsonInput.vehicle_types) {
+    var vehicleProfileMap = {};
+    var serviceMap = {};
+    var shipmentMap = {};
+    var locationMap = {};
+
+    if (jsonInput.vehicle_types) {
         for (var typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
             var type = jsonInput.vehicle_types[typeIndex];
             vehicleTypeMap[type.type_id] = type.profile;
         }
     }
 
-    var vehicleProfileMap = {};
-    var serviceMap = {};
-    var shipmentMap = {};
-    var locationMap = {};
-
-    if(jsonInput.services != null){
-    for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
-        var service = jsonInput.services[serviceIndex];
-        locationMap[service.address.location_id] = service.address;
-        serviceMap[service.id] = service;
-    }
+    if (jsonInput.services) {
+        for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
+            var service = jsonInput.services[serviceIndex];
+            locationMap[service.address.location_id] = service.address;
+            serviceMap[service.id] = service;
+        }
     }
 
-    if(jsonInput.shipments != null) {
+    if (jsonInput.shipments) {
         for (var shipmentIndex = 0; shipmentIndex < jsonInput.shipments.length; shipmentIndex++) {
             var shipment = jsonInput.shipments[shipmentIndex];
             locationMap[shipment.pickup.address.location_id] = shipment.pickup.address;
@@ -157,45 +157,75 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         }
     }
 
-    for (var vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
-        var vehicle = jsonInput.vehicles[vehicleIndex];
-        var profile = null;
-        if(vehicle.type_id != null){
-            profile = vehicleTypeMap[vehicle.type_id];
-            if(profile != null){
-                vehicleProfileMap[vehicle.vehicle_id] = profile;
-            }
-            else vehicleProfileMap[vehicle.vehicle_id] = "car";
-        }
-        else vehicleProfileMap[vehicle.vehicle_id] = "car";
-        if (vehicle.start_address)
-            locationMap[vehicle.start_address.location_id] = vehicle.start_address;
+    var breakMap = {};
+    var vehicleMap = {};
+    if (jsonInput.vehicles) {
+        for (var vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
+            var vehicle = jsonInput.vehicles[vehicleIndex];
+            vehicleMap[vehicle.vehicle_id] = vehicle;
+            var profile = null;
+            if (vehicle.type_id != null) {
+                profile = vehicleTypeMap[vehicle.type_id];
+                if (profile != null) {
+                    vehicleProfileMap[vehicle.vehicle_id] = profile;
+                }
+                else
+                    vehicleProfileMap[vehicle.vehicle_id] = "car";
+            } else
+                vehicleProfileMap[vehicle.vehicle_id] = "car";
 
-        if (vehicle.end_address)
-            locationMap[vehicle.end_address.location_id] = vehicle.end_address;
+            if (vehicle.start_address) {
+                locationMap[vehicle.start_address.location_id] = vehicle.start_address;
+            }
+            if (vehicle.end_address) {
+                locationMap[vehicle.end_address.location_id] = vehicle.end_address;
+            }
+            if (vehicle.break) {
+                var break_id = vehicle.vehicle_id + "_break";
+                breakMap[break_id] = vehicle.break;
+            }
+        }
     }
 
     var tempCallback = function (json) {
         if (json.solution) {
             var sol = json.solution;
+            json.raw_solution = JSON.parse(JSON.stringify(sol));            
             for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
                 var route = sol.routes[routeIndex];
-                var profile = vehicleProfileMap[route.vehicle_id];
+                var vehicleId = route.vehicle_id;
+                var profile = vehicleProfileMap[vehicleId];
                 route["profile"] = profile;
                 for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
                     var act = route.activities[actIndex];
                     act["address"] = locationMap[act.location_id];
+                    if (act.id) {
+                        var driverBreak = breakMap[act.id];
+                        // console.log(act.id + " " + driverBreak);
+                        if (driverBreak) {
+                            act["break"] = breakMap[act.id];
+                        }
+                        else if (serviceMap[act.id]) {
+                            act["service"] = serviceMap[act.id];
+                        }
+                        else if (shipmentMap[act.id]) {
+                            act["shipment"] = shipmentMap[act.id];
+                        }
+                    }
+                    else {
+                        act["vehicle"] = vehicleMap[vehicleId];
+                    }
                 }
             }
             var unassignedServices = new Array();
-            for(var i=0;i<sol.unassigned.services.length;i++){
+            for (var i = 0; i < sol.unassigned.services.length; i++) {
                 var serviceId = sol.unassigned.services[i];
                 unassignedServices.push(serviceMap[serviceId]);
             }
             sol["unassigned_services"] = unassignedServices;
 
             var unassignedShipments = new Array();
-            for(var i=0;i<sol.unassigned.shipments.length;i++){
+            for (var i = 0; i < sol.unassigned.shipments.length; i++) {
                 var shipmentId = sol.unassigned.shipments[i];
                 unassignedShipments.push(shipmentMap[shipmentId]);
             }
