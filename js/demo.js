@@ -17,6 +17,7 @@ $(document).ready(function (e) {
         // a bit hackish to refresh the map
         routingMap.invalidateSize(false);
         vrpMap.invalidateSize(false);
+        geocodingMap.invalidateSize(false);
     }
 
     var host;
@@ -59,7 +60,8 @@ $(document).ready(function (e) {
     var vrpMap = createMap('vrp-map');
     setupRouteOptimizationAPI(vrpMap, ghOptimization, ghRouting);
 
-    setupGeocodingAPI(ghGeocoding);
+    var geocodingMap = createMap('geocoding-map');
+    setupGeocodingAPI(geocodingMap, ghGeocoding);
 
     setupMatrixAPI(ghMatrix);
 
@@ -381,28 +383,117 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     $("#optimize_button").click(optimizeRoute);
 }
 
-function setupGeocodingAPI(ghGeocoding) {
+function setupGeocodingAPI(map, ghGeocoding) {
     //  Find address    
+    map.setView([51.505, -0.09], 13);
+    var iconObject = L.icon({
+        iconUrl: './img/marker-icon.png',
+        shadowSize: [50, 64],
+        shadowAnchor: [4, 62],
+        iconAnchor: [12, 40]
+    });
+    var geocodingLayer = L.geoJson().addTo(map);
+    geocodingLayer.options = {
+        style: {color: "#00cc33", "weight": 5, "opacity": 0.6}
+    };
 
-    var mysubmit = function () {
+    L.NumberedDivIcon = L.Icon.extend({
+        options: {
+            iconUrl: './img/marker-icon.png',
+            iconSize: new L.Point(25, 41),
+            iconAnchor: new L.Point(13, 41),
+            popupAnchor: new L.Point(0, -33),
+            className: 'leaflet-div-icon'
+        },
+        createIcon: function () {
+            var div = document.createElement('div');
+            var img = this._createImg(this.options['iconUrl']);
+            var numdiv = document.createElement('div');
+            numdiv.setAttribute("class", "number");
+            numdiv.innerHTML = this.options['number'] || '';
+            div.appendChild(img);
+            div.appendChild(numdiv);
+            this._setIconStyles(div, 'icon');
+            return div;
+        }
+    });
+
+    var clearGeocoding = function () {
         $("#geocoding-results").empty();
         $("#geocoding-error").empty();
-
         $("#geocoding-response").empty();
+        geocodingLayer.clearLayers();
+    };
+
+    var mysubmit = function () {
+        clearGeocoding();
+
         ghGeocoding.doRequest(function (json) {
             if (json.message) {
                 $("#geocoding-error").text("An error occured: " + json.message);
             } else {
                 var listUL = $("<ol>");
                 $("#geocoding-response").append("Locale:" + ghGeocoding.locale + "<br/>").append(listUL);
+                var minLon, minLat, maxLon, maxLat;
+                var counter = 0;
                 for (var hitIdx in json.hits) {
+                    counter++;
                     var hit = json.hits[hitIdx];
 
-                    $("<li>" + dataToText(hit) + "</li>").appendTo(listUL);
+                    var str = counter + ". " + dataToText(hit);
+                    $("<div>" + str + "</div>").appendTo(listUL);
+                    new L.Marker(hit.point, {
+                        icon: new L.NumberedDivIcon({iconUrl: './img/marker-icon-green.png', number: '' + counter})
+                    }).bindPopup("<div>" + str + "</div>").addTo(geocodingLayer);
+
+                    if (!minLat || minLat > hit.point.lat)
+                        minLat = hit.point.lat;
+                    if (!minLon || minLon > hit.point.lng)
+                        minLon = hit.point.lng;
+
+                    if (!maxLat || maxLat < hit.point.lat)
+                        maxLat = hit.point.lat;
+                    if (!maxLon || maxLon < hit.point.lng)
+                        maxLon = hit.point.lng;
+                }
+
+                if (minLat) {
+                    var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                    map.fitBounds(tmpB);
                 }
             }
+
         }, {query: textField.val()});
-    }
+    };
+
+    // reverse geocoding
+    var iconObject = L.icon({
+        iconUrl: './img/marker-icon.png',
+        shadowSize: [50, 64],
+        shadowAnchor: [4, 62],
+        iconAnchor: [12, 40],
+        popupAnchor: new L.Point(0, -33),
+    });
+    map.on('click', function (e) {
+        clearGeocoding();
+
+        ghGeocoding.doRequest(function (json) {
+            if (json.message) {
+                $("#geocoding-error").text("An error occured: " + json.message);
+            } else {
+                var counter = 0;
+                for (var hitIdx in json.hits) {
+                    counter++;
+                    var hit = json.hits[hitIdx];
+                    var str = counter + ". " + dataToText(hit);
+                    L.marker(hit.point, {icon: iconObject}).addTo(geocodingLayer).bindPopup(str).openPopup();
+
+                    // only show first result for now
+                    break;
+                }
+            }
+        }, {point: e.latlng.lat + "," + e.latlng.lng});
+    });
 
     var textField = $("#geocoding_text_field");
     textField.keypress(function (e) {

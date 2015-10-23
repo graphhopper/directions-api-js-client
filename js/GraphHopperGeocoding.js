@@ -18,10 +18,17 @@ GraphHopperGeocoding.prototype.clearLocation = function () {
 GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
     var qString = "locale=" + args.locale;
 
-    qString += "&q=" + encodeURIComponent(args.query);
-
-    if (args.location_bias)
-        qString += "&point=" + encodeURIComponent(args.location_bias.toString());
+    if (args.query) {
+        qString += "&q=" + encodeURIComponent(args.query);
+        if (args.location_bias)
+            qString += "&point=" + encodeURIComponent(args.location_bias.toString());
+        else if (args.point)
+            qString += "&point=" + encodeURIComponent(args.point.toString());
+    } else {
+        qString += "&reverse=true";
+        if (args.point)
+            qString += "&point=" + encodeURIComponent(args.point.toString());
+    }
 
     if (args.debug)
         qString += "&debug=true";
