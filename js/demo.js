@@ -1,3 +1,10 @@
+var iconObject = L.icon({
+    iconUrl: './img/marker-icon.png',
+    shadowSize: [50, 64],
+    shadowAnchor: [4, 62],
+    iconAnchor: [12, 40]
+});
+
 $(document).ready(function (e) {
     jQuery.support.cors = true;
 
@@ -18,6 +25,7 @@ $(document).ready(function (e) {
         routingMap.invalidateSize(false);
         vrpMap.invalidateSize(false);
         geocodingMap.invalidateSize(false);
+        isochroneMap.invalidateSize(false);
     }
 
     var host;
@@ -33,6 +41,8 @@ $(document).ready(function (e) {
     var ghGeocoding = new GraphHopperGeocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
     var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
     var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
+    var ghIsochrone = new GraphHopperIsochrone({key: defaultKey, host: host, vehicle: profile});
+
     if (location.protocol === "file:") {
         ghOptimization.host = 'http://localhost:9000/api/1';
         ghOptimization.basePath = '/vrp';
@@ -65,6 +75,9 @@ $(document).ready(function (e) {
 
     setupMatrixAPI(ghMatrix);
 
+    var isochroneMap = createMap('isochrone-map');
+    setupIsochrone(isochroneMap, ghIsochrone);
+
     var tmpTab = window.location.hash;
     if (!tmpTab)
         tmpTab = "#routing";
@@ -74,12 +87,7 @@ $(document).ready(function (e) {
 
 function setupRoutingAPI(map, ghRouting) {
     map.setView([52.521235, 13.3992], 12);
-    var iconObject = L.icon({
-        iconUrl: './img/marker-icon.png',
-        shadowSize: [50, 64],
-        shadowAnchor: [4, 62],
-        iconAnchor: [12, 40]
-    });
+
     var instructionsDiv = $("#instructions");
     map.on('click', function (e) {
         if (ghRouting.points.length > 1) {
@@ -565,6 +573,41 @@ function setupMatrixAPI(ghMatrix) {
         });
 
         return false;
+    });
+}
+
+function setupIsochrone(map, ghIsochrone) {
+    map.setView([51.505, -0.09], 13);
+    var isochroneLayer;
+    var inprogress = false;
+
+    map.on('click', function (e) {        
+        var callback = function (json) {
+            if (isochroneLayer)
+                isochroneLayer.clearLayers();
+
+            isochroneLayer = L.geoJson(json.polygons, {
+                style: function (feature) {
+                    var num = feature.properties.bucket;
+                    var color = (num % 2 === 0) ? "#00cc33" : "blue";
+                    return {color: color, "weight": num + 2, "opacity": 0.6};
+                }
+            });
+
+            map.addLayer(isochroneLayer);
+            
+            $('#isochrone-response').text("Calculation done");
+            inprogress = false;
+        };
+        var pointStr = e.latlng.lat + "," + e.latlng.lng;
+
+        if (!inprogress) {
+            inprogress = true;
+            $('#isochrone-response').text("Calculating ...");
+            ghIsochrone.doRequest(callback, {point: pointStr});
+        } else {
+            $('#isochrone-response').text("Please wait. Calculation in progress ...");
+        }
     });
 }
 

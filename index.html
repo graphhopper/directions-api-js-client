@@ -16,6 +16,7 @@
         <script type="text/javascript" src="js/GraphHopperMatrix.js"></script>
         <script type="text/javascript" src="js/GraphHopperGeocoding.js"></script>        
         <script type="text/javascript" src="js/GraphHopperOptimization.js?v=1"></script>
+        <script type="text/javascript" src="js/GraphHopperIsochrone.js?"></script>
 
         <script type="text/javascript" src="js/demo.js?v=2"></script>
     </head>
@@ -37,7 +38,7 @@
                     <li><a
                             href="https://graphhopper.com/#directions-api"><b>Free Sign Up</b></a></li>                    
                     <li><a href="https://github.com/graphhopper/directions-api-js-client">Fork this at Github</a></li>
-                    <li><a href="https://github.com/graphhopper/directions-api/blob/master/README.md">Documentation and Clients</a></li>
+                    <li><a href="https://graphhopper.com/api/1/docs">Directions API Documentation</a></li>
                 </ul>
             </div>
 
@@ -50,6 +51,7 @@
                     <li><a href="#optimization">Route Optimization API</a></li>
                     <li><a href="#matrix">Matrix API</a></li>
                     <li><a href="#geocoding">Geocoding API</a></li>                    
+                    <li><a href="#isochrone">Isochrone API</a></li>                    
                 </ul>                
             </div>
 
@@ -164,6 +166,23 @@
 
                 <div id="matrix-error">
                 </div>
+            </div>
+            
+            <div id="isochrone" class="tab-content">
+
+                <div style="padding-bottom: 10px;">
+                    The Isochrone API calculates the reach of a location. 
+                    Calculate the reach via clicking on the map.
+                </div>
+                <br/>
+
+                <div id="isochrone-response" style="float: right; padding-left: 20px;">
+
+                </div>
+                <div id="isochrone-error" style="float: right; padding-left: 20px;">
+                </div>
+
+                <div id="isochrone-map" style="cursor: default; height:600px; width: 800px;"></div>               
             </div>
         </div>
 
