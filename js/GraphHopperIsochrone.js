@@ -1,5 +1,5 @@
 GraphHopperIsochrone = function (args) {
-    this.limit = 600;
+    this.reach = 600;
     this.buckets = 3;
     this.vehicle = "car";
     this.point;
@@ -12,7 +12,7 @@ GraphHopperIsochrone = function (args) {
 
 GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
     var qString = "point=" + args.point;
-    qString += "&limit=" + args.limit;
+    qString += "&reach=" + args.reach;
     qString += "&buckets=" + args.buckets;
 
     if (args.debug)
