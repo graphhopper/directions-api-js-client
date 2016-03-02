@@ -577,7 +577,7 @@ function setupMatrixAPI(ghMatrix) {
 }
 
 function setupIsochrone(map, ghIsochrone) {
-    map.setView([51.505, -0.09], 13);
+    map.setView([37.44, -122.16], 12);
     var isochroneLayer;
     var inprogress = false;
 
@@ -604,7 +604,7 @@ function setupIsochrone(map, ghIsochrone) {
         if (!inprogress) {
             inprogress = true;
             $('#isochrone-response').text("Calculating ...");
-            ghIsochrone.doRequest(callback, {point: pointStr});
+            ghIsochrone.doRequest(callback, {point: pointStr, buckets: 2});
         } else {
             $('#isochrone-response').text("Please wait. Calculation in progress ...");
         }
