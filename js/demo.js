@@ -33,7 +33,7 @@ $(document).ready(function (e) {
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
     //
-    var defaultKey = "49562145-3a86-4210-8f2b-14fd4c602a3c";
+    var defaultKey = "bd5f8b44-bfa8-407a-b868-7f2efc1146d9";
     var profile = "car";
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
@@ -43,10 +43,10 @@ $(document).ready(function (e) {
     var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
     var ghIsochrone = new GraphHopperIsochrone({key: defaultKey, host: host, vehicle: profile});
 
-    if (location.protocol === "file:") {
-        ghOptimization.host = 'http://localhost:9000/api/1';
-        ghOptimization.basePath = '/vrp';
-    }
+//    if (location.protocol === "file:") {
+//        ghOptimization.host = 'http://localhost:9000/api/1';
+//        ghOptimization.basePath = '/vrp';
+//    }
 
     var overwriteExistingKey = function () {
         var key = $("#custom_key_input").val();
@@ -281,13 +281,18 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             }
 
             var routeStyle;
-            if (routeIndex === 2) {
-                routeStyle = {color: "yellow"};
+            if (routeIndex === 3) {
+                routeStyle = {color: "cyan"};
+            } else if (routeIndex === 2) {
+                routeStyle = {color: "black"};
             } else if (routeIndex === 1) {
                 routeStyle = {color: "green"};
             } else {
                 routeStyle = {color: "blue"};
             }
+
+            routeStyle.weight = 5;
+            routeStyle.opacity = 1;
 
             var ghCallback = createGHCallback(routeStyle);
             ghRouting.doRequest(ghCallback, {instructions: false});
@@ -330,13 +335,13 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             return;
         }
         $("#vrp-response").text("Calculating ...");
-        ghOptimization.doTSPRequest(optimizeResponse);
+        ghOptimization.doVRPRequest(optimizeResponse, $("#optimize_vehicles").val());
     };
 
     $("#vrp_clear_button").click(clearMap);
 
     // Increase version if one of the examples change, see #2
-    var exampleVersion = 1;
+    var exampleVersion = 2;
 
     $("#set_example_vrp").click(function () {
         $.getJSON("route-optimization-examples/vrp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
@@ -581,7 +586,7 @@ function setupIsochrone(map, ghIsochrone) {
     var isochroneLayer;
     var inprogress = false;
 
-    map.on('click', function (e) {        
+    map.on('click', function (e) {
         var callback = function (json) {
             if (isochroneLayer)
                 isochroneLayer.clearLayers();
@@ -595,7 +600,7 @@ function setupIsochrone(map, ghIsochrone) {
             });
 
             map.addLayer(isochroneLayer);
-            
+
             $('#isochrone-response').text("Calculation done");
             inprogress = false;
         };

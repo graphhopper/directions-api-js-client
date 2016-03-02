@@ -2,9 +2,9 @@
     "vehicles": [{
             "vehicle_id": "vehicle1",
             "start_address": {
-                "location_id": "v1_gera",
-                "lon": 12.076721,
-                "lat": 50.877044
+                "location_id": "v1_erfurt",
+                "lon": 11.028771,
+                "lat": 50.977723
             },
             "type_id": "vehicle_type_1"
         },
@@ -16,20 +16,36 @@
                 "lat": 50.977723
             },
             "type_id": "vehicle_type_1"
+        }, {
+            "vehicle_id": "vehicle3",
+            "start_address": {
+                "location_id": "v3_kassel",
+                "lon": 9.492188,
+                "lat": 51.296276
+            },
+            "type_id": "vehicle_type_1"
+        }, {
+            "vehicle_id": "vehicle4",
+            "start_address": {
+                "location_id": "v4_erfurt",
+                "lon": 11.028771,
+                "lat": 50.977723
+            },
+            "type_id": "vehicle_type_1"
         }],
     "vehicle_types": [{
             "type_id": "vehicle_type_1",
             "profile": "car",
-            "capacity": [5]
+            "capacity": [3]
         }],
     "services": [
         {
             "id": "b1",
-            "name": "drink_bionade_in_rostock",
+            "name": "drink_bionade_in_magdeburg",
             "address": {
                 "location_id": "loc_b1",
-                "lon": 12.1333333,
-                "lat": 54.0833333
+                "lon": 11.645508,
+                "lat": 52.126744
             },
             "size": [1]
         },
@@ -110,6 +126,24 @@
                 "location_id": "loc_b9",
                 "lon": 11.8927,
                 "lat": 50.310392
+            },
+            "size": [1]
+        }, {
+            "id": "b10",
+            "name": "drink_mainz",
+            "address": {
+                "location_id": "loc_b10",
+                "lon": 8.278198,
+                "lat": 50.00067
+            },
+            "size": [1]
+        }, {
+            "id": "b11",
+            "name": "drink_schwerin",
+            "address": {
+                "location_id": "loc_b11",
+                "lon": 11.447754,
+                "lat": 53.618579
             },
             "size": [1]
         }

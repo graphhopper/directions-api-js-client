@@ -17,6 +17,10 @@ GraphHopperOptimization.prototype.clear = function () {
 };
 
 GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
+    this.doVRPRequest(callback, 1);
+};
+
+GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
     var that = this;
     var firstPoint = that.points[0];
     var servicesArray = [];
@@ -25,11 +29,11 @@ GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
             continue;
         var point = that.points[pointIndex];
         var obj = {
-            "id": "s" + pointIndex,
+            "id": "_" + pointIndex,
             "type": "pickup",
             "name": "maintenance " + pointIndex,
             "address": {
-                "location_id": "location_" + pointIndex,
+                "location_id": "_location_" + pointIndex,
                 "lon": point.lng,
                 "lat": point.lat
             }
@@ -37,18 +41,26 @@ GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
         servicesArray.push(obj);
     }
 
+    var list = []
+    for (var i = 0; i < vehicles; i++) {
+        list.push({
+            "vehicle_id": "_vehicle_" + i,
+            "start_address": {
+                "location_id": "_start_location",
+                "lon": firstPoint.lng,
+                "lat": firstPoint.lat
+            },
+            "type_id": "_vtype_1"
+        });
+    }
+
     var jsonInput = {
-        "vehicles": [{
-                "vehicle_id": "traveling_salesman",
-                "start_address": {
-                    "location_id": "ts_start_location",
-                    "lon": firstPoint.lng,
-                    "lat": firstPoint.lat
-                },
-                "type_id": "tsp_type_1"
-            }],
+        "algorithm": {
+            "problem_type": "min-max"
+        },
+        "vehicles": list,
         "vehicle_types": [{
-                "type_id": "tsp_type_1",
+                "type_id": "_vtype_1",
                 "profile": this.profile
             }],
         "services": servicesArray
@@ -93,12 +105,10 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
                     console.log("finished");
                     clearInterval(timerRet);
                     callback(json);
-                }
-                else if (json.message) {
+                } else if (json.message) {
                     clearInterval(timerRet);
                     callback(json);
-                }
-                else if (data === undefined) {
+                } else if (data === undefined) {
                     clearInterval(timerRet);
                     var json = {
                         "message": "unknown error in calculation for server on " + that.host
@@ -127,6 +137,7 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
 
 GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
 
+    var vehicleTypeProfileMap = {};
     var vehicleTypeMap = {};
     var vehicleProfileMap = {};
     var serviceMap = {};
@@ -136,7 +147,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
     if (jsonInput.vehicle_types) {
         for (var typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
             var type = jsonInput.vehicle_types[typeIndex];
-            vehicleTypeMap[type.type_id] = type.profile;
+            vehicleTypeProfileMap[type.type_id] = type.profile;
+            vehicleTypeMap[type.type_id] = type;
         }
     }
 
@@ -164,13 +176,13 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
             var vehicle = jsonInput.vehicles[vehicleIndex];
             vehicleMap[vehicle.vehicle_id] = vehicle;
             var profile = null;
-            if (vehicle.type_id != null) {
-                profile = vehicleTypeMap[vehicle.type_id];
-                if (profile != null) {
+            if (vehicle.type_id !== null) {
+                profile = vehicleTypeProfileMap[vehicle.type_id];
+                if (profile !== null) {
                     vehicleProfileMap[vehicle.vehicle_id] = profile;
-                }
-                else
+                } else {
                     vehicleProfileMap[vehicle.vehicle_id] = "car";
+                }
             } else
                 vehicleProfileMap[vehicle.vehicle_id] = "car";
 
@@ -190,7 +202,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
     var tempCallback = function (json) {
         if (json.solution) {
             var sol = json.solution;
-            json.raw_solution = JSON.parse(JSON.stringify(sol));            
+            json.raw_solution = JSON.parse(JSON.stringify(sol));
             for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
                 var route = sol.routes[routeIndex];
                 var vehicleId = route.vehicle_id;
@@ -204,16 +216,15 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
                         // console.log(act.id + " " + driverBreak);
                         if (driverBreak) {
                             act["break"] = breakMap[act.id];
-                        }
-                        else if (serviceMap[act.id]) {
+                        } else if (serviceMap[act.id]) {
                             act["service"] = serviceMap[act.id];
-                        }
-                        else if (shipmentMap[act.id]) {
+                        } else if (shipmentMap[act.id]) {
                             act["shipment"] = shipmentMap[act.id];
                         }
-                    }
-                    else {
-                        act["vehicle"] = vehicleMap[vehicleId];
+                    } else {
+                        var vehicle = vehicleMap[vehicleId];
+                        act["vehicle"] = vehicle;
+                        act["vehicle_type"] = vehicleTypeMap[vehicle.type_id];
                     }
                 }
             }
