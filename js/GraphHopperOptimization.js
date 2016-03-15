@@ -116,6 +116,13 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
                     callback(json);
                 }
 
+            }).error(function (json) {
+                if (json.responseJSON)
+                    json = json.responseJSON;
+
+                console.log(json);
+                clearInterval(timerRet);
+                callback(json);
             });
         };
 
