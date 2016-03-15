@@ -35,6 +35,12 @@ There is also a different client developed from the community [here](https://www
 
 You need [the optimization client](./js/GraphHopperOptimization.js).
 
+### GraphHopper Isochrone API
+
+![GraphHopper Isochrone API screenshot](https://raw.githubusercontent.com/graphhopper/directions-api/master/img/isochrone-example.png)
+
+You need [the isochrone client](./js/GraphHopperIsochrone.js)
+
 ### GraphHopper Matrix API
 
 ![GraphHopper Matrix API screenshot](./img/screenshot-matrix.png)
