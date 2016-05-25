@@ -78,9 +78,8 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
         args = graphhopper.util.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "/optimize?key=" + args.key;
-
     $.ajax({
-        timeout: 5000,
+        timeout: 8000,
         url: url,
         type: "POST",
         contentType: 'application/json; charset=utf-8',
