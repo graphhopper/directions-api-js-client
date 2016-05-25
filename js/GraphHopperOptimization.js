@@ -5,6 +5,7 @@ GraphHopperOptimization = function (args) {
     this.profile = args.profile;
     this.basePath = '/vrp';
     this.waitInMillis = 1000;
+    this.postTimeout = 8000;
     graphhopper.util.copyProperties(args, this);
 };
 
@@ -79,7 +80,7 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
 
     var url = args.host + args.basePath + "/optimize?key=" + args.key;
     $.ajax({
-        timeout: 8000,
+        timeout: args.postTimeout,
         url: url,
         type: "POST",
         contentType: 'application/json; charset=utf-8',
