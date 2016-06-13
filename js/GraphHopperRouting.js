@@ -69,7 +69,7 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
 
     if (args.elevation)
         qString += "&elevation=" + args.elevation;
-    
+
     if (args.optimize)
         qString += "&optimize=" + args.optimize;
 
@@ -103,6 +103,12 @@ GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
                     path.points = {
                         "type": "LineString",
                         "coordinates": tmpArray
+                    };
+
+                    var tmpSnappedArray = graphhopper.util.decodePath(path.snapped_waypoints, that.elevation);
+                    path.snapped_waypoints = {
+                        "type": "LineString",
+                        "coordinates": tmpSnappedArray
                     };
                 }
             }
