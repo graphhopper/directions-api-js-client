@@ -65,8 +65,7 @@ GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
         timeout: 30000,
         url: url,
         type: "GET",
-        dataType: args.data_type,
-        crossDomain: true
+        dataType: args.data_type
     }).done(function (json) {
         callback(json);
 

@@ -91,8 +91,7 @@ GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
         timeout: 5000,
         url: url,
         type: "GET",
-        dataType: args.data_type,
-        crossDomain: true
+        dataType: args.data_type
     }).done(function (json) {
         if (json.paths) {
             for (var i = 0; i < json.paths.length; i++) {

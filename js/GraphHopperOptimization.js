@@ -85,8 +85,7 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
         type: "POST",
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(jsonInput),
-        dataType: "json",
-        crossDomain: true
+        dataType: "json"
     }).done(function (data) {
         var solutionUrl = args.host + args.basePath + "/solution/" + data.job_id + "?key=" + args.key;
         var timerRet;

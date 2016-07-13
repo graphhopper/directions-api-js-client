@@ -26,6 +26,7 @@ $(document).ready(function (e) {
         vrpMap.invalidateSize(false);
         geocodingMap.invalidateSize(false);
         isochroneMap.invalidateSize(false);
+        mapMatchingMap.invalidateSize(false);
     }
 
     var host;
@@ -42,6 +43,7 @@ $(document).ready(function (e) {
     var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
     var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
     var ghIsochrone = new GraphHopperIsochrone({key: defaultKey, host: host, vehicle: profile});
+    var ghMapMatching = new GraphHopperMapMatching({key: defaultKey, host: host, vehicle: profile});
 
 //    if (location.protocol === "file:") {
 //        ghOptimization.host = 'http://localhost:9000/api/1';
@@ -57,6 +59,8 @@ $(document).ready(function (e) {
             ghMatrix.key = key;
             ghGeocoding.key = key;
             ghOptimization.key = key;
+            ghIsochrone.key = key;
+            ghMapMatching.key = key;
         } else {
             $("#custom_key_enabled").hide();
         }
@@ -77,6 +81,9 @@ $(document).ready(function (e) {
 
     var isochroneMap = createMap('isochrone-map');
     setupIsochrone(isochroneMap, ghIsochrone);
+
+    var mapMatchingMap = createMap('map-matching-map');
+    setupMapMatching(mapMatchingMap, ghMapMatching);
 
     var tmpTab = window.location.hash;
     if (!tmpTab)
@@ -637,4 +644,70 @@ function createMap(divId) {
         "Omniscale": omniscale,
         "OpenMapSurfer": openMapSurfer, }).addTo(map);
     return map;
+}
+
+function setupMapMatching(map, mmClient) {
+    map.setView([50.9, 13.4], 9);
+
+    var routeLayer = L.geoJson().addTo(map);
+    routeLayer.options = {
+        // use style provided by the 'properties' entry of the geojson added by addDataToRoutingLayer
+        style: function (feature) {
+            return feature.properties && feature.properties.style;
+        }};
+
+    function readSingleFile(e) {
+        var file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var content = e.target.result;
+
+            var dom = (new DOMParser()).parseFromString(content, 'text/xml');
+            var pathOriginal = toGeoJSON.gpx(dom);
+
+            routeLayer.clearLayers();
+            pathOriginal.features[0].properties = {style: {color: "black", weight: 2, opacity: 0.9}};
+            routeLayer.addData(pathOriginal);
+
+            $("#map-matching-response").text("calculate route match ...");
+            $("#map-matching-error").text("");
+
+            var vehicle = $("#vehicle-input").val();
+            if (!vehicle)
+                vehicle = "car";
+            mmClient.vehicle = vehicle;
+            mmClient.doRequest(content, function (json) {
+                if (json.message) {
+                    $("#map-matching-response").text("");
+                    $("#map-matching-error").text(json.message);
+                } else if (json.paths && json.paths.length > 0) {
+                    $("#map-matching-response").text("success");
+                    var matchedPath = json.paths[0];
+                    var geojsonFeature = {
+                        type: "Feature",
+                        geometry: matchedPath.points,
+                        properties: {style: {color: "#00cc33", weight: 6, opacity: 0.4}}
+                    };
+                    routeLayer.addData(geojsonFeature);
+
+                    if (matchedPath.bbox) {
+                        var minLon = matchedPath.bbox[0];
+                        var minLat = matchedPath.bbox[1];
+                        var maxLon = matchedPath.bbox[2];
+                        var maxLat = matchedPath.bbox[3];
+                        var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                        map.fitBounds(tmpB);         
+                    }
+                } else {
+                    $("#map-matching-error").text("unknown error");
+                }
+            });
+        };
+        reader.readAsText(file);
+    }
+
+    document.getElementById('matching-file-input').addEventListener('change', readSingleFile, false);
 }

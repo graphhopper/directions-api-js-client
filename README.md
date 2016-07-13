@@ -19,6 +19,8 @@ Now open index.html in your browser.
 Currently all JavaScript clients require jQuery (tested with 2.1.0) and the
 small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
 
+Currently the Map Matching API needs the togeojson.js, also included.
+
 ## Integrate the APIs in your application
 
 ### GraphHopper Routing API
@@ -53,7 +55,13 @@ You need [the matrix client](./js/GraphHopperMatrix.js).
 
 You need [the geocoding client](./js/GraphHopperGeocoding.js).
 
+### GraphHopper Map Matching API
+
+![GraphHopper Map Matching API screenshot](./img/screenshot-map-matching.png)
+
+You need [the map matching client](./js/GraphHopperMapMatching.js) and the 
+[togeojson.js](./js/togeojson.js)
+
 ## License
 
 Code stands under Apache License 2.0
-

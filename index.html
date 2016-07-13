@@ -13,12 +13,16 @@
 
         <script type="text/javascript" src="js/GHUtil.js"></script>
         <script type="text/javascript" src="js/GraphHopperRouting.js"></script>
-        <script type="text/javascript" src="js/GraphHopperMatrix.js"></script>
+        <script type="text/javascript" src="js/GraphHopperMatrix.js"></script>        
         <script type="text/javascript" src="js/GraphHopperGeocoding.js"></script>        
         <script type="text/javascript" src="js/GraphHopperOptimization.js?v=2"></script>
         <script type="text/javascript" src="js/GraphHopperIsochrone.js?v=2"></script>
 
-        <script type="text/javascript" src="js/demo.js?v=2"></script>
+        <!-- map matching currently needs togeojson.js -->
+        <script type="text/javascript" src="js/GraphHopperMapMatching.js"></script>
+        <script type="text/javascript" src="js/togeojson.js"></script>
+
+        <script type="text/javascript" src="js/demo.js?v=3"></script>
     </head>
     <body>        
         <div id="main">
@@ -49,9 +53,10 @@
                 <ul id="mynavigation" class="tabs-menu">
                     <li class="current"><a href="#routing">Routing API</a></li>
                     <li><a href="#optimization">Route Optimization API</a></li>
+                    <li><a href="#geocoding">Geocoding API</a></li>
+                    <li><a href="#map-matching">Map Matching API</a></li>
+                    <li><a href="#isochrone">Isochrone API</a></li>
                     <li><a href="#matrix">Matrix API</a></li>
-                    <li><a href="#geocoding">Geocoding API</a></li>                    
-                    <li><a href="#isochrone">Isochrone API</a></li>                    
                 </ul>                
             </div>
 
@@ -71,7 +76,7 @@
                 <div id="routing-error" style="float: right; padding-left: 20px;">
                 </div>
 
-                <div id="routing-map" style="cursor: default; height:600px; width: 800px;"></div>
+                <div id="routing-map" style="cursor: default; height:600px; width: 1000px;"></div>
 
                 <div id="instructions-header">
                     Click to see instructions for route
@@ -96,7 +101,7 @@
 
                 <div class="clear"></div>
                 <div id="vrp-map-wrapper">
-                    <div id="vrp-map" style="cursor: default; height:550px; width: 600px;"></div>
+                    <div id="vrp-map" style="cursor: default; height:550px; width: 800px;"></div>
 
                     <div id="example-list">
                         <div>
@@ -138,8 +143,30 @@
                 </div>
                 <div id="geocoding-response">
                 </div>
-                <div id="geocoding-map" style="cursor: default; height:550px; width: 600px;"></div>
+                <div id="geocoding-map" style="cursor: default; height:550px; width: 1000px;"></div>
 
+            </div>
+
+            <div id="map-matching" class="tab-content">
+                <div>
+                    The Map Matching API snaps measured GPS tracks to the digital road network using
+                    a certain vehicle. Upload a GPX file (black line) to the API and see what the 
+                    Map Matching API calculates from it (green line).
+                    E.g. use <a href="">this file</a> from GPSies.com.
+                </div>
+                <br/>
+                Vehicles: <input type="text" value="car" id="vehicle-input"/>
+                <br/>
+                <input type="file" id="matching-file-input" />
+                <br/>
+                <br/>
+                <div id="map-matching-response">
+
+                </div>
+                <div id="map-matching-error">
+                </div>
+
+                <div id="map-matching-map" style="cursor: default; height:600px; width: 1000px;"></div>                               
             </div>
 
             <div id="matrix" class="tab-content">
@@ -188,7 +215,7 @@
                 <div id="isochrone-error" style="float: right; padding-left: 20px;">
                 </div>
 
-                <div id="isochrone-map" style="cursor: default; height:600px; width: 800px;"></div>               
+                <div id="isochrone-map" style="cursor: default; height:600px; width: 1000px;"></div>               
             </div>
         </div>
 
