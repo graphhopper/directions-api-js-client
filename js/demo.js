@@ -34,7 +34,7 @@ $(document).ready(function (e) {
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
     //
-    var defaultKey = "x";
+    var defaultKey = "bd5f8b44-bfa8-407a-b868-7f2efc1146d9";
     var profile = "car";
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
@@ -655,18 +655,17 @@ function setupMapMatching(map, mmClient) {
             return feature.properties && feature.properties.style;
         }};
 
-    function mybind(key, url) {
+    function mybind(key, url, vehicle) {
         $("#" + key).click(function (event) {
+            $("#map-matching-response").text("downloading file ...");
             $.get(url, function (content) {
-                console.log("data loaded:" + content)
                 var dom = (new DOMParser()).parseFromString(content, 'text/xml');
                 var pathOriginal = toGeoJSON.gpx(dom);
                 routeLayer.clearLayers();
                 pathOriginal.features[0].properties = {style: {color: "black", weight: 2, opacity: 0.9}};
                 routeLayer.addData(pathOriginal);
-                $("#map-matching-response").text("calculate route match ...");
+                $("#map-matching-response").text("send file ...");
                 $("#map-matching-error").text("");
-                var vehicle = $("#vehicle-input").val();
                 if (!vehicle)
                     vehicle = "car";
                 mmClient.vehicle = vehicle;
@@ -675,7 +674,7 @@ function setupMapMatching(map, mmClient) {
                         $("#map-matching-response").text("");
                         $("#map-matching-error").text(json.message);
                     } else if (json.paths && json.paths.length > 0) {
-                        $("#map-matching-response").text("success");
+                        $("#map-matching-response").text("calculated map matching");
                         var matchedPath = json.paths[0];
                         var geojsonFeature = {
                             type: "Feature",
@@ -692,6 +691,7 @@ function setupMapMatching(map, mmClient) {
                             map.fitBounds(tmpB);
                         }
                     } else {
+                        console.log(json);
                         $("#map-matching-error").text("unknown error");
                     }
                 });//doRequest
@@ -700,6 +700,6 @@ function setupMapMatching(map, mmClient) {
     }
 
     var host = "https://raw.githubusercontent.com/graphhopper/directions-api-js-client/master/map-matching-examples";
-    mybind("bike_example1", host + "/bike.gpx");
-    mybind("car_example1", host + "/car.gpx");
+    mybind("bike_example1", host + "/bike.gpx", "bike");
+    mybind("car_example1", host + "/car.gpx", "car");
 }
