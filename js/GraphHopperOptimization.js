@@ -91,7 +91,7 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
         var timerRet;
 
         var pollTrigger = function () {
-            console.log("poll solution " + solutionUrl);
+            // console.log("poll solution " + solutionUrl);
             $.ajax({
                 timeout: 5000,
                 url: solutionUrl,
@@ -99,6 +99,12 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
                 dataType: "json",
                 crossDomain: true
             }).done(function (json) {
+                if (json === undefined) {
+                    clearInterval(timerRet);
+                    callback({"message": "unknown error in calculation for server on " + that.host});
+                    return;
+                }
+
                 console.log(json);
                 if (json.status === "finished") {
                     console.log("finished");
@@ -107,20 +113,14 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
                 } else if (json.message) {
                     clearInterval(timerRet);
                     callback(json);
-                } else if (data === undefined) {
-                    clearInterval(timerRet);
-                    var json = {
-                        "message": "unknown error in calculation for server on " + that.host
-                    };
-                    callback(json);
                 }
 
             }).error(function (json) {
-                if (json.responseJSON)
+                clearInterval(timerRet);
+                if (json && json.responseJSON)
                     json = json.responseJSON;
 
                 console.log(json);
-                clearInterval(timerRet);
                 callback(json);
             });
         };
