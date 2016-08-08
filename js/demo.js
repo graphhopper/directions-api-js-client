@@ -625,24 +625,20 @@ function setupIsochrone(map, ghIsochrone) {
 
 function createMap(divId) {
     var osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-    var mapquest = L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-        attribution: osmAttr + ', <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>',
-        subdomains: ['otile1', 'otile2', 'otile3', 'otile4']
-    });
-
-    var openMapSurfer = L.tileLayer('http://openmapsurfer.uni-hd.de/tiles/roads/x={x}&y={y}&z={z}', {
-        attribution: osmAttr + ', <a href="http://openmapsurfer.uni-hd.de/contact.html">GIScience Heidelberg</a>'
-    });
 
     var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/graphhp-7ae5b6f7/tile', {
         layers: 'osm',
         attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
     });
 
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: osmAttr
+    });
+
     var map = L.map(divId, {layers: [omniscale]});
-    L.control.layers({"MapQuest": mapquest,
+    L.control.layers({
         "Omniscale": omniscale,
-        "OpenMapSurfer": openMapSurfer, }).addTo(map);
+        "OpenStreetMap": osm}).addTo(map);
     return map;
 }
 

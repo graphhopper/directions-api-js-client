@@ -1,7 +1,8 @@
 GraphHopperMapMatching = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.vehicle = "car";
-    this.gps_accuracy = 50;
+    this.gps_accuracy = 20;
+    this.max_visited_nodes = 3000;
     this.debug = false;
     this.data_type = 'json';
     this.locale = 'en';
@@ -19,9 +20,8 @@ GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
     if (args.debug)
         qString += "&debug=true";
 
-    if (args.gps_accuracy)
-        qString += "&gps_accuracy=" + args.gps_accuracy;
-
+    qString += "&gps_accuracy=" + args.gps_accuracy;
+    qString += "&max_visited_nodes=" + args.max_visited_nodes;
     qString += "&type=" + args.data_type;
 
     if (args.instructions)
@@ -45,7 +45,9 @@ GraphHopperMapMatching.prototype.doRequest = function (content, callback, reqArg
     if (reqArgs)
         args = graphhopper.util.copyProperties(reqArgs, args);
 
-    var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+    var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args);
+    if (args.key)
+        url += "&key=" + args.key;
 
     $.ajax({
         timeout: 20000,
