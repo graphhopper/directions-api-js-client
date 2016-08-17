@@ -14,6 +14,7 @@ GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
     var qString = "point=" + args.point;
     qString += "&time_limit=" + args.time_limit;
     qString += "&buckets=" + args.buckets;
+    qString += "&vehicle=" + args.vehicle;
 
     if (args.debug)
         qString += "&debug=true";
