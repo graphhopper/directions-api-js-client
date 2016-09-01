@@ -626,7 +626,7 @@ function setupIsochrone(map, ghIsochrone) {
 function createMap(divId) {
     var osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-    var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/graphhp-7ae5b6f7/tile', {
+    var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/ghexamples-3646a190/tile', {
         layers: 'osm',
         attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
     });
