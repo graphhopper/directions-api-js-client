@@ -34,7 +34,7 @@ $(document).ready(function (e) {
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
     //
-    var defaultKey = "614b8305-b4db-48c9-bf4a-40de90919939";
+    var defaultKey = "bb6ff532-0a97-417d-b7d3-d05d0d5a61bf";
     var profile = "car";
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
