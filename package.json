@@ -4,7 +4,7 @@
   "description": "A Javascript Client for GraphHopper",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
-  "main": "./dist/graphhopper-client.js",
+  "main": "dist/graphhopper-client.js",
   "scripts": {
     "watch": "watchify src/main-template.js -o dist/graphhopper-client.js --debug --verbose",
     "bundle": "browserify src/main-template.js -o dist/graphhopper-client.js",
@@ -27,5 +27,9 @@
     "browserify": "14.0.0",
     "browserify-swap": "0.2.2",
     "uglifyify": "3.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/graphhopper/directions-api-js-client.git"
   }
 }
