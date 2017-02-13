@@ -34,16 +34,16 @@ $(document).ready(function (e) {
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
     //
-    var defaultKey = "bd5f8b44-bfa8-407a-b868-7f2efc1146d9";
+    var defaultKey = "614b8305-b4db-48c9-bf4a-40de90919939";
     var profile = "car";
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
-    var ghRouting = new GraphHopperRouting({key: defaultKey, host: host, vehicle: profile, elevation: false});
-    var ghGeocoding = new GraphHopperGeocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
-    var ghMatrix = new GraphHopperMatrix({key: defaultKey, host: host, vehicle: profile});
-    var ghOptimization = new GraphHopperOptimization({key: defaultKey, host: host, profile: profile});
-    var ghIsochrone = new GraphHopperIsochrone({key: defaultKey, host: host, vehicle: profile});
-    var ghMapMatching = new GraphHopperMapMatching({key: defaultKey, host: host, vehicle: profile});
+    var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host, vehicle: profile, elevation: false});
+    var ghGeocoding = new GraphHopper.Geocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
+    var ghMatrix = new GraphHopper.Matrix({key: defaultKey, host: host, vehicle: profile});
+    var ghOptimization = new GraphHopper.Optimization({key: defaultKey, host: host, profile: profile});
+    var ghIsochrone = new GraphHopper.Isochrone({key: defaultKey, host: host, vehicle: profile});
+    var ghMapMatching = new GraphHopper.MapMatching({key: defaultKey, host: host, vehicle: profile});
 
 //    if (location.protocol === "file:") {
 //        ghOptimization.host = 'http://localhost:9000/api/1';

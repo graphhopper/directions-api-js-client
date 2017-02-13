@@ -1,3 +1,6 @@
+var GHUtil = require("./GHUtil");
+var ghUtil = new GHUtil();
+
 GraphHopperRouting = function (args) {
     this.points = [];
     this.host = "https://graphhopper.com/api/1";
@@ -37,7 +40,7 @@ GraphHopperRouting = function (args) {
         6: "enter roundabout"
     };
 
-    graphhopper.util.copyProperties(args, this);
+    ghUtil.copyProperties(args, this);
 };
 
 GraphHopperRouting.prototype.clearPoints = function () {
@@ -81,9 +84,9 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
 
 GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    var args = graphhopper.util.clone(that);
+    var args = ghUtil.clone(that);
     if (reqArgs)
-        args = graphhopper.util.copyProperties(reqArgs, args);
+        args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
@@ -98,13 +101,13 @@ GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
                 var path = json.paths[i];
                 // convert encoded polyline to geo json
                 if (path.points_encoded) {
-                    var tmpArray = graphhopper.util.decodePath(path.points, that.elevation);
+                    var tmpArray = ghUtil.decodePath(path.points, that.elevation);
                     path.points = {
                         "type": "LineString",
                         "coordinates": tmpArray
                     };
 
-                    var tmpSnappedArray = graphhopper.util.decodePath(path.snapped_waypoints, that.elevation);
+                    var tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, that.elevation);
                     path.snapped_waypoints = {
                         "type": "LineString",
                         "coordinates": tmpSnappedArray
@@ -135,3 +138,5 @@ GraphHopperRouting.prototype.getGraphHopperMapsLink = function () {
 GraphHopperRouting.prototype.getTurnText = function (sign) {
     return this.turn_sign_map[sign];
 };
+
+module.exports = GraphHopperRouting;

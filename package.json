@@ -1,0 +1,31 @@
+{
+  "name": "graphhopper-js-api-client",
+  "version": "0.9.0",
+  "description": "A Javascript Client for GraphHopper",
+  "author": "GraphHopper Community",
+  "license": "Apache-2.0",
+  "main": "./dist/graphhopper-client.js",
+  "scripts": {
+    "watch": "watchify src/main-template.js -o dist/graphhopper-client.js --debug --verbose",
+    "bundle": "browserify src/main-template.js -o dist/graphhopper-client.js",
+    "bundleDebug": "browserify src/main-template.js --debug -o dist/graphhopper-client.js",
+    "bundleProduction": "browserify -g uglifyify src/main-template.js -o dist/graphhopper-client.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-swap"
+    ]
+  },
+  "dependencies": {
+    "jquery": "^2.1"
+  },
+  "devDependencies": {
+    "jasmine": "2.5.3",
+    "jasmine-jquery": "2.1.1",
+    "jshint": "2.9.4",
+    "watchify": "3.9.0",
+    "browserify": "14.0.0",
+    "browserify-swap": "0.2.2",
+    "uglifyify": "3.0.4"
+  }
+}

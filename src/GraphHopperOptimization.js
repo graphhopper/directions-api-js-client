@@ -1,3 +1,6 @@
+var GHUtil = require("./GHUtil");
+var ghUtil = new GHUtil();
+
 GraphHopperOptimization = function (args) {
     this.points = [];
     this.host = "https://graphhopper.com/api/1";
@@ -6,7 +9,7 @@ GraphHopperOptimization = function (args) {
     this.basePath = '/vrp';
     this.waitInMillis = 1000;
     this.postTimeout = 8000;
-    graphhopper.util.copyProperties(args, this);
+    ghUtil.copyProperties(args, this);
 };
 
 GraphHopperOptimization.prototype.addPoint = function (input) {
@@ -74,9 +77,9 @@ GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
 
 GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, reqArgs) {
     var that = this;
-    var args = graphhopper.util.clone(that);
+    var args = ghUtil.clone(that);
     if (reqArgs)
-        args = graphhopper.util.copyProperties(reqArgs, args);
+        args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "/optimize?key=" + args.key;
     $.ajax({
@@ -253,3 +256,5 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
 
     this.doRawRequest(jsonInput, tempCallback, reqArgs);
 };
+
+module.exports = GraphHopperOptimization;
