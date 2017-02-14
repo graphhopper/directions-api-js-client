@@ -8,7 +8,7 @@ describe("js-client", function () {
         fixtures = loadJSONFixtures('response1.json');
 
         jasmine.Ajax.install();
-        ghOptimization = new GraphHopperOptimization({key: "defaultKey", profile: "car", waitInMillis: 0});
+        ghOptimization = new GraphHopper.Optimization({key: "defaultKey", profile: "car", waitInMillis: 0});
     });
 
     it("should parse services correctly", function () {

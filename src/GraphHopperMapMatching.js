@@ -1,3 +1,6 @@
+var GHUtil = require("./GHUtil");
+var ghUtil = new GHUtil();
+
 GraphHopperMapMatching = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.vehicle = "car";
@@ -11,7 +14,7 @@ GraphHopperMapMatching = function (args) {
     this.elevation = true;
     this.basePath = '/match';
 
-    graphhopper.util.copyProperties(args, this);
+    ghUtil.copyProperties(args, this);
 };
 
 GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
@@ -41,9 +44,9 @@ GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
 
 GraphHopperMapMatching.prototype.doRequest = function (content, callback, reqArgs) {
     var that = this;
-    var args = graphhopper.util.clone(that);
+    var args = ghUtil.clone(that);
     if (reqArgs)
-        args = graphhopper.util.copyProperties(reqArgs, args);
+        args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args);
     if (args.key)
@@ -62,7 +65,7 @@ GraphHopperMapMatching.prototype.doRequest = function (content, callback, reqArg
                 var path = json.paths[i];
                 // convert encoded polyline to geo json
                 if (path.points_encoded) {
-                    var tmpArray = graphhopper.util.decodePath(path.points, that.elevation);
+                    var tmpArray = ghUtil.decodePath(path.points, that.elevation);
                     path.points = {
                         "type": "LineString",
                         "coordinates": tmpArray
@@ -88,3 +91,5 @@ GraphHopperMapMatching.prototype.doRequest = function (content, callback, reqArg
         }
     });
 };
+
+module.exports = GraphHopperMapMatching;

@@ -1,3 +1,6 @@
+var GHUtil = require("./GHUtil");
+var ghUtil = new GHUtil();
+
 GraphHopperMatrix = function (args) {
     this.host = "https://graphhopper.com/api/1";
     vehicle = "car";
@@ -9,7 +12,7 @@ GraphHopperMatrix = function (args) {
     this.basePath = "/matrix";
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
 
-    graphhopper.util.copyProperties(args, this);
+    ghUtil.copyProperties(args, this);
 };
 
 GraphHopperMatrix.prototype.addPoint = function (latlon) {
@@ -36,9 +39,9 @@ GraphHopperMatrix.prototype.addOutArray = function (type) {
 
 GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    var args = graphhopper.util.clone(that);
+    var args = ghUtil.clone(that);
     if (reqArgs)
-        args = graphhopper.util.copyProperties(reqArgs, args);
+        args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "?vehicle=" + args.vehicle + "&key=" + args.key;
 
@@ -115,3 +118,5 @@ GraphHopperMatrix.prototype.toHtmlTable = function (doubleArray) {
     htmlOut += "</table>";
     return htmlOut;
 };
+
+module.exports = GraphHopperMatrix;

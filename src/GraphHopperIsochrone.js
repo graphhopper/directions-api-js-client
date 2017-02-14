@@ -1,3 +1,6 @@
+var GHUtil = require("./GHUtil");
+var ghUtil = new GHUtil();
+
 GraphHopperIsochrone = function (args) {
     this.time_limit = 600;
     this.buckets = 3;
@@ -7,7 +10,7 @@ GraphHopperIsochrone = function (args) {
     this.debug = false;
     this.basePath = '/isochrone';
 
-    graphhopper.util.copyProperties(args, this);
+    ghUtil.copyProperties(args, this);
 };
 
 GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
@@ -24,9 +27,9 @@ GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
 
 GraphHopperIsochrone.prototype.doRequest = function (callback, reqArgs) {
     var that = this;
-    var args = graphhopper.util.clone(that);
+    var args = ghUtil.clone(that);
     if (reqArgs)
-        args = graphhopper.util.copyProperties(reqArgs, args);
+        args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
 
@@ -52,3 +55,5 @@ GraphHopperIsochrone.prototype.doRequest = function (callback, reqArgs) {
         callback(json);
     });
 };
+
+module.exports = GraphHopperIsochrone;
