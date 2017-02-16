@@ -17,7 +17,6 @@
     ]
   },
   "dependencies": {
-    "derequire": "^2.0.6",
     "jquery": "^2.1"
   },
   "devDependencies": {
@@ -27,6 +26,7 @@
     "watchify": "3.9.0",
     "browserify": "14.1.0",
     "browserify-swap": "0.2.2",
+    "derequire": "^2.0.6",
     "uglifyify": "3.0.4"
   },
   "repository": {
