@@ -6,62 +6,6 @@ This project offers JavaScript clients and examples for the [GraphHopper Directi
 
 Also see how we integrated the Routing and the Geocoding API to build a fully featured maps application called [GraphHopper Maps](https://graphhopper.com/maps/)
 
-First step to play with the code is to get this repository:
-
-```bash
-git clone https://github.com/graphhopper/directions-api-js-client/
-```
-
-Now open index.html in your browser.
-
-## Dependencies
-
-Currently all JavaScript clients require jQuery (tested with 2.1.0) and the
-small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
-
-Currently the Map Matching API needs the togeojson.js, also included.
-
-## Integrate the APIs in your application
-
-### GraphHopper Routing API
-
-![GraphHopper Routing API screenshot](./img/screenshot-routing.png)
-
-You need [the routing client](./js/GraphHopperRouting.js).
-
-There is also a different client developed from the community [here](https://www.npmjs.com/package/lrm-graphhopper).
-
-### GraphHopper Route Optimization API
-
-![Route Optimization API screenshot](./img/screenshot-vrp.png)
-
-You need [the optimization client](./js/GraphHopperOptimization.js).
-
-### GraphHopper Isochrone API
-
-![GraphHopper Isochrone API screenshot](https://raw.githubusercontent.com/graphhopper/directions-api/master/img/isochrone-example.png)
-
-You need [the isochrone client](./js/GraphHopperIsochrone.js)
-
-### GraphHopper Matrix API
-
-![GraphHopper Matrix API screenshot](./img/screenshot-matrix.png)
-
-You need [the matrix client](./js/GraphHopperMatrix.js).
-
-### GraphHopper Geocoding API
-
-![GraphHopper Geocoding API screenshot](./img/screenshot-geocoding.png)
-
-You need [the geocoding client](./js/GraphHopperGeocoding.js).
-
-### GraphHopper Map Matching API
-
-![GraphHopper Map Matching API screenshot](./img/screenshot-map-matching.png)
-
-You need [the map matching client](./js/GraphHopperMapMatching.js) and the 
-[togeojson.js](./js/togeojson.js)
-
 ## Getting Started
 
 Install the lib with npm:
@@ -98,6 +42,56 @@ You can either require the whole client enabling you to use every GraphHopper AP
  };
 ```
 
+## Dependencies
+
+Currently all JavaScript clients require jQuery (tested with 2.1.0) and the
+small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
+
+Currently the Map Matching API needs the togeojson.js, also included.
+
+## Integrate the APIs in your application
+
+You can either use our [bundled version](./dist/graphhopper-client.js), including all APIs or you can use only the 
+pieces you need.
+
+### GraphHopper Routing API
+
+![GraphHopper Routing API screenshot](./img/screenshot-routing.png)
+
+You need [the routing client](./src/GraphHopperRouting.js).
+
+There is also a different client developed from the community [here](https://www.npmjs.com/package/lrm-graphhopper).
+
+### GraphHopper Route Optimization API
+
+![Route Optimization API screenshot](./img/screenshot-vrp.png)
+
+You need [the optimization client](./src/GraphHopperOptimization.js).
+
+### GraphHopper Isochrone API
+
+![GraphHopper Isochrone API screenshot](https://raw.githubusercontent.com/graphhopper/directions-api/master/img/isochrone-example.png)
+
+You need [the isochrone client](./src/GraphHopperIsochrone.js)
+
+### GraphHopper Matrix API
+
+![GraphHopper Matrix API screenshot](./img/screenshot-matrix.png)
+
+You need [the matrix client](./src/GraphHopperMatrix.js).
+
+### GraphHopper Geocoding API
+
+![GraphHopper Geocoding API screenshot](./img/screenshot-geocoding.png)
+
+You need [the geocoding client](./src/GraphHopperGeocoding.js).
+
+### GraphHopper Map Matching API
+
+![GraphHopper Map Matching API screenshot](./img/screenshot-map-matching.png)
+
+You need [the map matching client](./src/GraphHopperMapMatching.js) and the 
+[togeojson.js](./js/togeojson.js)
 
 ## License
 
