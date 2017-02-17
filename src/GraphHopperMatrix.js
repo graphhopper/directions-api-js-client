@@ -1,16 +1,20 @@
+var request = require('superagent');
+
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
 
 GraphHopperMatrix = function (args) {
     this.host = "https://graphhopper.com/api/1";
-    vehicle = "car";
-    debug = false;
-    data_type = "json";
+    this.vehicle = "car";
+    this.debug = false;
+    //TODO Is there an alternative? Why is this defined as variable?
+    this.data_type = 'application/json';
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
     this.basePath = "/matrix";
     this.graphhopper_maps_host = "https://graphhopper.com/maps/?";
+    this.timeout = 30000;
 
     ghUtil.copyProperties(args, this);
 };
@@ -64,26 +68,17 @@ GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
     if (args.debug)
         url += "&debug=true";
 
-    $.ajax({
-        timeout: 30000,
-        url: url,
-        type: "GET",
-        dataType: args.data_type
-    }).done(function (json) {
-        callback(json);
-
-    }).fail(function (jqXHR) {
-
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-            callback(jqXHR.responseJSON);
-
-        } else {
-            callback({
-                "message": "Unknown error",
-                "details": "Error for " + url
-            });
-        }
-    });
+    request
+        .get(url)
+        .accept(args.data_type)
+        .timeout(args.timeout)
+        .end(function (err, res) {
+            if (err || !res.ok) {
+                callback(ghUtil.extractError(res, url));
+            } else if (res) {
+                callback(res.body);
+            }
+        });
 };
 
 GraphHopperMatrix.prototype.toHtmlTable = function (doubleArray) {
@@ -107,9 +102,9 @@ GraphHopperMatrix.prototype.toHtmlTable = function (doubleArray) {
         var res = doubleArray[idxFrom];
         for (var idxTo in res) {
             var mapsURL = this.graphhopper_maps_host
-                    + "point=" + encodeURIComponent(this.from_points[idxFrom])
-                    + "&point=" + encodeURIComponent(this.to_points[idxTo])
-                    + "&vehicle=" + this.vehicle;
+                + "point=" + encodeURIComponent(this.from_points[idxFrom])
+                + "&point=" + encodeURIComponent(this.to_points[idxTo])
+                + "&vehicle=" + this.vehicle;
 
             htmlOut += "<td> <a href='" + mapsURL + "'>" + res[idxTo] + "</a> </td>";
         }

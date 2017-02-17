@@ -1,3 +1,5 @@
+var request = require('superagent');
+
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
 
@@ -10,6 +12,7 @@ GraphHopperGeocoding = function (args) {
     this.debug = false;
     this.locale = "en";
     this.basePath = '/geocode';
+    this.timeout = 5000;
 
     ghUtil.copyProperties(args, this);
 };
@@ -50,27 +53,17 @@ GraphHopperGeocoding.prototype.doRequest = function (callback, reqArgs) {
 
     var url = args.host + args.basePath + "?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
 
-    $.ajax({
-        timeout: 5000,
-        url: url,
-        type: "GET",
-        dataType: args.data_type
-    }).done(function (json) {
-        callback(json);
-
-    }).fail(function (jqXHR) {
-        var msg = "Unknown error";
-
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message)
-            msg = jqXHR.responseJSON.message;
-
-        var details = "Error for " + url;
-        var json = {
-            "message": msg,
-            "details": details
-        };
-        callback(json);
-    });
+    request
+        .get(url)
+        .accept('application/json')
+        .timeout(args.timeout)
+        .end(function (err, res) {
+            if (err || !res.ok) {
+                callback(ghUtil.extractError(res, url));
+            } else if (res) {
+                callback(res.body);
+            }
+        });
 };
 
 module.exports = GraphHopperGeocoding;

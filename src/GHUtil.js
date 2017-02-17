@@ -75,4 +75,22 @@ GHUtil.prototype.decodePath = function (encoded, is3D) {
     return array;
 };
 
+GHUtil.prototype.extractError = function (res, url) {
+    var msg;
+
+    if (res && res.body) {
+        msg = res.body;
+        if (msg.message)
+            msg = msg.message;
+    } else {
+        msg = res;
+    }
+
+    var details = "Error for " + url;
+    return {
+        "message": msg,
+        "details": details
+    };
+};
+
 module.exports = GHUtil;
