@@ -62,6 +62,43 @@ You need [the geocoding client](./js/GraphHopperGeocoding.js).
 You need [the map matching client](./js/GraphHopperMapMatching.js) and the 
 [togeojson.js](./js/togeojson.js)
 
+## Getting Started
+
+Install the lib with npm:
+
+```npm install graphhopper-js-api-client --save```
+
+You can either require the whole client enabling you to use every GraphHopper API, but you can alos only require the pieces you need.
+```
+ global.$ = require('jquery');
+ require('graphhopper-js-api-client');
+ // If you only need e.g. Routing, you can only require the needed parts
+ //var GraphHopperRouting = require('graphhopper-js-api-client/src/GraphHopperRouting');
+ //var GHInput = require('graphhopper-js-api-client/src/GHInput');
+ 
+ window.onload = function() {
+ 
+     var defaultKey = "[Sign-up for free and get your own key: https://graphhopper.com/#directions-api]";
+     var profile = "car";
+ 
+     var host;
+     var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host, vehicle: profile, elevation: false});
+     // If you only need e.g. Routing, you can only require the needed parts
+     //var ghRouting = new GraphHopperRouting({key: defaultKey, host: host, vehicle: profile, elevation: false});
+ 
+     // Setup your own Points
+     ghRouting.addPoint(new GHInput(47.400905, 8.534317));
+     ghRouting.addPoint(new GHInput(47.394108, 8.538265));
+ 
+     ghRouting.doRequest(function (json) {
+         // Add your own result handling here
+         console.log(json);
+     });
+ 
+ };
+```
+
+
 ## License
 
 Code stands under Apache License 2.0
