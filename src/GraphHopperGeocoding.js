@@ -12,7 +12,7 @@ GraphHopperGeocoding = function (args) {
     this.debug = false;
     this.locale = "en";
     this.basePath = '/geocode';
-    this.timeout = 5000;
+    this.timeout = 10000;
 
     ghUtil.copyProperties(args, this);
 };

@@ -7,8 +7,6 @@ GraphHopperMatrix = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.vehicle = "car";
     this.debug = false;
-    //TODO Is there an alternative? Why is this defined as variable?
-    this.data_type = 'application/json';
     this.from_points = [];
     this.to_points = [];
     this.out_arrays = [];
@@ -70,7 +68,7 @@ GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
 
     request
         .get(url)
-        .accept(args.data_type)
+        .accept('application/json')
         .timeout(args.timeout)
         .end(function (err, res) {
             if (err || !res.ok) {

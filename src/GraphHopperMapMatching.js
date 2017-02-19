@@ -15,7 +15,7 @@ GraphHopperMapMatching = function (args) {
     this.instructions = true;
     this.elevation = true;
     this.basePath = '/match';
-    this.timeout = 20000;
+    this.timeout = 30000;
 
     ghUtil.copyProperties(args, this);
 };

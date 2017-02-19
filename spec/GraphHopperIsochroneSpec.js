@@ -6,8 +6,9 @@ describe("Isochrone Test", function () {
     it("Get results", function (done) {
         ghIsochrone.doRequest(function (json) {
             expect(json.message).not.toBeDefined();
-            expect(json.polygons).not.toBeLessThan(0);
+            expect(json.polygons.length).toBeGreaterThan(0);
+            expect(json.polygons[0].geometry.type).toEqual('Polygon');
             done();
-        }, {point: "52.532932,13.253632", buckets: 2});
+        }, {point: "52.547966,13.349419", buckets: 2});
     });
 });

@@ -7,7 +7,7 @@ describe("Geocoding Test", function () {
         it("Get results", function (done) {
             ghGeocoding.doRequest(function (json) {
                 expect(json.message).not.toBeDefined();
-                expect(json.hits).not.toBeLessThan(0);
+                expect(json.hits.length).toBeGreaterThan(5);
                 done();
             }, {query: "München"});
         });
@@ -16,9 +16,10 @@ describe("Geocoding Test", function () {
         it("Get results", function (done) {
             ghGeocoding.doRequest(function (json) {
                 expect(json.message).not.toBeDefined();
-                expect(json.hits).not.toBeLessThan(0);
+                // Expect at least one result for reverse
+                expect(json.hits.length).toBeGreaterThan(0);
                 done();
-            }, {point: "61.773123,61.347656"});
+            }, {point: "52.547966,13.349419"});
         });
     });
     describe("Create Exception", function () {

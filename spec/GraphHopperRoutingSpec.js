@@ -10,7 +10,9 @@ describe("Simple Route", function () {
 
         ghRouting.doRequest(function (json) {
             expect(json.message).not.toBeDefined();
-            expect(json.paths).not.toBeLessThan(0);
+            expect(json.paths.length).toBeGreaterThan(0);
+            expect(json.paths[0].distance).toBeGreaterThan(3000);
+            expect(json.paths[0].distance).toBeLessThan(4000);
             done();
         });
     });

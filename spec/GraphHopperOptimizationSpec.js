@@ -22,7 +22,11 @@ describe("Optimization Test", function () {
 
         ghOptimization.doRequest(jsonInput, function (json) {
             expect(json.message).not.toBeDefined();
-            expect(json.solution).not.toBeLessThan(0);
+            expect(json.solution.time).toBeGreaterThan(27000);
+            expect(json.solution.time).toBeLessThan(30000);
+            expect(json.solution.no_vehicles).toBe(1);
+            expect(json.raw_solution.time).toBeGreaterThan(27000);
+            expect(json.raw_solution.time).toBeLessThan(30000);
             done();
         }, {});
 

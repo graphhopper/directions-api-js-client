@@ -11,7 +11,7 @@ GraphHopperIsochrone = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.debug = false;
     this.basePath = '/isochrone';
-    this.timeout = 5000;
+    this.timeout = 10000;
 
     ghUtil.copyProperties(args, this);
 };

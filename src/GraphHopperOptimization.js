@@ -10,8 +10,8 @@ GraphHopperOptimization = function (args) {
     this.profile = args.profile;
     this.basePath = '/vrp';
     this.waitInMillis = 1000;
-    this.timeout = 5000;
-    this.postTimeout = 8000;
+    this.timeout = 10000;
+    this.postTimeout = 15000;
     ghUtil.copyProperties(args, this);
 };
 

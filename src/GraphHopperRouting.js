@@ -1,6 +1,4 @@
 var request = require('superagent');
-var request = require('superagent');
-
 
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
@@ -17,7 +15,7 @@ GraphHopperRouting = function (args) {
     this.elevation = false;
     this.optimize = 'false';
     this.basePath = '/route';
-    this.timeout = 5000;
+    this.timeout = 10000;
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
