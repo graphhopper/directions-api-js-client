@@ -1,3 +1,5 @@
+var request = require('superagent');
+
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
 
@@ -8,7 +10,8 @@ GraphHopperOptimization = function (args) {
     this.profile = args.profile;
     this.basePath = '/vrp';
     this.waitInMillis = 1000;
-    this.postTimeout = 8000;
+    this.timeout = 10000;
+    this.postTimeout = 15000;
     ghUtil.copyProperties(args, this);
 };
 
@@ -64,13 +67,13 @@ GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
         },
         "vehicles": list,
         "vehicle_types": [{
-                "type_id": "_vtype_1",
-                "profile": this.profile
-            }],
+            "type_id": "_vtype_1",
+            "profile": this.profile
+        }],
         "services": servicesArray
 
     };
-    console.log(jsonInput);
+    //console.log(jsonInput);
 
     that.doRequest(jsonInput, callback);
 };
@@ -82,66 +85,51 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, 
         args = ghUtil.copyProperties(reqArgs, args);
 
     var url = args.host + args.basePath + "/optimize?key=" + args.key;
-    $.ajax({
-        timeout: args.postTimeout,
-        url: url,
-        type: "POST",
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(jsonInput),
-        dataType: "json"
-    }).done(function (data) {
-        var solutionUrl = args.host + args.basePath + "/solution/" + data.job_id + "?key=" + args.key;
-        var timerRet;
 
-        var pollTrigger = function () {
-            // console.log("poll solution " + solutionUrl);
-            $.ajax({
-                timeout: 5000,
-                url: solutionUrl,
-                type: "GET",
-                dataType: "json",
-                crossDomain: true
-            }).done(function (json) {
-                if (json === undefined) {
-                    clearInterval(timerRet);
-                    callback({"message": "unknown error in calculation for server on " + that.host});
-                    return;
-                }
+    request
+        .post(url)
+        .send(JSON.stringify(jsonInput))
+        .accept('application/json; charset=utf-8')
+        .type('application/json')
+        .timeout(args.postTimeout)
+        .end(function (err, res) {
+            if (err || !res.ok) {
+                callback(ghUtil.extractError(res, url));
+            } else if (res) {
+                var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
+                var timerRet;
 
-                console.log(json);
-                if (json.status === "finished") {
-                    console.log("finished");
-                    clearInterval(timerRet);
-                    callback(json);
-                } else if (json.message) {
-                    clearInterval(timerRet);
-                    callback(json);
-                }
+                var pollTrigger = function () {
+                    // console.log("poll solution " + solutionUrl);
+                    request
+                        .get(solutionUrl)
+                        .accept('application/json')
+                        .timeout(args.timeout)
+                        .end(function (err, res) {
+                            if (err || !res.ok || res.body === undefined) {
+                                clearInterval(timerRet);
+                                callback(ghUtil.extractError(res, url));
+                            } else if (res) {
+                                //console.log(res.body);
+                                if (res.body.status === "finished") {
+                                    //console.log("finished");
+                                    clearInterval(timerRet);
+                                    callback(res.body);
+                                } else if (res.body.message) {
+                                    clearInterval(timerRet);
+                                    callback(res.body);
+                                }
+                            }
+                        });
+                };
 
-            }).error(function (json) {
-                clearInterval(timerRet);
-                if (json && json.responseJSON)
-                    json = json.responseJSON;
+                if (that.waitInMillis > 0)
+                    timerRet = setInterval(pollTrigger, that.waitInMillis);
+                else
+                    pollTrigger();
 
-                console.log(json);
-                callback(json);
-            });
-        };
-
-        if (that.waitInMillis > 0)
-            timerRet = setInterval(pollTrigger, that.waitInMillis);
-        else
-            pollTrigger();
-
-    }).error(function (resp) {
-        // console.log("error: " + JSON.stringify(resp));
-        var json = {
-            "message": "unknown error - server on " + that.host + " does not respond"
-        };
-        if (resp.responseJSON)
-            json = resp.responseJSON;
-        callback(json);
-    });
+            }
+        });
 };
 
 GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {

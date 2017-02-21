@@ -9,7 +9,8 @@
     "watch": "watchify src/main-template.js -o dist/graphhopper-client.js --debug --verbose",
     "bundle": "browserify src/main-template.js -o dist/graphhopper-client.js",
     "bundleDebug": "browserify src/main-template.js --debug -o dist/graphhopper-client.js",
-    "bundleProduction": "browserify -g uglifyify src/main-template.js | derequire > dist/graphhopper-client.js"
+    "bundleProduction": "browserify -g uglifyify src/main-template.js | derequire > dist/graphhopper-client.js",
+    "test": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine"
   },
   "browserify": {
     "transform": [
@@ -17,17 +18,16 @@
     ]
   },
   "dependencies": {
-    "jquery": "^2.1"
+    "superagent": "3.4.2"
   },
   "devDependencies": {
-    "jasmine": "2.5.3",
-    "jasmine-jquery": "2.1.1",
-    "jshint": "2.9.4",
-    "watchify": "3.9.0",
     "browserify": "14.1.0",
     "browserify-swap": "0.2.2",
     "derequire": "^2.0.6",
-    "uglifyify": "3.0.4"
+    "jasmine": "2.5.3",
+    "jshint": "2.9.4",
+    "uglifyify": "3.0.4",
+    "watchify": "3.9.0"
   },
   "repository": {
     "type": "git",

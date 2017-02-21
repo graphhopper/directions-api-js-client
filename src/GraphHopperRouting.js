@@ -1,3 +1,5 @@
+var request = require('superagent');
+
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
 
@@ -6,13 +8,14 @@ GraphHopperRouting = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.vehicle = "car";
     this.debug = false;
-    this.data_type = 'json';
+    this.data_type = 'application/json';
     this.locale = 'en';
     this.points_encoded = true;
     this.instructions = true;
     this.elevation = false;
     this.optimize = 'false';
     this.basePath = '/route';
+    this.timeout = 10000;
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
@@ -90,45 +93,36 @@ GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
 
     var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
-    $.ajax({
-        timeout: 5000,
-        url: url,
-        type: "GET",
-        dataType: args.data_type
-    }).done(function (json) {
-        if (json.paths) {
-            for (var i = 0; i < json.paths.length; i++) {
-                var path = json.paths[i];
-                // convert encoded polyline to geo json
-                if (path.points_encoded) {
-                    var tmpArray = ghUtil.decodePath(path.points, that.elevation);
-                    path.points = {
-                        "type": "LineString",
-                        "coordinates": tmpArray
-                    };
+    request
+        .get(url)
+        .accept(args.data_type)
+        .timeout(args.timeout)
+        .end(function (err, res) {
+            if (err || !res.ok) {
+                callback(ghUtil.extractError(res, url));
+            } else if (res) {
+                if (res.body.paths) {
+                    for (var i = 0; i < res.body.paths.length; i++) {
+                        var path = res.body.paths[i];
+                        // convert encoded polyline to geo json
+                        if (path.points_encoded) {
+                            var tmpArray = ghUtil.decodePath(path.points, that.elevation);
+                            path.points = {
+                                "type": "LineString",
+                                "coordinates": tmpArray
+                            };
 
-                    var tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, that.elevation);
-                    path.snapped_waypoints = {
-                        "type": "LineString",
-                        "coordinates": tmpSnappedArray
-                    };
+                            var tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, that.elevation);
+                            path.snapped_waypoints = {
+                                "type": "LineString",
+                                "coordinates": tmpSnappedArray
+                            };
+                        }
+                    }
                 }
+                callback(res.body);
             }
-        }
-        callback(json);
-
-    }).fail(function (jqXHR) {
-
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-            callback(jqXHR.responseJSON);
-
-        } else {
-            callback({
-                "message": "Unknown error",
-                "details": "Error for " + url
-            });
-        }
-    });
+        });
 };
 
 GraphHopperRouting.prototype.getGraphHopperMapsLink = function () {
