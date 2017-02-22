@@ -1,3 +1,5 @@
+var request = require('superagent');
+
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
 
@@ -13,6 +15,7 @@ GraphHopperMapMatching = function (args) {
     this.instructions = true;
     this.elevation = true;
     this.basePath = '/match';
+    this.timeout = 30000;
 
     ghUtil.copyProperties(args, this);
 };
@@ -52,44 +55,36 @@ GraphHopperMapMatching.prototype.doRequest = function (content, callback, reqArg
     if (args.key)
         url += "&key=" + args.key;
 
-    $.ajax({
-        timeout: 20000,
-        url: url,
-        contentType: "application/xml",
-        type: "POST",
-        crossDomain: true,
-        data: content
-    }).done(function (json) {
-        if (json.paths) {
-            for (var i = 0; i < json.paths.length; i++) {
-                var path = json.paths[i];
-                // convert encoded polyline to geo json
-                if (path.points_encoded) {
-                    var tmpArray = ghUtil.decodePath(path.points, that.elevation);
-                    path.points = {
-                        "type": "LineString",
-                        "coordinates": tmpArray
-                    };
+    request
+        .post(url)
+        .send(content)
+        .accept('application/json')
+        .type('application/xml')
+        .timeout(args.timeout)
+        .end(function (err, res) {
+            if (err || !res.ok) {
+                callback(ghUtil.extractError(res, url));
+            } else if (res) {
 
-                    // for now delete this
-                    delete path.snapped_waypoints;
+                if (res.body.paths) {
+                    for (var i = 0; i < res.body.paths.length; i++) {
+                        var path = res.body.paths[i];
+                        // convert encoded polyline to geo json
+                        if (path.points_encoded) {
+                            var tmpArray = ghUtil.decodePath(path.points, that.elevation);
+                            path.points = {
+                                "type": "LineString",
+                                "coordinates": tmpArray
+                            };
+
+                            // for now delete this
+                            delete path.snapped_waypoints;
+                        }
+                    }
                 }
+                callback(res.body);
             }
-        }
-        callback(json);
-
-    }).fail(function (jqXHR) {
-
-        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-            callback(jqXHR.responseJSON);
-
-        } else {
-            callback({
-                "message": "Unknown error",
-                "details": "Error for " + url
-            });
-        }
-    });
+        });
 };
 
 module.exports = GraphHopperMapMatching;
