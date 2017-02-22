@@ -14,7 +14,6 @@ Install the lib with npm:
 
 You can either require the whole client enabling you to use every GraphHopper API, but you can alos only require the pieces you need.
 ```
- global.$ = require('jquery');
  require('graphhopper-js-api-client');
  // If you only need e.g. Routing, you can only require the needed parts
  //var GraphHopperRouting = require('graphhopper-js-api-client/src/GraphHopperRouting');
@@ -44,10 +43,9 @@ You can either require the whole client enabling you to use every GraphHopper AP
 
 ## Dependencies
 
-Currently all JavaScript clients require jQuery (tested with 2.1.0) and the
-small file [GHUtil.js](./js/GHUtil.js), both included in this repository.
+The API depends on superagent which is packaged into the graphhopper-client.js.
 
-Currently the Map Matching API needs the togeojson.js, also included.
+The demo uses a couple of dependencies, but they are not required for requests to the API.
 
 ## Integrate the APIs in your application
 
