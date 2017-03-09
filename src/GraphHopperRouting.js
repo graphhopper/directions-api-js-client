@@ -1,4 +1,5 @@
 var request = require('superagent');
+var Promise = require("bluebird");
 
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
@@ -85,44 +86,49 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
     return qString;
 };
 
-GraphHopperRouting.prototype.doRequest = function (callback, reqArgs) {
+GraphHopperRouting.prototype.doRequest = function (reqArgs) {
     var that = this;
-    var args = ghUtil.clone(that);
-    if (reqArgs)
-        args = ghUtil.copyProperties(reqArgs, args);
 
-    var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+    return new Promise(function (resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
 
-    request
-        .get(url)
-        .accept(args.data_type)
-        .timeout(args.timeout)
-        .end(function (err, res) {
-            if (err || !res.ok) {
-                callback(ghUtil.extractError(res, url));
-            } else if (res) {
-                if (res.body.paths) {
-                    for (var i = 0; i < res.body.paths.length; i++) {
-                        var path = res.body.paths[i];
-                        // convert encoded polyline to geo json
-                        if (path.points_encoded) {
-                            var tmpArray = ghUtil.decodePath(path.points, that.elevation);
-                            path.points = {
-                                "type": "LineString",
-                                "coordinates": tmpArray
-                            };
+        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
 
-                            var tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, that.elevation);
-                            path.snapped_waypoints = {
-                                "type": "LineString",
-                                "coordinates": tmpSnappedArray
-                            };
+        request
+            .get(url)
+            .accept(args.data_type)
+            .timeout(args.timeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    console.log("whaat!!!!");
+                    console.log(res);
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    if (res.body.paths) {
+                        for (var i = 0; i < res.body.paths.length; i++) {
+                            var path = res.body.paths[i];
+                            // convert encoded polyline to geo json
+                            if (path.points_encoded) {
+                                var tmpArray = ghUtil.decodePath(path.points, that.elevation);
+                                path.points = {
+                                    "type": "LineString",
+                                    "coordinates": tmpArray
+                                };
+
+                                var tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, that.elevation);
+                                path.snapped_waypoints = {
+                                    "type": "LineString",
+                                    "coordinates": tmpSnappedArray
+                                };
+                            }
                         }
                     }
+                    resolve(res.body);
                 }
-                callback(res.body);
-            }
-        });
+            });
+    });
 };
 
 GraphHopperRouting.prototype.getGraphHopperMapsLink = function () {

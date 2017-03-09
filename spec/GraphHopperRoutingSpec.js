@@ -8,12 +8,15 @@ describe("Simple Route", function () {
         ghRouting.addPoint(new GHInput("52.488634,13.368988"));
         ghRouting.addPoint(new GHInput("52.50034,13.40332"));
 
-        ghRouting.doRequest(function (json) {
-            expect(json.message).not.toBeDefined();
-            expect(json.paths.length).toBeGreaterThan(0);
-            expect(json.paths[0].distance).toBeGreaterThan(3000);
-            expect(json.paths[0].distance).toBeLessThan(4000);
-            done();
-        });
+        ghRouting.doRequest()
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                expect(json.paths[0].distance).toBeGreaterThan(3000);
+                expect(json.paths[0].distance).toBeLessThan(4000);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
     });
 });

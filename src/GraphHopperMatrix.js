@@ -1,4 +1,5 @@
 var request = require('superagent');
+var Promise = require("bluebird");
 
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
@@ -39,44 +40,46 @@ GraphHopperMatrix.prototype.addOutArray = function (type) {
     this.out_arrays.push(type);
 };
 
-GraphHopperMatrix.prototype.doRequest = function (callback, reqArgs) {
+GraphHopperMatrix.prototype.doRequest = function (reqArgs) {
     var that = this;
-    var args = ghUtil.clone(that);
-    if (reqArgs)
-        args = ghUtil.copyProperties(reqArgs, args);
+    return new Promise(function (resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
 
-    var url = args.host + args.basePath + "?vehicle=" + args.vehicle + "&key=" + args.key;
+        var url = args.host + args.basePath + "?vehicle=" + args.vehicle + "&key=" + args.key;
 
-    for (var idx in args.from_points) {
-        var p = args.from_points[idx];
-        url += "&from_point=" + encodeURIComponent(p.toString());
-    }
-    for (var idx in args.to_points) {
-        var p = args.to_points[idx];
-        url += "&to_point=" + encodeURIComponent(p.toString());
-    }
-
-    if (args.out_arrays) {
-        for (var idx in args.out_arrays) {
-            var type = args.out_arrays[idx];
-            url += "&out_array=" + type;
+        for (var idx in args.from_points) {
+            var p = args.from_points[idx];
+            url += "&from_point=" + encodeURIComponent(p.toString());
         }
-    }
+        for (var idx in args.to_points) {
+            var p = args.to_points[idx];
+            url += "&to_point=" + encodeURIComponent(p.toString());
+        }
 
-    if (args.debug)
-        url += "&debug=true";
-
-    request
-        .get(url)
-        .accept('application/json')
-        .timeout(args.timeout)
-        .end(function (err, res) {
-            if (err || !res.ok) {
-                callback(ghUtil.extractError(res, url));
-            } else if (res) {
-                callback(res.body);
+        if (args.out_arrays) {
+            for (var idx in args.out_arrays) {
+                var type = args.out_arrays[idx];
+                url += "&out_array=" + type;
             }
-        });
+        }
+
+        if (args.debug)
+            url += "&debug=true";
+
+        request
+            .get(url)
+            .accept('application/json')
+            .timeout(args.timeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.body);
+                }
+            });
+    });
 };
 
 GraphHopperMatrix.prototype.toHtmlTable = function (doubleArray) {

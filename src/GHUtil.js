@@ -86,11 +86,7 @@ GHUtil.prototype.extractError = function (res, url) {
         msg = res;
     }
 
-    var details = "Error for " + url;
-    return {
-        "message": msg,
-        "details": details
-    };
+    return new Error(msg+ " - for url "+url);
 };
 
 module.exports = GHUtil;

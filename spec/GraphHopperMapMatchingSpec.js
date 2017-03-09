@@ -5,15 +5,18 @@ var bikeGPX;
 
 describe("Map Matching Test", function () {
     it("Bike Example", function (done) {
-        ghMapMatching.doRequest(bikeGPX, function (json) {
-            expect(json.message).not.toBeDefined();
-            expect(json.paths.length).toBeGreaterThan(0);
-            var dist = json.map_matching.distance;
-            expect(dist).toBeGreaterThan(62000);
-            expect(dist).toBeLessThan(67000);
-            expect(json.paths.length).toBeGreaterThan(0);
-            done();
-        });
+        ghMapMatching.doRequest(bikeGPX)
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                var dist = json.map_matching.distance;
+                expect(dist).toBeGreaterThan(62000);
+                expect(dist).toBeLessThan(67000);
+                expect(json.paths.length).toBeGreaterThan(0);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
     });
 
     beforeEach(function () {
