@@ -35,7 +35,7 @@ describe("Geocoding Test", function () {
                     done.fail("Shouldn't suceed");
                 })
                 .catch(function (err) {
-                    expect(err.message).toBeDefined();
+                    expect(err.message.length).toBeGreaterThan(0);
                     done();
                 });
         });
