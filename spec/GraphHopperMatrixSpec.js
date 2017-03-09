@@ -11,14 +11,18 @@ describe("Matrix Test", function () {
         ghMatrix.addPoint(new GHInput("52.43299,13.461571"));
         ghMatrix.addPoint(new GHInput("52.622226,13.381233"));
 
-        ghMatrix.doRequest(function (json) {
-            expect(json.message).not.toBeDefined();
-            expect(json.distances.length).toBe(4);
-            // Always 0 by definition
-            expect(json.distances[0][0]).toBe(0);
-            expect(json.distances[0][1]).toBeGreaterThan(40000);
-            expect(json.distances[0][1]).toBeLessThan(42000);
-            done();
-        });
+        ghMatrix.doRequest()
+            .then(function (json) {
+                expect(json.distances.length).toBe(4);
+                // Always 0 by definition
+                expect(json.distances[0][0]).toBe(0);
+                expect(json.distances[0][1]).toBeGreaterThan(40000);
+                expect(json.distances[0][1]).toBeLessThan(42000);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            })
+        ;
     });
 });

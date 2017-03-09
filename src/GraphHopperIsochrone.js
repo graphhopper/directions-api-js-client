@@ -1,4 +1,5 @@
 var request = require('superagent');
+var Promise = require("bluebird");
 
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
@@ -11,7 +12,7 @@ GraphHopperIsochrone = function (args) {
     this.host = "https://graphhopper.com/api/1";
     this.debug = false;
     this.basePath = '/isochrone';
-    this.timeout = 10000;
+    this.timeout = 30000;
 
     ghUtil.copyProperties(args, this);
 };
@@ -28,25 +29,28 @@ GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
     return qString;
 };
 
-GraphHopperIsochrone.prototype.doRequest = function (callback, reqArgs) {
+GraphHopperIsochrone.prototype.doRequest = function (reqArgs) {
     var that = this;
-    var args = ghUtil.clone(that);
-    if (reqArgs)
-        args = ghUtil.copyProperties(reqArgs, args);
 
-    var url = args.host + args.basePath + "?" + this.getParametersAsQueryString(args) + "&key=" + args.key;
+    return new Promise(function(resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
 
-    request
-        .get(url)
-        .accept('application/json')
-        .timeout(args.timeout)
-        .end(function (err, res) {
-            if (err || !res.ok) {
-                callback(ghUtil.extractError(res, url));
-            } else if (res) {
-                callback(res.body);
-            }
-        });
+        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+
+        request
+            .get(url)
+            .accept('application/json')
+            .timeout(args.timeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.body);
+                }
+            });
+    });
 };
 
 module.exports = GraphHopperIsochrone;

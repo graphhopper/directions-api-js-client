@@ -39,7 +39,12 @@ $(document).ready(function (e) {
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
     var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host, vehicle: profile, elevation: false});
-    var ghGeocoding = new GraphHopper.Geocoding({key: defaultKey, host: host, limit: 8, locale: "en" /* currently fr, en, de and it are explicitely supported */});
+    var ghGeocoding = new GraphHopper.Geocoding({
+        key: defaultKey,
+        host: host,
+        limit: 8,
+        locale: "en" /* currently fr, en, de and it are explicitely supported */
+    });
     var ghMatrix = new GraphHopper.Matrix({key: defaultKey, host: host, vehicle: profile});
     var ghOptimization = new GraphHopper.Optimization({key: defaultKey, host: host, profile: profile});
     var ghIsochrone = new GraphHopper.Isochrone({key: defaultKey, host: host, vehicle: profile});
@@ -108,15 +113,8 @@ function setupRoutingAPI(map, ghRouting) {
             // ******************
             //  Calculate route! 
             // ******************
-            ghRouting.doRequest(function (json) {
-                if (json.message) {
-                    var str = "An error occured: " + json.message;
-                    if (json.hints)
-                        str += json.hints;
-
-                    $("#routing-response").text(str);
-
-                } else {
+            ghRouting.doRequest()
+                .then(function (json) {
                     var path = json.paths[0];
                     routingLayer.addData({
                         "type": "Feature",
@@ -150,13 +148,16 @@ function setupRoutingAPI(map, ghRouting) {
                             // use 'sign' to display e.g. equally named images
 
                             $("<li>" + instr.text + " <small>(" + ghRouting.getTurnText(instr.sign) + ")</small>"
-                                    + " for " + instr.distance + "m and " + Math.round(instr.time / 1000) + "sec"
-                                    + ", geometry points:" + instruction_points.length + "</li>").
-                                    appendTo(listUL);
+                                + " for " + instr.distance + "m and " + Math.round(instr.time / 1000) + "sec"
+                                + ", geometry points:" + instruction_points.length + "</li>").appendTo(listUL);
                         }
                     }
-                }
-            });
+
+                })
+                .catch(function (err) {
+                    var str = "An error occured: " + err.message;
+                    $("#routing-response").text(str);
+                });
         }
     });
 
@@ -238,32 +239,64 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
 
     var createSignupSteps = function () {
         return "<div style='color:black'>To test this example <br/>"
-                + "1. <a href='https://graphhopper.com/#directions-api'>sign up for free</a>,<br/>"
-                + "2. log in and request a free standard package then <br/>"
-                + "3. copy the API key to the text field in the upper right corner<div>";
+            + "1. <a href='https://graphhopper.com/#directions-api'>sign up for free</a>,<br/>"
+            + "2. log in and request a free standard package then <br/>"
+            + "3. copy the API key to the text field in the upper right corner<div>";
+    };
+
+    var getRouteStyle = function (routeIndex) {
+        var routeStyle;
+        if (routeIndex === 3) {
+            routeStyle = {color: "cyan"};
+        } else if (routeIndex === 2) {
+            routeStyle = {color: "black"};
+        } else if (routeIndex === 1) {
+            routeStyle = {color: "green"};
+        } else {
+            routeStyle = {color: "blue"};
+        }
+
+        routeStyle.weight = 5;
+        routeStyle.opacity = 1;
+        return routeStyle;
+    };
+
+    var createGHCallback = function (routeStyle) {
+        return function (json) {
+            for (var pathIndex = 0; pathIndex < json.paths.length; pathIndex++) {
+                var path = json.paths[pathIndex];
+                routingLayer.addData({
+                    "type": "Feature",
+                    "geometry": path.points,
+                    "properties": {
+                        style: routeStyle
+                    }
+                });
+            }
+        };
+    };
+
+    var optimizeError = function (err) {
+        $("#vrp-response").text(" ");
+
+        if (err.message.indexOf("Too many locations") >= 0) {
+            $("#vrp-error").empty();
+            $("#vrp-error").append(createSignupSteps());
+        } else {
+            $("#vrp-error").text("An error occured: " + err.message);
+        }
+        console.error(err);
     };
 
     var optimizeResponse = function (json) {
-        if (json.message) {
-            $("#vrp-response").text(" ");
-
-            if (json.message.indexOf("Too many locations") >= 0) {
-                $("#vrp-error").empty();
-                $("#vrp-error").append(createSignupSteps());
-            } else {
-                $("#vrp-error").text("An error occured: " + json.message);
-            }
-            console.log(JSON.stringify(json));
-            return;
-        }
         var sol = json.solution;
         if (!sol)
             return;
 
         $("#vrp-response").text("Solution found for " + sol.routes.length + " vehicle(s)! "
-                + "Distance: " + Math.floor(sol.distance / 1000) + "km "
-                + ", time: " + Math.floor(sol.time / 60) + "min "
-                + ", costs: " + sol.costs);
+            + "Distance: " + Math.floor(sol.distance / 1000) + "km "
+            + ", time: " + Math.floor(sol.time / 60) + "min "
+            + ", costs: " + sol.costs);
 
         var no_unassigned = sol.unassigned.services.length + sol.unassigned.shipments.length;
         if (no_unassigned > 0)
@@ -287,53 +320,21 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
                     firstAdd = add;
             }
 
-            var routeStyle;
-            if (routeIndex === 3) {
-                routeStyle = {color: "cyan"};
-            } else if (routeIndex === 2) {
-                routeStyle = {color: "black"};
-            } else if (routeIndex === 1) {
-                routeStyle = {color: "green"};
-            } else {
-                routeStyle = {color: "blue"};
-            }
+            var ghCallback = createGHCallback(getRouteStyle(routeIndex));
 
-            routeStyle.weight = 5;
-            routeStyle.opacity = 1;
-
-            var ghCallback = createGHCallback(routeStyle);
-            ghRouting.doRequest(ghCallback, {instructions: false});
+            ghRouting.doRequest({instructions: false})
+                .then(ghCallback)
+                .catch(function (err) {
+                    var str = "An error for the routing occurred: " + err.message;
+                    $("#vrp-error").text(str);
+                });
         }
     };
 
     var eqAddress = function (add1, add2) {
         return add1 && add2
-                && Math.floor(add1.lat * 1000000) === Math.floor(add2.lat * 1000000)
-                && Math.floor(add1.lon * 1000000) === Math.floor(add2.lon * 1000000);
-    };
-
-    var createGHCallback = function (routeStyle) {
-        return function (json) {
-            if (json.message) {
-                var str = "An error for the routing occurred: " + json.message;
-                if (json.hints)
-                    str += json.hints;
-                $("#vrp-error").text(str);
-                console.log(JSON.stringify(json));
-
-            } else {
-                for (var pathIndex = 0; pathIndex < json.paths.length; pathIndex++) {
-                    var path = json.paths[pathIndex];
-                    routingLayer.addData({
-                        "type": "Feature",
-                        "geometry": path.points,
-                        "properties": {
-                            style: routeStyle
-                        }
-                    });
-                }
-            }
-        };
+            && Math.floor(add1.lat * 1000000) === Math.floor(add2.lat * 1000000)
+            && Math.floor(add1.lon * 1000000) === Math.floor(add2.lon * 1000000);
     };
 
     var optimizeRoute = function () {
@@ -342,7 +343,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             return;
         }
         $("#vrp-response").text("Calculating ...");
-        ghOptimization.doVRPRequest(optimizeResponse, $("#optimize_vehicles").val());
+        ghOptimization.doVRPRequest($("#optimize_vehicles").val())
+            .then(optimizeResponse)
+            .catch(optimizeError);
     };
 
     $("#vrp_clear_button").click(clearMap);
@@ -356,7 +359,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             clearMap();
             map.setView([51, 10], 6);
             $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
+            ghOptimization.doRequest(jsonData)
+                .then(optimizeResponse)
+                .catch(optimizeError);
         });
     });
 
@@ -366,7 +371,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             clearMap();
             map.setView([51, 10], 6);
             $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
+            ghOptimization.doRequest(jsonData)
+                .then(optimizeResponse)
+                .catch(optimizeError);
         });
     });
 
@@ -376,7 +383,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             clearMap();
             map.setView([51, 10], 6);
             $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
+            ghOptimization.doRequest(jsonData)
+                .then(optimizeResponse)
+                .catch(optimizeError);
         });
     });
 
@@ -386,7 +395,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             clearMap();
             map.setView([38.754083, -101.074219], 4);
             $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
+            ghOptimization.doRequest(jsonData)
+                .then(optimizeResponse)
+                .catch(optimizeError);
         });
     });
 
@@ -396,7 +407,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             clearMap();
             map.setView([54.136696, -4.592285], 6);
             $("#vrp-response").text("Calculating ...");
-            ghOptimization.doRequest(jsonData, optimizeResponse);
+            ghOptimization.doRequest(jsonData)
+                .then(optimizeResponse)
+                .catch(optimizeError);
         });
     });
 
@@ -448,10 +461,8 @@ function setupGeocodingAPI(map, ghGeocoding) {
     var mysubmit = function () {
         clearGeocoding();
 
-        ghGeocoding.doRequest(function (json) {
-            if (json.message) {
-                $("#geocoding-error").text("An error occured: " + json.message);
-            } else {
+        ghGeocoding.doRequest({query: textField.val()})
+            .then(function (json) {
                 var listUL = $("<ol>");
                 $("#geocoding-response").append("Locale:" + ghGeocoding.locale + "<br/>").append(listUL);
                 var minLon, minLat, maxLon, maxLat;
@@ -481,9 +492,10 @@ function setupGeocodingAPI(map, ghGeocoding) {
                     var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                     map.fitBounds(tmpB);
                 }
-            }
-
-        }, {query: textField.val()});
+            })
+            .catch(function (err) {
+                $("#geocoding-error").text("An error occured: " + err.message);
+            });
     };
 
     // reverse geocoding
@@ -497,10 +509,8 @@ function setupGeocodingAPI(map, ghGeocoding) {
     map.on('click', function (e) {
         clearGeocoding();
 
-        ghGeocoding.doRequest(function (json) {
-            if (json.message) {
-                $("#geocoding-error").text("An error occured: " + json.message);
-            } else {
+        ghGeocoding.doRequest({point: e.latlng.lat + "," + e.latlng.lng})
+            .then(function (json) {
                 var counter = 0;
                 for (var hitIdx in json.hits) {
                     counter++;
@@ -511,8 +521,10 @@ function setupGeocodingAPI(map, ghGeocoding) {
                     // only show first result for now
                     break;
                 }
-            }
-        }, {point: e.latlng.lat + "," + e.latlng.lng});
+            })
+            .catch(function (err) {
+                $("#geocoding-error").text("An error occured: " + err.message);
+            });
     });
 
     var textField = $("#geocoding_text_field");
@@ -570,19 +582,16 @@ function setupMatrixAPI(ghMatrix) {
         $("#matrix-error").empty();
         $("#matrix-response").empty();
 
-        ghMatrix.doRequest(function (json) {
-            if (json.message) {
-                var str = "An error occured: " + json.message;
-                if (json.hints)
-                    str += json.hints;
-
-                $("#matrix-error").text(str);
-            } else {
+        ghMatrix.doRequest()
+            .then(function (json) {
                 var outHtml = "Distances in meters: <br/>" + ghMatrix.toHtmlTable(json.distances);
                 outHtml += "<br/><br/>Times in seconds: <br/>" + ghMatrix.toHtmlTable(json.times);
                 $("#matrix-response").html(outHtml);
-            }
-        });
+            })
+            .catch(function (err) {
+                var str = "An error occured: " + err.message;
+                $("#matrix-error").text(str);
+            });
 
         return false;
     });
@@ -594,29 +603,33 @@ function setupIsochrone(map, ghIsochrone) {
     var inprogress = false;
 
     map.on('click', function (e) {
-        var callback = function (json) {
-            if (isochroneLayer)
-                isochroneLayer.clearLayers();
-
-            isochroneLayer = L.geoJson(json.polygons, {
-                style: function (feature) {
-                    var num = feature.properties.bucket;
-                    var color = (num % 2 === 0) ? "#00cc33" : "blue";
-                    return {color: color, "weight": num + 2, "opacity": 0.6};
-                }
-            });
-
-            map.addLayer(isochroneLayer);
-
-            $('#isochrone-response').text("Calculation done");
-            inprogress = false;
-        };
         var pointStr = e.latlng.lat + "," + e.latlng.lng;
 
         if (!inprogress) {
             inprogress = true;
             $('#isochrone-response').text("Calculating ...");
-            ghIsochrone.doRequest(callback, {point: pointStr, buckets: 2});
+            ghIsochrone.doRequest({point: pointStr, buckets: 2})
+                .then(function (json) {
+                    if (isochroneLayer)
+                        isochroneLayer.clearLayers();
+
+                    isochroneLayer = L.geoJson(json.polygons, {
+                        style: function (feature) {
+                            var num = feature.properties.bucket;
+                            var color = (num % 2 === 0) ? "#00cc33" : "blue";
+                            return {color: color, "weight": num + 2, "opacity": 0.6};
+                        }
+                    });
+
+                    map.addLayer(isochroneLayer);
+
+                    $('#isochrone-response').text("Calculation done");
+                    inprogress = false;
+                })
+                .catch(function (err) {
+                    $('#isochrone-response').text("An error occured: " + err.message);
+                })
+            ;
         } else {
             $('#isochrone-response').text("Please wait. Calculation in progress ...");
         }
@@ -638,7 +651,8 @@ function createMap(divId) {
     var map = L.map(divId, {layers: [omniscale]});
     L.control.layers({
         "Omniscale": omniscale,
-        "OpenStreetMap": osm}).addTo(map);
+        "OpenStreetMap": osm
+    }).addTo(map);
     return map;
 }
 
@@ -649,7 +663,8 @@ function setupMapMatching(map, mmClient) {
         // use style provided by the 'properties' entry of the geojson added by addDataToRoutingLayer
         style: function (feature) {
             return feature.properties && feature.properties.style;
-        }};
+        }
+    };
 
     function mybind(key, url, vehicle) {
         $("#" + key).click(function (event) {
@@ -665,11 +680,8 @@ function setupMapMatching(map, mmClient) {
                 if (!vehicle)
                     vehicle = "car";
                 mmClient.vehicle = vehicle;
-                mmClient.doRequest(content, function (json) {
-                    if (json.message) {
-                        $("#map-matching-response").text("");
-                        $("#map-matching-error").text(json.message);
-                    } else if (json.paths && json.paths.length > 0) {
+                mmClient.doRequest(content)
+                    .then(function (json) {
                         $("#map-matching-response").text("calculated map matching");
                         var matchedPath = json.paths[0];
                         var geojsonFeature = {
@@ -686,11 +698,11 @@ function setupMapMatching(map, mmClient) {
                             var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                             map.fitBounds(tmpB);
                         }
-                    } else {
-                        console.log(json);
-                        $("#map-matching-error").text("unknown error");
-                    }
-                });//doRequest
+                    })
+                    .catch(function (err) {
+                        $("#map-matching-response").text("");
+                        $("#map-matching-error").text(err.message);
+                    });//doRequest
             });// get
         });//click
     }

@@ -1,4 +1,5 @@
 var request = require('superagent');
+var Promise = require("bluebird");
 
 var GHUtil = require("./GHUtil");
 var ghUtil = new GHUtil();
@@ -23,12 +24,13 @@ GraphHopperOptimization.prototype.clear = function () {
     this.points.length = 0;
 };
 
-GraphHopperOptimization.prototype.doTSPRequest = function (callback) {
-    this.doVRPRequest(callback, 1);
+GraphHopperOptimization.prototype.doTSPRequest = function () {
+    return this.doVRPRequest(1);
 };
 
-GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
+GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
     var that = this;
+
     var firstPoint = that.points[0];
     var servicesArray = [];
     for (var pointIndex in that.points) {
@@ -48,7 +50,7 @@ GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
         servicesArray.push(obj);
     }
 
-    var list = []
+    var list = [];
     for (var i = 0; i < vehicles; i++) {
         list.push({
             "vehicle_id": "_vehicle_" + i,
@@ -75,64 +77,67 @@ GraphHopperOptimization.prototype.doVRPRequest = function (callback, vehicles) {
     };
     //console.log(jsonInput);
 
-    that.doRequest(jsonInput, callback);
+    return that.doRequest(jsonInput);
 };
 
-GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, callback, reqArgs) {
+GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, reqArgs) {
     var that = this;
-    var args = ghUtil.clone(that);
-    if (reqArgs)
-        args = ghUtil.copyProperties(reqArgs, args);
 
-    var url = args.host + args.basePath + "/optimize?key=" + args.key;
+    return new Promise(function (resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
 
-    request
-        .post(url)
-        .send(JSON.stringify(jsonInput))
-        .accept('application/json; charset=utf-8')
-        .type('application/json')
-        .timeout(args.postTimeout)
-        .end(function (err, res) {
-            if (err || !res.ok) {
-                callback(ghUtil.extractError(res, url));
-            } else if (res) {
-                var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
-                var timerRet;
+        var url = args.host + args.basePath + "/optimize?key=" + args.key;
 
-                var pollTrigger = function () {
-                    // console.log("poll solution " + solutionUrl);
-                    request
-                        .get(solutionUrl)
-                        .accept('application/json')
-                        .timeout(args.timeout)
-                        .end(function (err, res) {
-                            if (err || !res.ok || res.body === undefined) {
-                                clearInterval(timerRet);
-                                callback(ghUtil.extractError(res, url));
-                            } else if (res) {
-                                //console.log(res.body);
-                                if (res.body.status === "finished") {
-                                    //console.log("finished");
+        request
+            .post(url)
+            .send(JSON.stringify(jsonInput))
+            .accept('application/json; charset=utf-8')
+            .type('application/json')
+            .timeout(args.postTimeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
+                    var timerRet;
+
+                    var pollTrigger = function () {
+                        // console.log("poll solution " + solutionUrl);
+                        request
+                            .get(solutionUrl)
+                            .accept('application/json')
+                            .timeout(args.timeout)
+                            .end(function (err, res) {
+                                if (err || !res.ok || res.body === undefined) {
                                     clearInterval(timerRet);
-                                    callback(res.body);
-                                } else if (res.body.message) {
-                                    clearInterval(timerRet);
-                                    callback(res.body);
+                                    reject(ghUtil.extractError(res, url));
+                                } else if (res) {
+                                    //console.log(res.body);
+                                    if (res.body.status === "finished") {
+                                        //console.log("finished");
+                                        clearInterval(timerRet);
+                                        resolve(res.body);
+                                    } else if (res.body.message) {
+                                        clearInterval(timerRet);
+                                        resolve(res.body);
+                                    }
                                 }
-                            }
-                        });
-                };
+                            });
+                    };
 
-                if (that.waitInMillis > 0)
-                    timerRet = setInterval(pollTrigger, that.waitInMillis);
-                else
-                    pollTrigger();
+                    if (that.waitInMillis > 0)
+                        timerRet = setInterval(pollTrigger, that.waitInMillis);
+                    else
+                        pollTrigger();
 
-            }
-        });
+                }
+            });
+    });
 };
 
-GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, reqArgs) {
+GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
 
     var vehicleTypeProfileMap = {};
     var vehicleTypeMap = {};
@@ -196,7 +201,8 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
         }
     }
 
-    var tempCallback = function (json) {
+    var promise = this.doRawRequest(jsonInput, reqArgs);
+    promise.then(function (json) {
         if (json.solution) {
             var sol = json.solution;
             json.raw_solution = JSON.parse(JSON.stringify(sol));
@@ -239,10 +245,10 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, callback, req
             }
             sol["unassigned_shipments"] = unassignedShipments;
         }
-        callback(json);
-    };
-
-    this.doRawRequest(jsonInput, tempCallback, reqArgs);
+        return json;
+    });
+    return promise;
+    
 };
 
 module.exports = GraphHopperOptimization;
