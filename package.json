@@ -18,7 +18,8 @@
     ]
   },
   "dependencies": {
-    "superagent": "3.5.0"
+    "superagent": "3.5.0",
+    "bluebird": "3.5.0"
   },
   "devDependencies": {
     "browserify": "14.1.0",
