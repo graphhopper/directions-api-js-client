@@ -276,19 +276,19 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         };
     };
 
-    var optimizeResponse = function (json) {
-        if (json.message) {
-            $("#vrp-response").text(" ");
+    var optimizeError = function (err) {
+        $("#vrp-response").text(" ");
 
-            if (json.message.indexOf("Too many locations") >= 0) {
-                $("#vrp-error").empty();
-                $("#vrp-error").append(createSignupSteps());
-            } else {
-                $("#vrp-error").text("An error occured: " + json.message);
-            }
-            console.log(JSON.stringify(json));
-            return;
+        if (err.message.indexOf("Too many locations") >= 0) {
+            $("#vrp-error").empty();
+            $("#vrp-error").append(createSignupSteps());
+        } else {
+            $("#vrp-error").text("An error occured: " + err.message);
         }
+        console.error(err);
+    };
+
+    var optimizeResponse = function (json) {
         var sol = json.solution;
         if (!sol)
             return;
@@ -324,15 +324,10 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
 
             ghRouting.doRequest({instructions: false})
                 .then(ghCallback)
-                .catch(function (json) {
-                        if (json) {
-                            var str = "An error for the routing occurred: " + json.message;
-                            if (json.hints)
-                                str += json.hints;
-                            $("#vrp-error").text(str);
-                        }
-                    }
-                );
+                .catch(function (err) {
+                    var str = "An error for the routing occurred: " + err.message;
+                    $("#vrp-error").text(str);
+                });
         }
     };
 
@@ -349,7 +344,8 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         }
         $("#vrp-response").text("Calculating ...");
         ghOptimization.doVRPRequest($("#optimize_vehicles").val())
-            .then(optimizeResponse);
+            .then(optimizeResponse)
+            .catch(optimizeError);
     };
 
     $("#vrp_clear_button").click(clearMap);
@@ -365,9 +361,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData)
                 .then(optimizeResponse)
-                .catch(function (err) {
-                    console.error(err.message);
-                });
+                .catch(optimizeError);
         });
     });
 
@@ -379,9 +373,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData)
                 .then(optimizeResponse)
-                .catch(function (err) {
-                    console.error(err.message);
-                });
+                .catch(optimizeError);
         });
     });
 
@@ -393,9 +385,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData)
                 .then(optimizeResponse)
-                .catch(function (err) {
-                    console.error(err.message);
-                });
+                .catch(optimizeError);
         });
     });
 
@@ -407,9 +397,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData)
                 .then(optimizeResponse)
-                .catch(function (err) {
-                    console.error(err.message);
-                });
+                .catch(optimizeError);
         });
     });
 
@@ -421,9 +409,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             $("#vrp-response").text("Calculating ...");
             ghOptimization.doRequest(jsonData)
                 .then(optimizeResponse)
-                .catch(function (err) {
-                    console.error(err.message);
-                });
+                .catch(optimizeError);
         });
     });
 
@@ -507,8 +493,8 @@ function setupGeocodingAPI(map, ghGeocoding) {
                     map.fitBounds(tmpB);
                 }
             })
-            .catch(function (json) {
-                $("#geocoding-error").text("An error occured: " + json.message);
+            .catch(function (err) {
+                $("#geocoding-error").text("An error occured: " + err.message);
             });
     };
 
@@ -536,8 +522,8 @@ function setupGeocodingAPI(map, ghGeocoding) {
                     break;
                 }
             })
-            .catch(function (json) {
-                $("#geocoding-error").text("An error occured: " + json.message);
+            .catch(function (err) {
+                $("#geocoding-error").text("An error occured: " + err.message);
             });
     });
 
@@ -640,8 +626,8 @@ function setupIsochrone(map, ghIsochrone) {
                     $('#isochrone-response').text("Calculation done");
                     inprogress = false;
                 })
-                .catch(function (json) {
-                    $('#isochrone-response').text("An error occured: " + json.message);
+                .catch(function (err) {
+                    $('#isochrone-response').text("An error occured: " + err.message);
                 })
             ;
         } else {
@@ -713,9 +699,9 @@ function setupMapMatching(map, mmClient) {
                             map.fitBounds(tmpB);
                         }
                     })
-                    .catch(function (json) {
+                    .catch(function (err) {
                         $("#map-matching-response").text("");
-                        $("#map-matching-error").text(json.message);
+                        $("#map-matching-error").text(err.message);
                     });//doRequest
             });// get
         });//click
