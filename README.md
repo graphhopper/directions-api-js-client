@@ -47,7 +47,7 @@ You can either require the whole client enabling you to use every GraphHopper AP
 
 ## Dependencies
 
-The API depends on superagent which is packaged into the graphhopper-client.js.
+The API depends on superagent and bluebird which are packaged into the graphhopper-client.js.
 
 The demo uses a couple of dependencies, but they are not required for requests to the API.
 
