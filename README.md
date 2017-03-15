@@ -33,9 +33,13 @@ You can either require the whole client enabling you to use every GraphHopper AP
      ghRouting.addPoint(new GHInput(47.400905, 8.534317));
      ghRouting.addPoint(new GHInput(47.394108, 8.538265));
  
-     ghRouting.doRequest(function (json) {
-         // Add your own result handling here
-         console.log(json);
+     ghRouting.doRequest()
+     .then(function(json){
+        // Add your own result handling here
+        console.log(json);
+     })
+     .catch(function(err){
+        console.error(err.message);
      });
  
  };
