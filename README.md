@@ -33,9 +33,13 @@ You can either require the whole client enabling you to use every GraphHopper AP
      ghRouting.addPoint(new GHInput(47.400905, 8.534317));
      ghRouting.addPoint(new GHInput(47.394108, 8.538265));
  
-     ghRouting.doRequest(function (json) {
-         // Add your own result handling here
-         console.log(json);
+     ghRouting.doRequest()
+     .then(function(json){
+        // Add your own result handling here
+        console.log(json);
+     })
+     .catch(function(err){
+        console.error(err.message);
      });
  
  };
@@ -43,7 +47,7 @@ You can either require the whole client enabling you to use every GraphHopper AP
 
 ## Dependencies
 
-The API depends on superagent which is packaged into the graphhopper-client.js.
+The API depends on superagent and bluebird which are packaged into the graphhopper-client.js.
 
 The demo uses a couple of dependencies, but they are not required for requests to the API.
 
