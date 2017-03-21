@@ -102,8 +102,6 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
             .timeout(args.timeout)
             .end(function (err, res) {
                 if (err || !res.ok) {
-                    console.log("whaat!!!!");
-                    console.log(res);
                     reject(ghUtil.extractError(res, url));
                 } else if (res) {
                     if (res.body.paths) {
@@ -123,8 +121,62 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
                                     "coordinates": tmpSnappedArray
                                 };
                             }
+                            if (path.instructions) {
+                                for (var j = 0; j < path.instructions.length; j++) {
+                                    // Add a LngLat to every instruction
+                                    path.instructions[j].lngLat = path.points.coordinates[path.instructions[j].interval[0]];
+                                }
+                            }
                         }
                     }
+                    resolve(res.body);
+                }
+            });
+    });
+};
+
+GraphHopperRouting.prototype.info = function (reqArgs) {
+    var that = this;
+
+    return new Promise(function (resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
+
+        var url = args.host + "/info?" + "key=" + args.key;
+
+        request
+            .get(url)
+            .accept(args.data_type)
+            .timeout(args.timeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.body);
+                }
+            });
+    });
+};
+
+GraphHopperRouting.prototype.i18n = function (reqArgs) {
+    var that = this;
+
+    return new Promise(function (resolve, reject) {
+        var args = ghUtil.clone(that);
+        if (reqArgs)
+            args = ghUtil.copyProperties(reqArgs, args);
+
+        var url = args.host + "/i18n/" + args.locale + "?" + "key=" + args.key;
+
+        request
+            .get(url)
+            .accept(args.data_type)
+            .timeout(args.timeout)
+            .end(function (err, res) {
+                if (err || !res.ok) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
                     resolve(res.body);
                 }
             });
