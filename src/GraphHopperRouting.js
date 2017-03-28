@@ -124,7 +124,9 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
                             if (path.instructions) {
                                 for (var j = 0; j < path.instructions.length; j++) {
                                     // Add a LngLat to every instruction
-                                    path.instructions[j].lngLat = path.points.coordinates[path.instructions[j].interval[0]];
+                                    var interval = path.instructions[j].interval;
+                                    // The second parameter of slice is non inclusive, therefore we have to add +1
+                                    path.instructions[j].points = path.points.coordinates.slice([interval[0],interval[1]+1]);
                                 }
                             }
                         }
