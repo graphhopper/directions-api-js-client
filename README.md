@@ -45,6 +45,10 @@ You can either require the whole client enabling you to use every GraphHopper AP
  };
 ```
 
+## Running Tests
+
+You can run all tests via `npm test`. If you only want to run a single spec file, you can use the `--spec` option, e.g., `npm test --spec spec/GraphHopperRoutingSpec.js`.
+
 ## Dependencies
 
 The API depends on superagent and bluebird which are packaged into the graphhopper-client.js.
