@@ -6,6 +6,7 @@ var ghUtil = new GHUtil();
 
 GraphHopperIsochrone = function (args) {
     this.time_limit = 600;
+    this.distance_limit = 0;
     this.buckets = 3;
     this.vehicle = "car";
     this.point;
@@ -13,6 +14,7 @@ GraphHopperIsochrone = function (args) {
     this.debug = false;
     this.basePath = '/isochrone';
     this.timeout = 30000;
+    this.reverse_flow = false;
 
     ghUtil.copyProperties(args, this);
 };
@@ -20,8 +22,10 @@ GraphHopperIsochrone = function (args) {
 GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
     var qString = "point=" + args.point;
     qString += "&time_limit=" + args.time_limit;
+    qString += "&distance_limit=" + args.distance_limit;
     qString += "&buckets=" + args.buckets;
     qString += "&vehicle=" + args.vehicle;
+    qString += "&reverse_flow=" + args.reverse_flow;
 
     if (args.debug)
         qString += "&debug=true";
