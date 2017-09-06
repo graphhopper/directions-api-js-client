@@ -8,6 +8,44 @@ Also see how we integrated the Routing and the Geocoding API to build a fully fe
 
 ## Getting Started
 
+### CDN
+
+You can use the hosted js client by adding it to your HTML like this:
+
+```
+ <script src="https://cdn.jsdelivr.net/npm/graphhopper-js-api-client/dist/graphhopper-client.js"></script>
+```
+
+You can then use it like this:
+```
+<script>
+  window.onload = function() {
+
+    var ghRouting = new GraphHopper.Routing({
+      key: "[Sign-up for free and get your own key: https://graphhopper.com/#directions-api]",
+      vehicle: "car",
+      elevation: false
+    });
+
+    ghRouting.addPoint(new GHInput(47.400905, 8.534317));
+    ghRouting.addPoint(new GHInput(47.394108, 8.538265));
+
+    ghRouting.doRequest()
+      .then(function(json) {
+        // Add your own result handling here
+        console.log(json);
+      })
+      .catch(function(err) {
+        console.error(err.message);
+      });
+
+
+  };
+</script>
+```
+
+### NPM
+
 Install the lib with npm:
 
 ```npm install graphhopper-js-api-client --save```
