@@ -50,7 +50,7 @@ Install the lib with npm:
 
 ```npm install graphhopper-js-api-client --save```
 
-You can either require the whole client enabling you to use every GraphHopper API, but you can alos only require the pieces you need.
+You can either require the whole client enabling you to use every GraphHopper API, but you can also only require the pieces you need.
 ```
  require('graphhopper-js-api-client');
  // If you only need e.g. Routing, you can only require the needed parts
@@ -59,7 +59,7 @@ You can either require the whole client enabling you to use every GraphHopper AP
  
  window.onload = function() {
  
-     var defaultKey = "[Sign-up for free and get your own key: https://graphhopper.com/#directions-api]";
+     var defaultKey = "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]";
      var profile = "car";
  
      var host;
