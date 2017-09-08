@@ -22,7 +22,7 @@ You can then use it like this:
   window.onload = function() {
 
     var ghRouting = new GraphHopper.Routing({
-      key: "[Sign-up for free and get your own key: https://graphhopper.com/#directions-api]",
+      key: "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]",
       vehicle: "car",
       elevation: false
     });
