@@ -1,5 +1,5 @@
 // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
-global.key = "bb6ff532-0a97-417d-b7d3-d05d0d5a61bf";
+global.key = "c9b2b65d-be3d-4d96-b19c-48365a066ae3";
 global.profile = "car";
 
 // Some tests take longer than the default 5000ms of Jasmine
