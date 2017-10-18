@@ -83,13 +83,62 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
     if (args.vehicle)
         qString += "&vehicle=" + args.vehicle;
 
-    if (args.details){
+    if (args.weighting)
+        qString += "&weighting=" + args.weighting;
+
+    if (args.heading_penalty)
+        qString += "&heading_penalty=" + args.heading_penalty;
+
+    if (args.pass_through)
+        qString += "&pass_through=" + args.pass_through;
+
+    if (args.algorithm)
+        qString += "&algorithm=" + args.algorithm;
+
+    if (args.block_area)
+        qString += "&block_area=" + args.block_area;
+
+    if (args.ch) {
+        if (args.ch.disable)
+            qString += "&ch.disable=" + args.ch.disable;
+    }
+
+    if (args.round_trip) {
+        if (args.round_trip.distance)
+            qString += "&round_trip.distance=" + args.round_trip.distance;
+        if (args.round_trip.seed)
+            qString += "&round_trip.seed=" + args.round_trip.seed;
+    }
+
+    if (args.alternative_route) {
+        if (args.alternative_route.max_paths)
+            qString += "&alternative_route.max_paths=" + args.alternative_route.max_paths;
+        if (args.alternative_route.max_weight_factor)
+            qString += "&alternative_route.max_weight_factor=" + args.alternative_route.max_weight_factor;
+        if (args.alternative_route.max_share_factor)
+            qString += "&alternative_route.max_share_factor=" + args.alternative_route.max_share_factor;
+    }
+
+    if (args.details) {
         for (var detailKey in args.details) {
             var detail = args.details[detailKey];
             qString += "&details=" + encodeURIComponent(detail);
         }
     }
-        qString += "&instructions=" + args.instructions;
+
+    if (args.point_hint) {
+        for (var hintKey in args.point_hint) {
+            var hint = args.point_hint[hintKey];
+            qString += "&point_hint=" + encodeURIComponent(hint);
+        }
+    }
+
+    if (args.heading) {
+        for (var headingKey in args.heading) {
+            var heading = args.heading[headingKey];
+            qString += "&heading=" + encodeURIComponent(heading);
+        }
+    }
 
     return qString;
 };
@@ -134,7 +183,7 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
                                     // Add a LngLat to every instruction
                                     var interval = path.instructions[j].interval;
                                     // The second parameter of slice is non inclusive, therefore we have to add +1
-                                    path.instructions[j].points = path.points.coordinates.slice([interval[0],interval[1]+1]);
+                                    path.instructions[j].points = path.points.coordinates.slice([interval[0], interval[1] + 1]);
                                 }
                             }
                         }
