@@ -16,8 +16,8 @@ describe("Matrix Test", function () {
                 expect(json.distances.length).toBe(4);
                 // Always 0 by definition
                 expect(json.distances[0][0]).toBe(0);
-                expect(json.distances[0][1]).toBeGreaterThan(40000);
-                expect(json.distances[0][1]).toBeLessThan(42000);
+                expect(json.distances[0][1]).toBeGreaterThan(46000);
+                expect(json.distances[0][1]).toBeLessThan(50000);
                 done();
             })
             .catch(function (err) {

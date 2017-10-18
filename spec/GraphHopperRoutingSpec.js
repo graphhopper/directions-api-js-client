@@ -5,6 +5,7 @@ var ghRouting = new GraphHopperRouting({key: key, vehicle: profile, elevation: f
 
 describe("Simple Route", function () {
     it("Get results", function (done) {
+        ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("52.488634,13.368988"));
         ghRouting.addPoint(new GHInput("52.50034,13.40332"));
 
@@ -17,6 +18,117 @@ describe("Simple Route", function () {
                 expect(json.paths[0].instructions[0].points[0][0]).toEqual(json.paths[0].points.coordinates[0][0]);
                 expect(json.paths[0].instructions[0].points[0][1]).toBeGreaterThan(52.4);
                 expect(json.paths[0].instructions[0].points[0][1]).toBeLessThan(52.6);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Compare Fastest vs. Shortest", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("52.303545,13.207455"));
+        ghRouting.addPoint(new GHInput("52.314093,13.28599"));
+
+        ghRouting.doRequest()
+            .then(function (json) {
+                var fastestTime = json.paths[0].time;
+                var fastestDistance = json.paths[0].distance;
+                // Shortest is not prepared with CH
+                ghRouting.doRequest({weighting: "shortest", ch: {disable: true}})
+                    .then(function (json2) {
+                        expect(json2.paths[0].time).toBeGreaterThan(fastestTime);
+                        expect(json2.paths[0].distance).toBeLessThan(fastestDistance);
+                        done();
+                    })
+                    .catch(function (err) {
+                        done.fail(err.message);
+                    });
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Get Path Details", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("52.488634,13.368988"));
+        ghRouting.addPoint(new GHInput("52.50034,13.40332"));
+
+        ghRouting.doRequest({"details": ["average_speed", "edge_id"]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                var details = json.paths[0].details;
+                expect(details).toBeDefined();
+                var edgeId = details.edge_id;
+                var averageSpeed = details.average_speed;
+                expect(edgeId.length).toBeGreaterThan(25);
+                expect(edgeId.length).toBeLessThan(75);
+                expect(averageSpeed.length).toBeGreaterThan(5);
+                expect(averageSpeed.length).toBeLessThan(15);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+
+    it("Use PointHint", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("48.482242,9.20878"));
+        ghRouting.addPoint(new GHInput("48.482886,9.208463"));
+
+        ghRouting.doRequest({"point_hint": ["Geranienweg", ""]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                // Due to PointHints, we match a different coordinate
+                // These coordinates might change over time
+                var snappedGeranienWeg = json.paths[0].snapped_waypoints.coordinates[0];
+                expect(snappedGeranienWeg[0]).toBeCloseTo(9.20869, 4);
+                expect(snappedGeranienWeg[1]).toBeCloseTo(48.48235, 4);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Disable CH and Use Turn Restrictions", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("52.29811,13.265026"));
+        ghRouting.addPoint(new GHInput("52.298018,13.264967"));
+
+        ghRouting.doRequest({ch: {disable: true}})
+            .then(function (json) {
+                // With ch this will be only 12 m due to ignored turn restriction
+                expect(json.paths[0].distance).toBeGreaterThan(300);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Disable CH to use Heading", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("48.871028,9.078012"));
+        ghRouting.addPoint(new GHInput("48.870925,9.077958"));
+
+        ghRouting.doRequest({ch: {disable: true}, heading: [0]})
+            .then(function (json) {
+                // With ch this will be only 12 m due to ignored turn restriction
+                expect(json.paths[0].distance).toBeGreaterThan(150);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Test Roundtrip", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("48.871028,9.078012"));
+        // tmp fix as the API currently requires two points
+        ghRouting.addPoint(new GHInput(""));
+
+        ghRouting.doRequest({round_trip: {distance: 10000, seed: 123}, algorithm: "round_trip"})
+            .then(function (json) {
+                expect(json.paths[0].distance).toBeGreaterThan(1000);
                 done();
             })
             .catch(function (err) {
