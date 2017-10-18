@@ -5,6 +5,7 @@ var ghRouting = new GraphHopperRouting({key: key, vehicle: profile, elevation: f
 
 describe("Simple Route", function () {
     it("Get results", function (done) {
+        ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("52.488634,13.368988"));
         ghRouting.addPoint(new GHInput("52.50034,13.40332"));
 
@@ -17,6 +18,28 @@ describe("Simple Route", function () {
                 expect(json.paths[0].instructions[0].points[0][0]).toEqual(json.paths[0].points.coordinates[0][0]);
                 expect(json.paths[0].instructions[0].points[0][1]).toBeGreaterThan(52.4);
                 expect(json.paths[0].instructions[0].points[0][1]).toBeLessThan(52.6);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+    it("Get Path Details", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("52.488634,13.368988"));
+        ghRouting.addPoint(new GHInput("52.50034,13.40332"));
+
+        ghRouting.doRequest({"details": ["average_speed", "edge_id"]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                var details = json.paths[0].details;
+                expect(details).toBeDefined();
+                var edgeId = details.edge_id;
+                var averageSpeed = details.average_speed;
+                expect(edgeId.length).toBeGreaterThan(25);
+                expect(edgeId.length).toBeLessThan(75);
+                expect(averageSpeed.length).toBeGreaterThan(5);
+                expect(averageSpeed.length).toBeLessThan(15);
                 done();
             })
             .catch(function (err) {

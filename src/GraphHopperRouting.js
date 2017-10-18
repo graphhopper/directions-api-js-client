@@ -83,6 +83,14 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
     if (args.vehicle)
         qString += "&vehicle=" + args.vehicle;
 
+    if (args.details){
+        for (var detailKey in args.details) {
+            var detail = args.details[detailKey];
+            qString += "&details=" + encodeURIComponent(detail);
+        }
+    }
+        qString += "&instructions=" + args.instructions;
+
     return qString;
 };
 

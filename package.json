@@ -1,6 +1,6 @@
 {
   "name": "graphhopper-js-api-client",
-  "version": "0.9.0-2",
+  "version": "0.9.0-3",
   "description": "A Javascript Client for GraphHopper",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
@@ -18,15 +18,15 @@
     ]
   },
   "dependencies": {
-    "superagent": "3.5.0",
-    "bluebird": "3.5.0"
+    "bluebird": "^3.5.1",
+    "superagent": "^3.6.3"
   },
   "devDependencies": {
-    "browserify": "14.1.0",
+    "browserify": "14.4.0",
     "browserify-swap": "0.2.2",
     "derequire": "^2.0.6",
-    "jasmine": "2.5.3",
-    "jshint": "2.9.4",
+    "jasmine": "2.8.0",
+    "jshint": "2.9.5",
     "uglifyify": "3.0.4",
     "watchify": "3.9.0"
   },
