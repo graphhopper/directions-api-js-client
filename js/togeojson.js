@@ -24,16 +24,22 @@ var toGeoJSON = (function() {
         for (var j = 0, o = []; j < x.length; j++) { o[j] = parseFloat(x[j]); }
         return o;
     }
-    function clean(x) {
-        var o = {};
-        for (var i in x) { if (x[i]) { o[i] = x[i]; } }
-        return o;
-    }
     // get the content of a text node, if any
     function nodeVal(x) {
         if (x) { norm(x); }
         return (x && x.textContent) || '';
     }
+    // get the contents of multiple text nodes, if present
+    function getMulti(x, ys) {
+        var o = {}, n, k;
+        for (k = 0; k < ys.length; k++) {
+            n = get1(x, ys[k]);
+            if (n) o[ys[k]] = nodeVal(n);
+        }
+        return o;
+    }
+    // add properties of Y to X, overwriting if present in both
+    function extend(x, y) { for (var k in y) x[k] = y[k]; }
     // get one coordinate from a coordinate array, if any
     function coord1(v) { return numarray(v.replace(removeSpace, '').split(',')); }
     // get all coordinates from a coordinate array as [[],[]]
@@ -198,9 +204,11 @@ var toGeoJSON = (function() {
             function getPlacemark(root) {
                 var geomsAndTimes = getGeometry(root), i, properties = {},
                     name = nodeVal(get1(root, 'name')),
+                    address = nodeVal(get1(root, 'address')),
                     styleUrl = nodeVal(get1(root, 'styleUrl')),
                     description = nodeVal(get1(root, 'description')),
                     timeSpan = get1(root, 'TimeSpan'),
+                    timeStamp = get1(root, 'TimeStamp'),
                     extendedData = get1(root, 'ExtendedData'),
                     lineStyle = get1(root, 'LineStyle'),
                     polyStyle = get1(root, 'PolyStyle'),
@@ -208,6 +216,7 @@ var toGeoJSON = (function() {
 
                 if (!geomsAndTimes.geoms.length) return [];
                 if (name) properties.name = name;
+                if (address) properties.address = address;
                 if (styleUrl) {
                     if (styleUrl[0] !== '#') {
                         styleUrl = '#' + styleUrl;
@@ -233,6 +242,9 @@ var toGeoJSON = (function() {
                     var begin = nodeVal(get1(timeSpan, 'begin'));
                     var end = nodeVal(get1(timeSpan, 'end'));
                     properties.timespan = { begin: begin, end: end };
+                }
+                if (timeStamp) {
+                    properties.timestamp = nodeVal(get1(timeStamp, 'when'));
                 }
                 if (lineStyle) {
                     var linestyles = kmlColor(nodeVal(get1(lineStyle, 'color'))),
@@ -331,12 +343,15 @@ var toGeoJSON = (function() {
                     line;
                 for (var i = 0; i < segments.length; i++) {
                     line = getPoints(segments[i], 'trkpt');
-                    if (line.line) track.push(line.line);
-                    if (line.times && line.times.length) times.push(line.times);
-                    if (line.heartRates && line.heartRates.length) heartRates.push(line.heartRates);
+                    if (line) {
+                        if (line.line) track.push(line.line);
+                        if (line.times && line.times.length) times.push(line.times);
+                        if (line.heartRates && line.heartRates.length) heartRates.push(line.heartRates);
+                    }
                 }
                 if (track.length === 0) return;
                 var properties = getProperties(node);
+                extend(properties, getLineStyle(get1(node, 'extensions')));
                 if (times.length) properties.coordTimes = track.length === 1 ? times[0] : times;
                 if (heartRates.length) properties.heartRates = track.length === 1 ? heartRates[0] : heartRates;
                 return {
@@ -351,9 +366,11 @@ var toGeoJSON = (function() {
             function getRoute(node) {
                 var line = getPoints(node, 'rtept');
                 if (!line.line) return;
+                var prop = getProperties(node);
+                extend(prop, getLineStyle(get1(node, 'extensions')));
                 var routeObj = {
                     type: 'Feature',
-                    properties: getProperties(node),
+                    properties: prop,
                     geometry: {
                         type: 'LineString',
                         coordinates: line.line
@@ -363,7 +380,7 @@ var toGeoJSON = (function() {
             }
             function getPoint(node) {
                 var prop = getProperties(node);
-                prop.sym = nodeVal(get1(node, 'sym'));
+                extend(prop, getMulti(node, ['sym']));
                 return {
                     type: 'Feature',
                     properties: prop,
@@ -373,15 +390,32 @@ var toGeoJSON = (function() {
                     }
                 };
             }
-            function getProperties(node) {
-                var meta = ['name', 'desc', 'author', 'copyright', 'link',
-                            'time', 'keywords'],
-                    prop = {},
-                    k;
-                for (k = 0; k < meta.length; k++) {
-                    prop[meta[k]] = nodeVal(get1(node, meta[k]));
+            function getLineStyle(extensions) {
+                var style = {};
+                if (extensions) {
+                    var lineStyle = get1(extensions, 'line');
+                    if (lineStyle) {
+                        var color = nodeVal(get1(lineStyle, 'color')),
+                            opacity = parseFloat(nodeVal(get1(lineStyle, 'opacity'))),
+                            width = parseFloat(nodeVal(get1(lineStyle, 'width')));
+                        if (color) style.stroke = color;
+                        if (!isNaN(opacity)) style['stroke-opacity'] = opacity;
+                        // GPX width is in mm, convert to px with 96 px per inch
+                        if (!isNaN(width)) style['stroke-width'] = width * 96 / 25.4;
+                    }
                 }
-                return clean(prop);
+                return style;
+            }
+            function getProperties(node) {
+                var prop = getMulti(node, ['name', 'cmt', 'desc', 'type', 'time', 'keywords']),
+                    links = get(node, 'link');
+                if (links.length) prop.links = [];
+                for (var i = 0, link; i < links.length; i++) {
+                    link = { href: attr(links[i], 'href') };
+                    extend(link, getMulti(links[i], ['text', 'type']));
+                    prop.links.push(link);
+                }
+                return prop;
             }
             return gj;
         }
