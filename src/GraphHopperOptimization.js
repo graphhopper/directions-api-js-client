@@ -69,9 +69,9 @@ GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
         },
         "vehicles": list,
         "vehicle_types": [{
-            "type_id": "_vtype_1",
-            "profile": this.profile
-        }],
+                "type_id": "_vtype_1",
+                "profile": this.profile
+            }],
         "services": servicesArray
 
     };
@@ -91,49 +91,49 @@ GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, reqArgs) {
         var url = args.host + args.basePath + "/optimize?key=" + args.key;
 
         request
-            .post(url)
-            .send(JSON.stringify(jsonInput))
-            .accept('application/json; charset=utf-8')
-            .type('application/json')
-            .timeout(args.postTimeout)
-            .end(function (err, res) {
-                if (err || !res.ok) {
-                    reject(ghUtil.extractError(res, url));
-                } else if (res) {
-                    var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
-                    var timerRet;
+                .post(url)
+                .send(JSON.stringify(jsonInput))
+                .accept('application/json; charset=utf-8')
+                .type('application/json')
+                .timeout(args.postTimeout)
+                .end(function (err, res) {
+                    if (err || !res.ok) {
+                        reject(ghUtil.extractError(res, url));
+                    } else if (res) {
+                        var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
+                        var timerRet;
 
-                    var pollTrigger = function () {
-                        // console.log("poll solution " + solutionUrl);
-                        request
-                            .get(solutionUrl)
-                            .accept('application/json')
-                            .timeout(args.timeout)
-                            .end(function (err, res) {
-                                if (err || !res.ok || res.body === undefined) {
-                                    clearInterval(timerRet);
-                                    reject(ghUtil.extractError(res, url));
-                                } else if (res) {
-                                    //console.log(res.body);
-                                    if (res.body.status === "finished") {
-                                        //console.log("finished");
-                                        clearInterval(timerRet);
-                                        resolve(res.body);
-                                    } else if (res.body.message) {
-                                        clearInterval(timerRet);
-                                        resolve(res.body);
-                                    }
-                                }
-                            });
-                    };
+                        var pollTrigger = function () {
+                            // console.log("poll solution " + solutionUrl);
+                            request
+                                    .get(solutionUrl)
+                                    .accept('application/json')
+                                    .timeout(args.timeout)
+                                    .end(function (err, res) {
+                                        if (err || !res.ok || res.body === undefined) {
+                                            clearInterval(timerRet);
+                                            reject(ghUtil.extractError(res, url));
+                                        } else if (res) {
+                                            //console.log(res.body);
+                                            if (res.body.status === "finished") {
+                                                //console.log("finished");
+                                                clearInterval(timerRet);
+                                                resolve(res.body);
+                                            } else if (res.body.message) {
+                                                clearInterval(timerRet);
+                                                resolve(res.body);
+                                            }
+                                        }
+                                    });
+                        };
 
-                    if (that.waitInMillis > 0)
-                        timerRet = setInterval(pollTrigger, that.waitInMillis);
-                    else
-                        pollTrigger();
+                        if (that.waitInMillis > 0)
+                            timerRet = setInterval(pollTrigger, that.waitInMillis);
+                        else
+                            pollTrigger();
 
-                }
-            });
+                    }
+                });
     });
 };
 
@@ -145,6 +145,21 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
     var serviceMap = {};
     var shipmentMap = {};
     var locationMap = {};
+    var hasGeometries = false;
+    var hasCustomCostMatrix = false;
+
+    if (jsonInput.cost_matrices && jsonInput.cost_matrices.length > 0)
+        hasCustomCostMatrix = true;
+
+    if (jsonInput.configuration && !hasCustomCostMatrix)
+        if (jsonInput.configuration.routing.calc_points === true)
+            hasGeometries = true;
+
+    if (!hasGeometries) {
+        if (!jsonInput.configuration && !hasCustomCostMatrix) {
+            jsonInput.configuration = {"routing": {"calc_points": true}};
+        }
+    }
 
     if (jsonInput.vehicle_types) {
         for (var typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
@@ -206,6 +221,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
         if (json.solution) {
             var sol = json.solution;
             json.raw_solution = JSON.parse(JSON.stringify(sol));
+            sol["calc_points"] = hasGeometries;
             for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
                 var route = sol.routes[routeIndex];
                 var vehicleId = route.vehicle_id;
@@ -248,7 +264,7 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
         return json;
     });
     return promise;
-    
+
 };
 
 module.exports = GraphHopperOptimization;
