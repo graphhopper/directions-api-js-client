@@ -98,6 +98,9 @@ GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
     if (args.block_area)
         qString += "&block_area=" + args.block_area;
 
+    if (args.avoid)
+        qString += "&avoid=" + args.avoid;
+
     if (args.ch) {
         if (args.ch.disable)
             qString += "&ch.disable=" + args.ch.disable;
