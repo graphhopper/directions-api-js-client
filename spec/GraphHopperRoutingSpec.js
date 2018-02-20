@@ -120,6 +120,21 @@ describe("Simple Route", function () {
                 done.fail(err.message);
             });
     });
+    it("Disable CH to use Avoid", function (done) {
+        ghRouting.clearPoints();
+        ghRouting.addPoint(new GHInput("48.8566,2.3522"));
+        ghRouting.addPoint(new GHInput("48.4047,2.7016"));
+
+        ghRouting.doRequest({ch: {disable: true}, avoid: [ 'motorway', 'toll' ]})
+            .then(function (json) {
+                // With ch and avoiding motorway this need more 1h05
+                expect(json.paths[0].time).toBeGreaterThan(3900000);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
     it("Test Roundtrip", function (done) {
         ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("48.871028,9.078012"));
