@@ -123,8 +123,6 @@ describe("Simple Route", function () {
     it("Test Roundtrip", function (done) {
         ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("48.871028,9.078012"));
-        // tmp fix as the API currently requires two points
-        ghRouting.addPoint(new GHInput(""));
 
         ghRouting.doRequest({round_trip: {distance: 10000, seed: 123}, algorithm: "round_trip"})
             .then(function (json) {
