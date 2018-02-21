@@ -85,7 +85,10 @@ You can either require the whole client enabling you to use every GraphHopper AP
 
 ## Running Tests
 
-You can run all tests via `npm test`. If you only want to run a single spec file, you can use the `--spec` option, e.g., `npm test --spec spec/GraphHopperRoutingSpec.js`.
+In order to run the tests, you have to register for a key on [GraphHopper](https://www.graphhopper.com/).
+Either set your key as environment variable using `export GHKEY=YOUR_KEY` or set your key in `spec/helpers/config.js`.
+You can run all tests via `npm test`. 
+If you only want to run a single spec file, you can use the `--spec` option, e.g., `npm test --spec spec/GraphHopperRoutingSpec.js`.
 
 ## Dependencies
 
