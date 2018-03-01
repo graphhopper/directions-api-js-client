@@ -1,5 +1,7 @@
 # JavaScript client for the Directions API
 
+[![Build Status](https://travis-ci.org/graphhopper/directions-api-js-client.svg?branch=master)](https://travis-ci.org/graphhopper/directions-api-js-client)
+
 This project offers JavaScript clients and examples for the [GraphHopper Directions API](https://graphhopper.com).
 
 **Try the live examples [here](https://graphhopper.com/api/1/examples/).**
