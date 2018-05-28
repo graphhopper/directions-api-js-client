@@ -668,6 +668,7 @@ function setupMapMatching(map, mmClient) {
 
     function mybind(key, url, vehicle) {
         $("#" + key).click(function (event) {
+            $("#" + key).prop('disabled', true);
             $("#map-matching-response").text("downloading file ...");
             $.get(url, function (content) {
                 var dom = (new DOMParser()).parseFromString(content, 'text/xml');
@@ -698,10 +699,12 @@ function setupMapMatching(map, mmClient) {
                             var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                             map.fitBounds(tmpB);
                         }
+                        $("#" + key).prop('disabled', false);
                     })
                     .catch(function (err) {
                         $("#map-matching-response").text("");
                         $("#map-matching-error").text(err.message);
+                        $("#" + key).prop('disabled', false);
                     });//doRequest
             });// get
         });//click
