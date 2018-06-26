@@ -24,6 +24,65 @@ describe("Simple Route", function () {
                 done.fail(err.message);
             });
     });
+
+    it("Pass Points as Objects", function (done) {
+        ghRouting.clearPoints();
+
+        ghRouting.doRequest({points: [{lat: 52.488634, lng: 13.368988}, {lat: 52.50034, lng: 13.40332}]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                expect(json.paths[0].distance).toBeGreaterThan(3000);
+                expect(json.paths[0].distance).toBeLessThan(4000);
+                expect(json.paths[0].instructions[0].points.length).toBeGreaterThan(1);
+                expect(json.paths[0].instructions[0].points[0][0]).toEqual(json.paths[0].points.coordinates[0][0]);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeGreaterThan(52.4);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeLessThan(52.6);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+
+    it("Pass Points as Array", function (done) {
+        ghRouting.clearPoints();
+
+        // This is geoJson format lng,lat
+        ghRouting.doRequest({points: [[13.368988, 52.488634], [13.40332, 52.50034]]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                expect(json.paths[0].distance).toBeGreaterThan(3000);
+                expect(json.paths[0].distance).toBeLessThan(4000);
+                expect(json.paths[0].instructions[0].points.length).toBeGreaterThan(1);
+                expect(json.paths[0].instructions[0].points[0][0]).toEqual(json.paths[0].points.coordinates[0][0]);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeGreaterThan(52.4);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeLessThan(52.6);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+
+    it("Pass Points as String", function (done) {
+        ghRouting.clearPoints();
+
+        ghRouting.doRequest({points: ["52.488634,13.368988", "52.50034,13.40332"]})
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                expect(json.paths[0].distance).toBeGreaterThan(3000);
+                expect(json.paths[0].distance).toBeLessThan(4000);
+                expect(json.paths[0].instructions[0].points.length).toBeGreaterThan(1);
+                expect(json.paths[0].instructions[0].points[0][0]).toEqual(json.paths[0].points.coordinates[0][0]);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeGreaterThan(52.4);
+                expect(json.paths[0].instructions[0].points[0][1]).toBeLessThan(52.6);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+
     it("Compare Fastest vs. Shortest", function (done) {
         ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("52.303545,13.207455"));

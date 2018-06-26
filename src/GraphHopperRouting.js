@@ -85,6 +85,8 @@ GraphHopperRouting.prototype.createPointParams = function (points) {
             str += "&";
         if (point.lat)
             str += "point=" + encodeURIComponent(point.lat + "," + point.lng);
+        else if (ghUtil.isArray(point) && point.length === 2)
+            str += "point=" + encodeURIComponent(point[1] + "," + point[0]);
         else
             str += "point=" + encodeURIComponent(point.toString());
     }
@@ -119,7 +121,14 @@ GraphHopperRouting.prototype.flatParameter = function (key, val) {
 /**
  * Execute the routing request using the provided args.
  *
- * @param reqArgs can be either a string, object, or null. If you pass a string, it should be in the form of "point=x&parameterA=b&key=abc"
+ * Points have to be an array. Each point can be in one of these forms:
+ * - "lat,lng"
+ * - [lng, lat]
+ * - {lat: lat, lng: lng}
+ *
+ * @param   reqArgs can be either a string, object, or null.
+ *          If you pass a string, it should be in the form of "point=x&parameterA=b&key=abc" and the parameters and values
+ *          should be encoded using <code>encodeURIComponent()</code>.
  */
 GraphHopperRouting.prototype.doRequest = function (reqArgs) {
     var that = this;
