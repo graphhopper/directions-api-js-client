@@ -125,6 +125,7 @@ GraphHopperRouting.prototype.flatParameter = function (key, val) {
  * - "lat,lng"
  * - [lng, lat]
  * - {lat: lat, lng: lng}
+ * - GHInput (e.g. new GHInput("52.303545,13.207455"))
  *
  * @param   reqArgs can be either a string, object, or null.
  *          If you pass a string, it should be in the form of "point=x&parameterA=b&key=abc" and the parameters and values
