@@ -58,8 +58,7 @@ GHUtil.prototype.decodePath = function (encoded, is3D) {
             // elevation
             shift = 0;
             result = 0;
-            do
-            {
+            do {
                 b = encoded.charCodeAt(index++) - 63;
                 result |= (b & 0x1f) << shift;
                 shift += 5;
@@ -86,7 +85,21 @@ GHUtil.prototype.extractError = function (res, url) {
         msg = res;
     }
 
-    return new Error(msg+ " - for url "+url);
+    return new Error(msg + " - for url " + url);
+};
+
+GHUtil.prototype.isArray = function (value) {
+    var stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object array]");
+};
+
+GHUtil.prototype.isObject = function (value) {
+    var stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object object]");
+};
+
+GHUtil.prototype.isString = function (value) {
+    return (typeof value === 'string');
 };
 
 module.exports = GHUtil;

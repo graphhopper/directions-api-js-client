@@ -17,6 +17,7 @@ GraphHopperRouting = function (args) {
     this.optimize = 'false';
     this.basePath = '/route';
     this.timeout = 10000;
+    this.skip = {"host": true, "basePath": true};
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
@@ -55,106 +56,91 @@ GraphHopperRouting.prototype.addPoint = function (latlon) {
     this.points.push(latlon);
 };
 
-GraphHopperRouting.prototype.getParametersAsQueryString = function (args) {
-    var qString = "locale=" + args.locale;
+GraphHopperRouting.prototype.getParametersAsQueryString = function (args, skipParameters) {
+    var queryString = "";
+    for (var key in args) {
+        if (skipParameters && skipParameters[key])
+            continue;
 
-    for (var idx in args.points) {
-        var p = args.points[idx];
-        qString += "&point=" + encodeURIComponent(p.toString());
+        var val = args[key];
+
+        if (key === 'points')
+            queryString += this.createPointParams(val);
+        else
+            queryString += this.flatParameter(key, val);
     }
-
-    if (args.debug)
-        qString += "&debug=true";
-
-    qString += "&type=" + args.data_type;
-
-    if (args.instructions)
-        qString += "&instructions=" + args.instructions;
-
-    if (args.points_encoded)
-        qString += "&points_encoded=" + args.points_encoded;
-
-    if (args.elevation)
-        qString += "&elevation=" + args.elevation;
-
-    if (args.optimize)
-        qString += "&optimize=" + args.optimize;
-
-    if (args.vehicle)
-        qString += "&vehicle=" + args.vehicle;
-
-    if (args.weighting)
-        qString += "&weighting=" + args.weighting;
-
-    if (args.heading_penalty)
-        qString += "&heading_penalty=" + args.heading_penalty;
-
-    if (args.pass_through)
-        qString += "&pass_through=" + args.pass_through;
-
-    if (args.algorithm)
-        qString += "&algorithm=" + args.algorithm;
-
-    if (args.block_area)
-        qString += "&block_area=" + args.block_area;
-
-    if (args.avoid)
-        qString += "&avoid=" + args.avoid.join(';');
-
-    if (args.ch) {
-        if (args.ch.disable)
-            qString += "&ch.disable=" + args.ch.disable;
-    }
-
-    if (args.round_trip) {
-        if (args.round_trip.distance)
-            qString += "&round_trip.distance=" + args.round_trip.distance;
-        if (args.round_trip.seed)
-            qString += "&round_trip.seed=" + args.round_trip.seed;
-    }
-
-    if (args.alternative_route) {
-        if (args.alternative_route.max_paths)
-            qString += "&alternative_route.max_paths=" + args.alternative_route.max_paths;
-        if (args.alternative_route.max_weight_factor)
-            qString += "&alternative_route.max_weight_factor=" + args.alternative_route.max_weight_factor;
-        if (args.alternative_route.max_share_factor)
-            qString += "&alternative_route.max_share_factor=" + args.alternative_route.max_share_factor;
-    }
-
-    if (args.details) {
-        for (var detailKey in args.details) {
-            var detail = args.details[detailKey];
-            qString += "&details=" + encodeURIComponent(detail);
-        }
-    }
-
-    if (args.point_hint) {
-        for (var hintKey in args.point_hint) {
-            var hint = args.point_hint[hintKey];
-            qString += "&point_hint=" + encodeURIComponent(hint);
-        }
-    }
-
-    if (args.heading) {
-        for (var headingKey in args.heading) {
-            var heading = args.heading[headingKey];
-            qString += "&heading=" + encodeURIComponent(heading);
-        }
-    }
-
-    return qString;
+    return queryString;
 };
 
+GraphHopperRouting.prototype.createPointParams = function (points) {
+    if (!ghUtil.isArray(points)) {
+        return "";
+    }
+
+    var str = "", point, i, l;
+
+    for (i = 0, l = points.length; i < l; i++) {
+        point = points[i];
+        if (i > 0)
+            str += "&";
+        if (point.lat)
+            str += "point=" + encodeURIComponent(point.lat + "," + point.lng);
+        else
+            str += "point=" + encodeURIComponent(point.toString());
+    }
+    return (str);
+};
+
+GraphHopperRouting.prototype.flatParameter = function (key, val) {
+    var url = "";
+    var arr;
+    var keyIndex;
+
+    if (ghUtil.isObject(val)) {
+        arr = Object.keys(val);
+        for (keyIndex in arr) {
+            var objKey = arr[keyIndex];
+            url += this.flatParameter(key + "." + objKey, val[objKey]);
+        }
+        return url;
+
+    } else if (ghUtil.isArray(val)) {
+        arr = val;
+        for (keyIndex in arr) {
+            url += this.flatParameter(key, arr[keyIndex]);
+        }
+        return url;
+    }
+
+    return "&" + encodeURIComponent(key) + "=" + encodeURIComponent(val);
+};
+
+
+/**
+ * Execute the routing request using the provided args.
+ *
+ * @param reqArgs can be either a string, object, or null. If you pass a string, it should be in the form of "point=x&parameterA=b&key=abc"
+ */
 GraphHopperRouting.prototype.doRequest = function (reqArgs) {
     var that = this;
 
     return new Promise(function (resolve, reject) {
         var args = ghUtil.clone(that);
-        if (reqArgs)
-            args = ghUtil.copyProperties(reqArgs, args);
+        var url = args.host + args.basePath + "?";
 
-        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+        if (reqArgs) {
+            if (ghUtil.isObject(reqArgs)) {
+                args = ghUtil.copyProperties(reqArgs, args);
+                url += that.getParametersAsQueryString(args, that.skip);
+            } else if (ghUtil.isString(reqArgs)) {
+                url += reqArgs;
+            } else {
+                reject(new Error("The reqArgs have to bei either String, an Object, or null"));
+            }
+        } else {
+            // Use the default args
+            url += that.getParametersAsQueryString(args, that.skip);
+        }
 
         request
             .get(url)

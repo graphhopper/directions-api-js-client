@@ -48,6 +48,7 @@ describe("Simple Route", function () {
                 done.fail(err.message);
             });
     });
+
     it("Get Path Details", function (done) {
         ghRouting.clearPoints();
         ghRouting.addPoint(new GHInput("52.488634,13.368988"));
@@ -64,6 +65,20 @@ describe("Simple Route", function () {
                 expect(edgeId.length).toBeLessThan(75);
                 expect(averageSpeed.length).toBeGreaterThan(5);
                 expect(averageSpeed.length).toBeLessThan(15);
+                done();
+            })
+            .catch(function (err) {
+                done.fail(err.message);
+            });
+    });
+
+    it("Use request String", function (done) {
+        ghRouting.clearPoints();
+
+        ghRouting.doRequest("point=48.631292%2C9.350739&point=48.629647%2C9.350567&type=json&vehicle=car&key=" + key)
+            .then(function (json) {
+                expect(json.paths.length).toBeGreaterThan(0);
+                expect(json.paths[0].distance).toBeGreaterThan(200);
                 done();
             })
             .catch(function (err) {
@@ -125,7 +140,7 @@ describe("Simple Route", function () {
         ghRouting.addPoint(new GHInput("48.8566,2.3522"));
         ghRouting.addPoint(new GHInput("48.4047,2.7016"));
 
-        ghRouting.doRequest({ch: {disable: true}, avoid: [ 'motorway', 'toll' ]})
+        ghRouting.doRequest({ch: {disable: true}, avoid: 'motorway,toll'})
             .then(function (json) {
                 // With ch and avoiding motorway this need more 1h05
                 expect(json.paths[0].time).toBeGreaterThan(3900000);
