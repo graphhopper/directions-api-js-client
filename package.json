@@ -18,7 +18,7 @@
     ]
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.5.2",
     "superagent": "^3.8.3"
   },
   "devDependencies": {
@@ -26,7 +26,7 @@
     "browserify-swap": "0.2.2",
     "derequire": "^2.0.6",
     "jasmine": "3.1.0",
-    "jshint": "2.9.5",
+    "jshint": "^2.9.6",
     "uglifyify": "4.0.5",
     "watchify": "3.11.0"
   },
