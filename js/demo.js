@@ -627,6 +627,7 @@ function setupIsochrone(map, ghIsochrone) {
                     inprogress = false;
                 })
                 .catch(function (err) {
+                    inprogress = false;
                     $('#isochrone-response').text("An error occured: " + err.message);
                 })
             ;
