@@ -17,7 +17,7 @@ GraphHopperRouting = function (args) {
     this.optimize = 'false';
     this.basePath = '/route';
     this.timeout = 10000;
-    this.skip = {"host": true, "basePath": true};
+    this.skip = {"skip": true, "host": true, "basePath": true, "graphhopper_maps_host": true, "turn_sign_map": true, "timeout": true, "data_type": true};
 
 // TODO make reading of /api/1/info/ possible
 //    this.elevation = false;
