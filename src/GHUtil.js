@@ -79,7 +79,9 @@ GHUtil.prototype.extractError = function (res, url) {
 
     if (res && res.body) {
         msg = res.body;
-        if (msg.message)
+        if (msg.hints && msg.hints[0] && msg.hints[0].message)
+            msg = msg.hints[0].message;
+        else if (msg.message)
             msg = msg.message;
     } else {
         msg = res;
