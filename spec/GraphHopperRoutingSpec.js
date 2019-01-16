@@ -222,6 +222,21 @@ describe("Simple Route", function () {
                 done.fail(err.message);
             });
     });
+    it("Test getting hint on error", function (done) {
+        ghRouting.clearPoints();
+        // Some random point in the ocean
+        ghRouting.addPoint(new GHInput("47.457809,-10.283203"));
+        ghRouting.addPoint(new GHInput("47.457809,-10.283203"));
+
+        ghRouting.doRequest()
+            .then(function (json) {
+                done.fail("No error received");
+            })
+            .catch(function (err) {
+                expect(err.message).toContain("Cannot find point 0: 47.457809,-10.283203");
+                done();
+            });
+    });
 });
 
 describe("Info Test", function () {
