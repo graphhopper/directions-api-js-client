@@ -233,6 +233,7 @@ describe("Simple Route", function () {
                 done.fail("No error received");
             })
             .catch(function (err) {
+                // This is the hint message describing the error
                 expect(err.message).toContain("Cannot find point 0: 47.457809,-10.283203");
                 done();
             });
