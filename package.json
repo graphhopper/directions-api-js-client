@@ -18,17 +18,17 @@
     ]
   },
   "dependencies": {
-    "bluebird": "^3.5.3",
-    "superagent": "^3.8.3"
+    "bluebird": "3.5.5",
+    "superagent": "5.0.6"
   },
   "devDependencies": {
     "browserify": "16.2.3",
     "browserify-swap": "0.2.2",
     "derequire": "^2.0.6",
-    "jasmine": "3.1.0",
-    "jshint": "^2.9.6",
-    "uglifyify": "4.0.5",
-    "watchify": "3.11.0"
+    "jasmine": "3.4.0",
+    "jshint": "2.10.2",
+    "uglifyify": "5.0.1",
+    "watchify": "3.11.1"
   },
   "repository": {
     "type": "git",
