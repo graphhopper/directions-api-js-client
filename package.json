@@ -24,10 +24,10 @@
   "devDependencies": {
     "browserify": "16.2.3",
     "browserify-swap": "0.2.2",
-    "derequire": "^2.0.6",
+    "derequire": "2.0.6",
     "jasmine": "3.4.0",
     "jshint": "2.10.2",
-    "uglifyify": "^5.0.2",
+    "uglifyify": "5.0.2",
     "watchify": "3.11.1"
   },
   "repository": {
