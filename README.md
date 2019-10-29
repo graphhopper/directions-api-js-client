@@ -142,6 +142,21 @@ You need [the geocoding client](./src/GraphHopperGeocoding.js).
 You need [the map matching client](./src/GraphHopperMapMatching.js) and the 
 [togeojson.js](./js/togeojson.js)
 
+## Releasing a new Version to NPM
+
+Releasing a new version to NPM is easy.
+
+Set the version you like to publish in the `package.json`. It's important to understand, that every version can only be published once and cannot be overwritten.
+
+Tag the commit you like to publish for example like this:
+```
+git log # get the commit hash of the commit you want to tag
+git tag <tag> <commit-hash>
+git push origin --tags
+```
+
+Travis will then build and publish the commit to NPM.
+
 ## License
 
 Code stands under Apache License 2.0
