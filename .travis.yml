@@ -5,7 +5,7 @@ before_deploy: npm run bundleProduction
 deploy:
   provider: npm
   email: $NPM_EMAIL
-  api_key: $NPM_AUTH_TOKEN
+  api-key: $NPM_AUTH_TOKEN
   edge: false # explictly disable v2
   on:
     tags: true # only deploy when tags are given  
