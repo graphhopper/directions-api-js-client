@@ -4,7 +4,7 @@ node_js:
 before_deploy: npm run bundleProduction
 deploy:
   provider: npm
-  api_token: $NPM_API_TOKEN
-  edge: true # opt in to dpl v2  
+  email: $NPM_EMAIL
+  api_key: $NPM_API_TOKEN 
   on:
     tags: true # only deploy when tags are given  
