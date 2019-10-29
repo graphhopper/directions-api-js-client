@@ -4,7 +4,7 @@ node_js:
 before_deploy: npm run bundleProduction
 deploy:
   provider: npm
-  email: $NPM_EMAIL
-  api_key: $NPM_AUTH_TOKEN 
+  email: '$NPM_EMAIL'
+  api_key: '$NPM_AUTH_TOKEN'
   on:
     tags: true # only deploy when tags are given  
