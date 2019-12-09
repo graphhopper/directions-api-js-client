@@ -145,7 +145,7 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
             } else if (ghUtil.isString(reqArgs)) {
                 url += reqArgs;
             } else {
-                reject(new Error("The reqArgs have to bei either String, an Object, or null"));
+                reject(new Error("The reqArgs have to be either String, an Object, or null"));
             }
         } else {
             // Use the default args
