@@ -43,6 +43,20 @@ GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
     if (args.limit)
         qString += "&limit=" + args.limit;
 
+    if (args.osm_tag) {
+
+        if(args.osm_tag.length) {
+
+            for(var j=0; j < args.osm_tag.length;++j) {
+                qString += "&osm_tag=" + args.osm_tag[j];
+            }
+
+        } else {
+            qString += "&osm_tag=" + args.osm_tag;
+        }
+
+    }
+
     return qString;
 };
 
