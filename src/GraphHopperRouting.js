@@ -7,7 +7,9 @@ var ghUtil = new GHUtil();
 GraphHopperRouting = function (args) {
     this.points = [];
     this.host = "https://graphhopper.com/api/1";
-    this.vehicle = "car";
+    if(args.profile === undefined) {
+        this.vehicle = "car";
+    }
     this.debug = false;
     this.data_type = 'application/json';
     this.locale = 'en';
