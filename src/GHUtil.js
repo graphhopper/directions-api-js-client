@@ -87,7 +87,7 @@ GHUtil.prototype.extractError = function (res, url) {
         msg = res;
     }
 
-    return new Error(msg + " - for url " + url);
+    return new Error(msg);
 };
 
 GHUtil.prototype.isArray = function (value) {
