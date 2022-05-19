@@ -10,4 +10,4 @@ jobs:
         with:
           node-version: 16
       - run: npm install
-      - run: export GHKEY=$GHKEY; npm test
+      - run: export GHKEY=${{ secrets.GHKEY }}; npm test
