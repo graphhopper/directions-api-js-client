@@ -1,6 +1,6 @@
 # JavaScript client for the Directions API
 
-[![Build Status](https://travis-ci.org/graphhopper/directions-api-js-client.svg?branch=master)](https://travis-ci.org/graphhopper/directions-api-js-client)
+[![Build Status](https://travis-ci.com/graphhopper/directions-api-js-client.svg?branch=master)](https://travis-ci.org/graphhopper/directions-api-js-client)
 
 This project offers JavaScript clients and examples for the [GraphHopper Directions API](https://graphhopper.com).
 
@@ -23,7 +23,8 @@ You can then use it like this:
 <script>
   window.onload = function() {
 
-    var ghRouting = new GraphHopper.Routing({key: "[Sign-up for free and get your own key:https://www.graphhopper.com/products/]"},
+    let ghRouting = new GraphHopper.Routing(
+      { key: "[Sign-up for free and get your own key:https://www.graphhopper.com/products/]"},
       { profile: "car", elevation: false });
 
     ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
@@ -47,32 +48,23 @@ Install the lib with npm:
 ```npm install graphhopper-js-api-client --save```
 
 You can either require the whole client enabling you to use every GraphHopper API, but you can also only require the pieces you need.
-```
- require('graphhopper-js-api-client');
- // If you only need e.g. Routing, you can only require the needed parts
- //var GraphHopperRouting = require('graphhopper-js-api-client/src/GraphHopperRouting');
- //var GHInput = require('graphhopper-js-api-client/src/GHInput');
+
+```javascript
+require('graphhopper-js-api-client');
  
- window.onload = function() {
- 
-     var defaultKey = "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]";
-     var profile = "car";
- 
-     var host;
-     var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host}, {profile: profile, elevation: false});
-     // If you only need e.g. Routing, you can only require the needed parts
-     //var ghRouting = new GraphHopperRouting({key: defaultKey, host: host},{profile: profile, elevation: false});
- 
-     ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
-     .then(function(json){
-        // Add your own result handling here
-        console.log(json);
-     })
-     .catch(function(err){
-        console.error(err.message);
-     });
- 
- };
+window.onload = function() {
+  let defaultKey = "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]";
+  let ghRouting = new GraphHopper.Routing({key: defaultKey}, {profile:"car", elevation: false});
+
+  ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
+    .then(function(json){
+       // Add your own result handling here
+       console.log(json);
+    })
+    .catch(function(err){
+       console.error(err.message);
+    });
+};
 ```
 
 ## Running Tests
