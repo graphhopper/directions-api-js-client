@@ -12,27 +12,23 @@ GraphHopperOptimization = function (args) {
     this.postTimeout = args.postTimeout ? args.postTimeout : 10000;
 };
 
-GraphHopperOptimization.prototype.doTSPRequest = function () {
-    return this.doVRPRequest(1);
-};
-
-GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
+GraphHopperOptimization.prototype.doVRPRequest = function (points, vehicles) {
     let that = this;
 
-    let firstPoint = that.points[0];
+    let firstPoint = points[0];
     let servicesArray = [];
-    for (let pointIndex in that.points) {
+    for (let pointIndex in points) {
         if (pointIndex < 1)
             continue;
-        let point = that.points[pointIndex];
+        let point = points[pointIndex];
         let obj = {
             "id": "_" + pointIndex,
             "type": "pickup",
             "name": "maintenance " + pointIndex,
             "address": {
                 "location_id": "_location_" + pointIndex,
-                "lon": point.lng,
-                "lat": point.lat
+                "lon": point[0],
+                "lat": point[1]
             }
         };
         servicesArray.push(obj);
@@ -44,8 +40,8 @@ GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
             "vehicle_id": "_vehicle_" + i,
             "start_address": {
                 "location_id": "_start_location",
-                "lon": firstPoint.lng,
-                "lat": firstPoint.lat
+                "lon": firstPoint[0],
+                "lat": firstPoint[1]
             },
             "type_id": "_vtype_1"
         });

@@ -53,7 +53,8 @@ GraphHopperMatrix.prototype.doRequest = function (reqArgs) {
     });
 };
 
-GraphHopperMatrix.prototype.toHtmlTable = function (to_points, from_points, doubleArray) {
+GraphHopperMatrix.prototype.toHtmlTable = function (request, doubleArray) {
+    let to_points = request.to_points, from_points = request.from_points;
     let htmlOut = "<table border='1' cellpadding='10'>";
 
     // header => to points
@@ -63,20 +64,20 @@ GraphHopperMatrix.prototype.toHtmlTable = function (to_points, from_points, doub
     htmlOut += "<td>&#8595; from &#92; to &#8594;</td>";
 
     // header with to points
-    for (let idxTo in this.to_points) {
-        htmlOut += "<td><b>" + this.to_points[idxTo] + "</b></td>";
+    for (let idxTo in to_points) {
+        htmlOut += "<td><b>" + to_points[idxTo][1] + "," + to_points[idxTo][0] + "</b></td>";
     }
     htmlOut += "</tr>";
 
     for (let idxFrom in doubleArray) {
         htmlOut += "<tr>";
-        htmlOut += "<td><b>" + this.from_points[idxFrom] + "</b></td>";
+        htmlOut += "<td><b>" + from_points[idxFrom][1] + "," + from_points[idxFrom][0] + "</b></td>";
         let res = doubleArray[idxFrom];
         for (let idxTo in res) {
             let mapsURL = "https://graphhopper.com/maps?"
-                + "point=" + encodeURIComponent(this.from_points[idxFrom])
-                + "&point=" + encodeURIComponent(this.to_points[idxTo])
-                + "&vehicle=" + this.vehicle;
+                + "point=" + encodeURIComponent(from_points[idxFrom][1] + "," + from_points[idxFrom][0])
+                + "&point=" + encodeURIComponent(to_points[idxTo][1] + "," + to_points[idxTo][0])
+                + "&profile=" + request.profile;
 
             htmlOut += "<td> <a href='" + mapsURL + "'>" + res[idxTo] + "</a> </td>";
         }

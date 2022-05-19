@@ -38,8 +38,8 @@ $(document).ready(function (e) {
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
     let ghRouting = new GraphHopper.Routing({key: defaultKey, host: host}, {elevation: false});
-    let ghGeocoding = new GraphHopper.Geocoding({ key: defaultKey, host: host},
-        { limit: 8, locale: "en" /* fr, en, de and it are supported */ });
+    let ghGeocoding = new GraphHopper.Geocoding({key: defaultKey, host: host},
+        {limit: 8, locale: "en" /* fr, en, de and it are supported */});
     let ghMatrix = new GraphHopper.Matrix({key: defaultKey, host: host});
     let ghOptimization = new GraphHopper.Optimization({key: defaultKey, host: host});
     let ghIsochrone = new GraphHopper.Isochrone({key: defaultKey, host: host});
@@ -170,6 +170,7 @@ function setupRoutingAPI(map, ghRouting) {
 
 function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     map.setView([51.505, -0.09], 13);
+    let optPoints = [];
 
     L.NumberedDivIcon = L.Icon.extend({
         options: {
@@ -216,8 +217,8 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     };
 
     map.on('click', function (e) {
-        addPointToMap(e.latlng.lat, e.latlng.lng, ghOptimization.points.length);
-        ghOptimization.addPoint(new GHInput(e.latlng.lat, e.latlng.lng));
+        addPointToMap(e.latlng.lat, e.latlng.lng, optPoints.length);
+        optPoints.push([e.latlng.lng, e.latlng.lat]);
     });
 
     let routingLayer = L.geoJson().addTo(map);
@@ -225,10 +226,12 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         return feature.properties && feature.properties.style;
     };
 
+    let routePoints = [];
+
     let clearMap = function () {
-        ghOptimization.clear();
+        optPoints.length = 0;
         routingLayer.clearLayers();
-        ghRouting.clearPoints();
+        routePoints.length = 0;
         $("#vrp-response").empty();
         $("#vrp-error").empty();
     };
@@ -303,11 +306,11 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             let route = sol.routes[routeIndex];
 
             // fetch real routes from graphhopper
-            ghRouting.clearPoints();
+            routePoints.length = 0;
             let firstAdd;
             for (let actIndex = 0; actIndex < route.activities.length; actIndex++) {
                 let add = route.activities[actIndex].address;
-                ghRouting.addPoint(new GHInput(add.lat, add.lon));
+                routePoints.push([add.lon, add.lat]);
 
                 if (!eqAddress(firstAdd, add))
                     addPointToMap(add.lat, add.lon, actIndex);
@@ -318,7 +321,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
 
             let ghCallback = createGHCallback(getRouteStyle(routeIndex));
 
-            ghRouting.doRequest({instructions: false})
+            ghRouting.doRequest({points: routePoints, instructions: false})
                 .then(ghCallback)
                 .catch(function (err) {
                     let str = "An error for the routing occurred: " + err.message;
@@ -334,12 +337,12 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     };
 
     let optimizeRoute = function () {
-        if (ghOptimization.points.length < 3) {
-            $("#vrp-response").text("At least 3 points required but was: " + ghOptimization.points.length);
+        if (optPoints.length < 3) {
+            $("#vrp-response").text("At least 3 points required but was: " + optPoints.length);
             return;
         }
         $("#vrp-response").text("Calculating ...");
-        ghOptimization.doVRPRequest($("#optimize_vehicles").val())
+        ghOptimization.doVRPRequest(optPoints, $("#optimize_vehicles").val())
             .then(optimizeResponse)
             .catch(optimizeError);
     };
@@ -561,13 +564,17 @@ function setupMatrixAPI(ghMatrix) {
     $('#matrix_search_button').click(function () {
 
         // possible out_array options are: weights, distances, times, paths
-        ghMatrix.addOutArray("distances");
-        ghMatrix.addOutArray("times");
-
-        ghMatrix.clearPoints();
+        let request = {"out_arrays": ["distances", "times"]}
+        request.points = []
         $('.point').each(function (idx, div) {
             // parse the input strings and adds it as from_point and to_point
-            ghMatrix.addPoint(new GHInput($(div).val()));
+            let str = $(div).val()
+            var index = str.indexOf(",");
+            if (index >= 0) {
+                let lat = parseFloat(str.substr(0, index)),
+                    lng = parseFloat(str.substr(index + 1));
+                request.points.push([lng, lat]);
+            }
 
             // To create an NxM matrix you can simply use the other methods e.g.
             // ghm.addFromPoint(new GHInput(someCoordinateString))
@@ -578,10 +585,10 @@ function setupMatrixAPI(ghMatrix) {
         $("#matrix-error").empty();
         $("#matrix-response").empty();
 
-        ghMatrix.doRequest()
+        ghMatrix.doRequest(request)
             .then(function (json) {
-                let outHtml = "Distances in meters: <br/>" + ghMatrix.toHtmlTable(json.distances);
-                outHtml += "<br/><br/>Times in seconds: <br/>" + ghMatrix.toHtmlTable(json.times);
+                let outHtml = "Distances in meters: <br/>" + ghMatrix.toHtmlTable(request, json.distances);
+                outHtml += "<br/><br/>Times in seconds: <br/>" + ghMatrix.toHtmlTable(request, json.times);
                 $("#matrix-response").html(outHtml);
             })
             .catch(function (err) {
