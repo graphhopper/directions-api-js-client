@@ -7,7 +7,7 @@
   "main": "dist/graphhopper-client.js",
   "scripts": {
     "watch": "watchify src/main-template.js -o dist/graphhopper-client.js --debug --verbose",
-    "bundle": "browserify src/main-template.js -o dist/graphhopper-client.js",
+    "bundle": "browserify src/main-template.js -o dist/graphhopper-client.js --trace-deprecation",
     "bundleDebug": "browserify src/main-template.js --debug -o dist/graphhopper-client.js",
     "bundleProduction": "browserify -g uglifyify src/main-template.js | derequire > dist/graphhopper-client.js",
     "test": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine"
