@@ -1,30 +1,34 @@
-var request = require('superagent');
-var Promise = require("bluebird");
+let request = require('axios');
 
-var GHUtil = require("./GHUtil");
-var ghUtil = new GHUtil();
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
 
-GraphHopperIsochrone = function (args) {
-    this.time_limit = 600;
-    this.distance_limit = 0;
-    this.buckets = 3;
-    this.vehicle = "car";
-    this.point;
-    this.host = "https://graphhopper.com/api/1";
-    this.debug = false;
-    this.basePath = '/isochrone';
-    this.timeout = 30000;
-    this.reverse_flow = false;
+GraphHopperIsochrone = function (args, requestDefaults) {
+    this.defaults = {
+        time_limit: 600,
+        distance_limit: 0,
+        buckets: 3,
+        profile: "car",
+        debug: false,
+        reverse_flow: false
+    };
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
 
-    ghUtil.copyProperties(args, this);
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/isochrone';
+    this.timeout = args.timeout ? args.timeout : 30000;
 };
 
 GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
-    var qString = "point=" + args.point;
+    let qString = "point=" + args.point;
     qString += "&time_limit=" + args.time_limit;
     qString += "&distance_limit=" + args.distance_limit;
     qString += "&buckets=" + args.buckets;
-    qString += "&vehicle=" + args.vehicle;
+    qString += "&profile=" + args.profile;
     qString += "&reverse_flow=" + args.reverse_flow;
 
     if (args.debug)
@@ -34,26 +38,27 @@ GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
 };
 
 GraphHopperIsochrone.prototype.doRequest = function (reqArgs) {
-    var that = this;
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
 
-    return new Promise(function(resolve, reject) {
-        var args = ghUtil.clone(that);
-        if (reqArgs)
-            args = ghUtil.copyProperties(reqArgs, args);
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let that = this;
 
-        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
+    return new Promise(function (resolve, reject) {
 
         request
-            .get(url)
-            .accept('application/json')
-            .timeout(args.timeout)
-            .end(function (err, res) {
-                if (err || !res.ok) {
+            .get(url, {timeout: that.timeout})
+            .then(res => {
+                if (res.status !== 200) {
                     reject(ghUtil.extractError(res, url));
                 } else if (res) {
-                    resolve(res.body);
+                    resolve(res.data);
                 }
-            });
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            })
     });
 };
 

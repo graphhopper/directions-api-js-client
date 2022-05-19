@@ -1,62 +1,5279 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
-(function (process,global,setImmediate){
-!function(t){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var e;"undefined"!=typeof window?e=window:"undefined"!=typeof global?e=global:"undefined"!=typeof self&&(e=self),e.Promise=t()}}(function(){var t,e,n;return function t(e,n,r){function i(s,a){if(!n[s]){if(!e[s]){var c="function"==typeof _dereq_&&_dereq_;if(!a&&c)return c(s,!0);if(o)return o(s,!0);var l=new Error("Cannot find module '"+s+"'");throw l.code="MODULE_NOT_FOUND",l}var u=n[s]={exports:{}};e[s][0].call(u.exports,function(t){var n=e[s][1][t];return i(n||t)},u,u.exports,t,e,n,r)}return n[s].exports}for(var o="function"==typeof _dereq_&&_dereq_,s=0;s<r.length;s++)i(r[s]);return i}({1:[function(t,e,n){"use strict";e.exports=function(t){var e=t._SomePromiseArray;function n(t){var n=new e(t),r=n.promise();return n.setHowMany(1),n.setUnwrap(),n.init(),r}t.any=function(t){return n(t)},t.prototype.any=function(){return n(this)}}},{}],2:[function(t,e,n){"use strict";var r;try{throw new Error}catch(t){r=t}var i=t("./schedule"),o=t("./queue"),s=t("./util");function a(){this._customScheduler=!1,this._isTickUsed=!1,this._lateQueue=new o(16),this._normalQueue=new o(16),this._haveDrainedQueues=!1,this._trampolineEnabled=!0;var t=this;this.drainQueues=function(){t._drainQueues()},this._schedule=i}function c(t,e,n){this._lateQueue.push(t,e,n),this._queueTick()}function l(t,e,n){this._normalQueue.push(t,e,n),this._queueTick()}function u(t){this._normalQueue._pushOne(t),this._queueTick()}function p(t){for(;t.length()>0;)h(t)}function h(t){var e=t.shift();if("function"!=typeof e)e._settlePromises();else{var n=t.shift(),r=t.shift();e.call(n,r)}}a.prototype.setScheduler=function(t){var e=this._schedule;return this._schedule=t,this._customScheduler=!0,e},a.prototype.hasCustomScheduler=function(){return this._customScheduler},a.prototype.enableTrampoline=function(){this._trampolineEnabled=!0},a.prototype.disableTrampolineIfNecessary=function(){s.hasDevTools&&(this._trampolineEnabled=!1)},a.prototype.haveItemsQueued=function(){return this._isTickUsed||this._haveDrainedQueues},a.prototype.fatalError=function(t,e){e?(process.stderr.write("Fatal "+(t instanceof Error?t.stack:t)+"\n"),process.exit(2)):this.throwLater(t)},a.prototype.throwLater=function(t,e){if(1===arguments.length&&(e=t,t=function(){throw e}),"undefined"!=typeof setTimeout)setTimeout(function(){t(e)},0);else try{this._schedule(function(){t(e)})}catch(t){throw new Error("No async scheduler available\n\n    See http://goo.gl/MqrFmX\n")}},s.hasDevTools?(a.prototype.invokeLater=function(t,e,n){this._trampolineEnabled?c.call(this,t,e,n):this._schedule(function(){setTimeout(function(){t.call(e,n)},100)})},a.prototype.invoke=function(t,e,n){this._trampolineEnabled?l.call(this,t,e,n):this._schedule(function(){t.call(e,n)})},a.prototype.settlePromises=function(t){this._trampolineEnabled?u.call(this,t):this._schedule(function(){t._settlePromises()})}):(a.prototype.invokeLater=c,a.prototype.invoke=l,a.prototype.settlePromises=u),a.prototype._drainQueues=function(){p(this._normalQueue),this._reset(),this._haveDrainedQueues=!0,p(this._lateQueue)},a.prototype._queueTick=function(){this._isTickUsed||(this._isTickUsed=!0,this._schedule(this.drainQueues))},a.prototype._reset=function(){this._isTickUsed=!1},e.exports=a,e.exports.firstLineError=r},{"./queue":26,"./schedule":29,"./util":36}],3:[function(t,e,n){"use strict";e.exports=function(t,e,n,r){var i=!1,o=function(t,e){this._reject(e)},s=function(t,e){e.promiseRejectionQueued=!0,e.bindingPromise._then(o,o,null,this,t)},a=function(t,e){0==(50397184&this._bitField)&&this._resolveCallback(e.target)},c=function(t,e){e.promiseRejectionQueued||this._reject(t)};t.prototype.bind=function(o){i||(i=!0,t.prototype._propagateFrom=r.propagateFromFunction(),t.prototype._boundValue=r.boundValueFunction());var l=n(o),u=new t(e);u._propagateFrom(this,1);var p=this._target();if(u._setBoundTo(l),l instanceof t){var h={promiseRejectionQueued:!1,promise:u,target:p,bindingPromise:l};p._then(e,s,void 0,u,h),l._then(a,c,void 0,u,h),u._setOnCancel(l)}else u._resolveCallback(p);return u},t.prototype._setBoundTo=function(t){void 0!==t?(this._bitField=2097152|this._bitField,this._boundTo=t):this._bitField=-2097153&this._bitField},t.prototype._isBound=function(){return 2097152==(2097152&this._bitField)},t.bind=function(e,n){return t.resolve(n).bind(e)}}},{}],4:[function(t,e,n){"use strict";var r;"undefined"!=typeof Promise&&(r=Promise);var i=t("./promise")();i.noConflict=function(){try{Promise===i&&(Promise=r)}catch(t){}return i},e.exports=i},{"./promise":22}],5:[function(t,e,n){"use strict";var r=Object.create;if(r){var i=r(null),o=r(null);i[" size"]=o[" size"]=0}e.exports=function(e){var n,r=t("./util"),i=r.canEvaluate;r.isIdentifier;function o(t,n){var i;if(null!=t&&(i=t[n]),"function"!=typeof i){var o="Object "+r.classString(t)+" has no method '"+r.toString(n)+"'";throw new e.TypeError(o)}return i}function s(t){return o(t,this.pop()).apply(t,this)}function a(t){return t[this]}function c(t){var e=+this;return e<0&&(e=Math.max(0,e+t.length)),t[e]}e.prototype.call=function(t){var e=[].slice.call(arguments,1);return e.push(t),this._then(s,void 0,void 0,e,void 0)},e.prototype.get=function(t){var e;if("number"==typeof t)e=c;else if(i){var r=n(t);e=null!==r?r:a}else e=a;return this._then(e,void 0,void 0,t,void 0)}}},{"./util":36}],6:[function(t,e,n){"use strict";e.exports=function(e,n,r,i){var o=t("./util"),s=o.tryCatch,a=o.errorObj,c=e._async;e.prototype.break=e.prototype.cancel=function(){if(!i.cancellation())return this._warn("cancellation is disabled");for(var t=this,e=t;t._isCancellable();){if(!t._cancelBy(e)){e._isFollowing()?e._followee().cancel():e._cancelBranched();break}var n=t._cancellationParent;if(null==n||!n._isCancellable()){t._isFollowing()?t._followee().cancel():t._cancelBranched();break}t._isFollowing()&&t._followee().cancel(),t._setWillBeCancelled(),e=t,t=n}},e.prototype._branchHasCancelled=function(){this._branchesRemainingToCancel--},e.prototype._enoughBranchesHaveCancelled=function(){return void 0===this._branchesRemainingToCancel||this._branchesRemainingToCancel<=0},e.prototype._cancelBy=function(t){return t===this?(this._branchesRemainingToCancel=0,this._invokeOnCancel(),!0):(this._branchHasCancelled(),!!this._enoughBranchesHaveCancelled()&&(this._invokeOnCancel(),!0))},e.prototype._cancelBranched=function(){this._enoughBranchesHaveCancelled()&&this._cancel()},e.prototype._cancel=function(){this._isCancellable()&&(this._setCancelled(),c.invoke(this._cancelPromises,this,void 0))},e.prototype._cancelPromises=function(){this._length()>0&&this._settlePromises()},e.prototype._unsetOnCancel=function(){this._onCancelField=void 0},e.prototype._isCancellable=function(){return this.isPending()&&!this._isCancelled()},e.prototype.isCancellable=function(){return this.isPending()&&!this.isCancelled()},e.prototype._doInvokeOnCancel=function(t,e){if(o.isArray(t))for(var n=0;n<t.length;++n)this._doInvokeOnCancel(t[n],e);else if(void 0!==t)if("function"==typeof t){if(!e){var r=s(t).call(this._boundValue());r===a&&(this._attachExtraTrace(r.e),c.throwLater(r.e))}}else t._resultCancelled(this)},e.prototype._invokeOnCancel=function(){var t=this._onCancel();this._unsetOnCancel(),c.invoke(this._doInvokeOnCancel,this,t)},e.prototype._invokeInternalOnCancel=function(){this._isCancellable()&&(this._doInvokeOnCancel(this._onCancel(),!0),this._unsetOnCancel())},e.prototype._resultCancelled=function(){this.cancel()}}},{"./util":36}],7:[function(t,e,n){"use strict";e.exports=function(e){var n=t("./util"),r=t("./es5").keys,i=n.tryCatch,o=n.errorObj;return function(t,s,a){return function(c){var l=a._boundValue();t:for(var u=0;u<t.length;++u){var p=t[u];if(p===Error||null!=p&&p.prototype instanceof Error){if(c instanceof p)return i(s).call(l,c)}else if("function"==typeof p){var h=i(p).call(l,c);if(h===o)return h;if(h)return i(s).call(l,c)}else if(n.isObject(c)){for(var f=r(p),_=0;_<f.length;++_){var d=f[_];if(p[d]!=c[d])continue t}return i(s).call(l,c)}}return e}}}},{"./es5":13,"./util":36}],8:[function(t,e,n){"use strict";e.exports=function(t){var e=!1,n=[];function r(){this._trace=new r.CapturedTrace(i())}function i(){var t=n.length-1;if(t>=0)return n[t]}return t.prototype._promiseCreated=function(){},t.prototype._pushContext=function(){},t.prototype._popContext=function(){return null},t._peekContext=t.prototype._peekContext=function(){},r.prototype._pushContext=function(){void 0!==this._trace&&(this._trace._promiseCreated=null,n.push(this._trace))},r.prototype._popContext=function(){if(void 0!==this._trace){var t=n.pop(),e=t._promiseCreated;return t._promiseCreated=null,e}return null},r.CapturedTrace=null,r.create=function(){if(e)return new r},r.deactivateLongStackTraces=function(){},r.activateLongStackTraces=function(){var n=t.prototype._pushContext,o=t.prototype._popContext,s=t._peekContext,a=t.prototype._peekContext,c=t.prototype._promiseCreated;r.deactivateLongStackTraces=function(){t.prototype._pushContext=n,t.prototype._popContext=o,t._peekContext=s,t.prototype._peekContext=a,t.prototype._promiseCreated=c,e=!1},e=!0,t.prototype._pushContext=r.prototype._pushContext,t.prototype._popContext=r.prototype._popContext,t._peekContext=t.prototype._peekContext=i,t.prototype._promiseCreated=function(){var t=this._peekContext();t&&null==t._promiseCreated&&(t._promiseCreated=this)}},r}},{}],9:[function(t,e,n){"use strict";e.exports=function(e,n){var r,i,o,s=e._getDomain,a=e._async,c=t("./errors").Warning,l=t("./util"),u=t("./es5"),p=l.canAttachTrace,h=/[\\\/]bluebird[\\\/]js[\\\/](release|debug|instrumented)/,f=/\((?:timers\.js):\d+:\d+\)/,_=/[\/<\(](.+?):(\d+):(\d+)\)?\s*$/,d=null,v=null,y=!1,m=!(0==l.env("BLUEBIRD_DEBUG")),g=!(0==l.env("BLUEBIRD_WARNINGS")||!m&&!l.env("BLUEBIRD_WARNINGS")),b=!(0==l.env("BLUEBIRD_LONG_STACK_TRACES")||!m&&!l.env("BLUEBIRD_LONG_STACK_TRACES")),w=0!=l.env("BLUEBIRD_W_FORGOTTEN_RETURN")&&(g||!!l.env("BLUEBIRD_W_FORGOTTEN_RETURN"));e.prototype.suppressUnhandledRejections=function(){var t=this._target();t._bitField=-1048577&t._bitField|524288},e.prototype._ensurePossibleRejectionHandled=function(){if(0==(524288&this._bitField)){this._setRejectionIsUnhandled();var t=this;setTimeout(function(){t._notifyUnhandledRejection()},1)}},e.prototype._notifyUnhandledRejectionIsHandled=function(){$("rejectionHandled",r,void 0,this)},e.prototype._setReturnedNonUndefined=function(){this._bitField=268435456|this._bitField},e.prototype._returnedNonUndefined=function(){return 0!=(268435456&this._bitField)},e.prototype._notifyUnhandledRejection=function(){if(this._isRejectionUnhandled()){var t=this._settledValue();this._setUnhandledRejectionIsNotified(),$("unhandledRejection",i,t,this)}},e.prototype._setUnhandledRejectionIsNotified=function(){this._bitField=262144|this._bitField},e.prototype._unsetUnhandledRejectionIsNotified=function(){this._bitField=-262145&this._bitField},e.prototype._isUnhandledRejectionNotified=function(){return(262144&this._bitField)>0},e.prototype._setRejectionIsUnhandled=function(){this._bitField=1048576|this._bitField},e.prototype._unsetRejectionIsUnhandled=function(){this._bitField=-1048577&this._bitField,this._isUnhandledRejectionNotified()&&(this._unsetUnhandledRejectionIsNotified(),this._notifyUnhandledRejectionIsHandled())},e.prototype._isRejectionUnhandled=function(){return(1048576&this._bitField)>0},e.prototype._warn=function(t,e,n){return U(t,e,n||this)},e.onPossiblyUnhandledRejection=function(t){var e=s();i="function"==typeof t?null===e?t:l.domainBind(e,t):void 0},e.onUnhandledRejectionHandled=function(t){var e=s();r="function"==typeof t?null===e?t:l.domainBind(e,t):void 0};var C=function(){};e.longStackTraces=function(){if(a.haveItemsQueued()&&!Y.longStackTraces)throw new Error("cannot enable long stack traces after promises have been created\n\n    See http://goo.gl/MqrFmX\n");if(!Y.longStackTraces&&z()){var t=e.prototype._captureStackTrace,r=e.prototype._attachExtraTrace,i=e.prototype._dereferenceTrace;Y.longStackTraces=!0,C=function(){if(a.haveItemsQueued()&&!Y.longStackTraces)throw new Error("cannot enable long stack traces after promises have been created\n\n    See http://goo.gl/MqrFmX\n");e.prototype._captureStackTrace=t,e.prototype._attachExtraTrace=r,e.prototype._dereferenceTrace=i,n.deactivateLongStackTraces(),a.enableTrampoline(),Y.longStackTraces=!1},e.prototype._captureStackTrace=L,e.prototype._attachExtraTrace=H,e.prototype._dereferenceTrace=N,n.activateLongStackTraces(),a.disableTrampolineIfNecessary()}},e.hasLongStackTraces=function(){return Y.longStackTraces&&z()};var j=function(){try{if("function"==typeof CustomEvent){var t=new CustomEvent("CustomEvent");return l.global.dispatchEvent(t),function(t,e){var n={detail:e,cancelable:!0};u.defineProperty(n,"promise",{value:e.promise}),u.defineProperty(n,"reason",{value:e.reason});var r=new CustomEvent(t.toLowerCase(),n);return!l.global.dispatchEvent(r)}}if("function"==typeof Event){t=new Event("CustomEvent");return l.global.dispatchEvent(t),function(t,e){var n=new Event(t.toLowerCase(),{cancelable:!0});return n.detail=e,u.defineProperty(n,"promise",{value:e.promise}),u.defineProperty(n,"reason",{value:e.reason}),!l.global.dispatchEvent(n)}}return(t=document.createEvent("CustomEvent")).initCustomEvent("testingtheevent",!1,!0,{}),l.global.dispatchEvent(t),function(t,e){var n=document.createEvent("CustomEvent");return n.initCustomEvent(t.toLowerCase(),!1,!0,e),!l.global.dispatchEvent(n)}}catch(t){}return function(){return!1}}(),E=l.isNode?function(){return process.emit.apply(process,arguments)}:l.global?function(t){var e="on"+t.toLowerCase(),n=l.global[e];return!!n&&(n.apply(l.global,[].slice.call(arguments,1)),!0)}:function(){return!1};function k(t,e){return{promise:e}}var F={promiseCreated:k,promiseFulfilled:k,promiseRejected:k,promiseResolved:k,promiseCancelled:k,promiseChained:function(t,e,n){return{promise:e,child:n}},warning:function(t,e){return{warning:e}},unhandledRejection:function(t,e,n){return{reason:e,promise:n}},rejectionHandled:k},T=function(t){var e=!1;try{e=E.apply(null,arguments)}catch(t){a.throwLater(t),e=!0}var n=!1;try{n=j(t,F[t].apply(null,arguments))}catch(t){a.throwLater(t),n=!0}return n||e};function x(){return!1}function P(t,e,n){var r=this;try{t(e,n,function(t){if("function"!=typeof t)throw new TypeError("onCancel must be a function, got: "+l.toString(t));r._attachCancellationCallback(t)})}catch(t){return t}}function S(t){if(!this._isCancellable())return this;var e=this._onCancel();void 0!==e?l.isArray(e)?e.push(t):this._setOnCancel([e,t]):this._setOnCancel(t)}function R(){return this._onCancelField}function O(t){this._onCancelField=t}function A(){this._cancellationParent=void 0,this._onCancelField=void 0}function D(t,e){if(0!=(1&e)){this._cancellationParent=t;var n=t._branchesRemainingToCancel;void 0===n&&(n=0),t._branchesRemainingToCancel=n+1}0!=(2&e)&&t._isBound()&&this._setBoundTo(t._boundTo)}e.config=function(t){if("longStackTraces"in(t=Object(t))&&(t.longStackTraces?e.longStackTraces():!t.longStackTraces&&e.hasLongStackTraces()&&C()),"warnings"in t){var n=t.warnings;Y.warnings=!!n,w=Y.warnings,l.isObject(n)&&"wForgottenReturn"in n&&(w=!!n.wForgottenReturn)}if("cancellation"in t&&t.cancellation&&!Y.cancellation){if(a.haveItemsQueued())throw new Error("cannot enable cancellation after promises are in use");e.prototype._clearCancellationData=A,e.prototype._propagateFrom=D,e.prototype._onCancel=R,e.prototype._setOnCancel=O,e.prototype._attachCancellationCallback=S,e.prototype._execute=P,V=D,Y.cancellation=!0}return"monitoring"in t&&(t.monitoring&&!Y.monitoring?(Y.monitoring=!0,e.prototype._fireEvent=T):!t.monitoring&&Y.monitoring&&(Y.monitoring=!1,e.prototype._fireEvent=x)),e},e.prototype._fireEvent=x,e.prototype._execute=function(t,e,n){try{t(e,n)}catch(t){return t}},e.prototype._onCancel=function(){},e.prototype._setOnCancel=function(t){},e.prototype._attachCancellationCallback=function(t){},e.prototype._captureStackTrace=function(){},e.prototype._attachExtraTrace=function(){},e.prototype._dereferenceTrace=function(){},e.prototype._clearCancellationData=function(){},e.prototype._propagateFrom=function(t,e){};var V=function(t,e){0!=(2&e)&&t._isBound()&&this._setBoundTo(t._boundTo)};function I(){var t=this._boundTo;return void 0!==t&&t instanceof e?t.isFulfilled()?t.value():void 0:t}function L(){this._trace=new K(this._peekContext())}function H(t,e){if(p(t)){var n=this._trace;if(void 0!==n&&e&&(n=n._parent),void 0!==n)n.attachExtraTrace(t);else if(!t.__stackCleaned__){var r=M(t);l.notEnumerableProp(t,"stack",r.message+"\n"+r.stack.join("\n")),l.notEnumerableProp(t,"__stackCleaned__",!0)}}}function N(){this._trace=void 0}function U(t,n,r){if(Y.warnings){var i,o=new c(t);if(n)r._attachExtraTrace(o);else if(Y.longStackTraces&&(i=e._peekContext()))i.attachExtraTrace(o);else{var s=M(o);o.stack=s.message+"\n"+s.stack.join("\n")}T("warning",o)||q(o,"",!0)}}function B(t){for(var e=[],n=0;n<t.length;++n){var r=t[n],i="    (No stack trace)"===r||d.test(r),o=i&&G(r);i&&!o&&(y&&" "!==r.charAt(0)&&(r="    "+r),e.push(r))}return e}function M(t){var e=t.stack,n=t.toString();return e="string"==typeof e&&e.length>0?function(t){for(var e=t.stack.replace(/\s+$/g,"").split("\n"),n=0;n<e.length;++n){var r=e[n];if("    (No stack trace)"===r||d.test(r))break}return n>0&&"SyntaxError"!=t.name&&(e=e.slice(n)),e}(t):["    (No stack trace)"],{message:n,stack:"SyntaxError"==t.name?e:B(e)}}function q(t,e,n){if("undefined"!=typeof console){var r;if(l.isObject(t)){var i=t.stack;r=e+v(i,t)}else r=e+String(t);"function"==typeof o?o(r,n):"function"!=typeof console.log&&"object"!=typeof console.log||console.log(r)}}function $(t,e,n,r){var i=!1;try{"function"==typeof e&&(i=!0,"rejectionHandled"===t?e(r):e(n,r))}catch(t){a.throwLater(t)}"unhandledRejection"===t?T(t,n,r)||i||q(n,"Unhandled rejection "):T(t,r)}function Q(t){var e;if("function"==typeof t)e="[function "+(t.name||"anonymous")+"]";else{e=t&&"function"==typeof t.toString?t.toString():l.toString(t);if(/\[object [a-zA-Z0-9$_]+\]/.test(e))try{e=JSON.stringify(t)}catch(t){}0===e.length&&(e="(empty array)")}return"(<"+function(t){if(t.length<41)return t;return t.substr(0,38)+"..."}(e)+">, no stack trace)"}function z(){return"function"==typeof J}var G=function(){return!1},X=/[\/<\(]([^:\/]+):(\d+):(?:\d+)\)?\s*$/;function W(t){var e=t.match(X);if(e)return{fileName:e[1],line:parseInt(e[2],10)}}function K(t){this._parent=t,this._promisesCreated=0;var e=this._length=1+(void 0===t?0:t._length);J(this,K),e>32&&this.uncycle()}l.inherits(K,Error),n.CapturedTrace=K,K.prototype.uncycle=function(){var t=this._length;if(!(t<2)){for(var e=[],n={},r=0,i=this;void 0!==i;++r)e.push(i),i=i._parent;for(r=(t=this._length=r)-1;r>=0;--r){var o=e[r].stack;void 0===n[o]&&(n[o]=r)}for(r=0;r<t;++r){var s=n[e[r].stack];if(void 0!==s&&s!==r){s>0&&(e[s-1]._parent=void 0,e[s-1]._length=1),e[r]._parent=void 0,e[r]._length=1;var a=r>0?e[r-1]:this;s<t-1?(a._parent=e[s+1],a._parent.uncycle(),a._length=a._parent._length+1):(a._parent=void 0,a._length=1);for(var c=a._length+1,l=r-2;l>=0;--l)e[l]._length=c,c++;return}}}},K.prototype.attachExtraTrace=function(t){if(!t.__stackCleaned__){this.uncycle();for(var e=M(t),n=e.message,r=[e.stack],i=this;void 0!==i;)r.push(B(i.stack.split("\n"))),i=i._parent;!function(t){for(var e=t[0],n=1;n<t.length;++n){for(var r=t[n],i=e.length-1,o=e[i],s=-1,a=r.length-1;a>=0;--a)if(r[a]===o){s=a;break}for(a=s;a>=0;--a){var c=r[a];if(e[i]!==c)break;e.pop(),i--}e=r}}(r),function(t){for(var e=0;e<t.length;++e)(0===t[e].length||e+1<t.length&&t[e][0]===t[e+1][0])&&(t.splice(e,1),e--)}(r),l.notEnumerableProp(t,"stack",function(t,e){for(var n=0;n<e.length-1;++n)e[n].push("From previous event:"),e[n]=e[n].join("\n");return n<e.length&&(e[n]=e[n].join("\n")),t+"\n"+e.join("\n")}(n,r)),l.notEnumerableProp(t,"__stackCleaned__",!0)}};var J=function(){var t=/^\s*at\s*/,e=function(t,e){return"string"==typeof t?t:void 0!==e.name&&void 0!==e.message?e.toString():Q(e)};if("number"==typeof Error.stackTraceLimit&&"function"==typeof Error.captureStackTrace){Error.stackTraceLimit+=6,d=t,v=e;var n=Error.captureStackTrace;return G=function(t){return h.test(t)},function(t,e){Error.stackTraceLimit+=6,n(t,e),Error.stackTraceLimit-=6}}var r,i=new Error;if("string"==typeof i.stack&&i.stack.split("\n")[0].indexOf("stackDetection@")>=0)return d=/@/,v=e,y=!0,function(t){t.stack=(new Error).stack};try{throw new Error}catch(t){r="stack"in t}return"stack"in i||!r||"number"!=typeof Error.stackTraceLimit?(v=function(t,e){return"string"==typeof t?t:"object"!=typeof e&&"function"!=typeof e||void 0===e.name||void 0===e.message?Q(e):e.toString()},null):(d=t,v=e,function(t){Error.stackTraceLimit+=6;try{throw new Error}catch(e){t.stack=e.stack}Error.stackTraceLimit-=6})}();"undefined"!=typeof console&&void 0!==console.warn&&(o=function(t){console.warn(t)},l.isNode&&process.stderr.isTTY?o=function(t,e){var n=e?"[33m":"[31m";console.warn(n+t+"[0m\n")}:l.isNode||"string"!=typeof(new Error).stack||(o=function(t,e){console.warn("%c"+t,e?"color: darkorange":"color: red")}));var Y={warnings:g,longStackTraces:!1,cancellation:!1,monitoring:!1};return b&&e.longStackTraces(),{longStackTraces:function(){return Y.longStackTraces},warnings:function(){return Y.warnings},cancellation:function(){return Y.cancellation},monitoring:function(){return Y.monitoring},propagateFromFunction:function(){return V},boundValueFunction:function(){return I},checkForgottenReturns:function(t,e,n,r,i){if(void 0===t&&null!==e&&w){if(void 0!==i&&i._returnedNonUndefined())return;if(0==(65535&r._bitField))return;n&&(n+=" ");var o="",s="";if(e._trace){for(var a=e._trace.stack.split("\n"),c=B(a),l=c.length-1;l>=0;--l){var u=c[l];if(!f.test(u)){var p=u.match(_);p&&(o="at "+p[1]+":"+p[2]+":"+p[3]+" ");break}}if(c.length>0){var h=c[0];for(l=0;l<a.length;++l)if(a[l]===h){l>0&&(s="\n"+a[l-1]);break}}}var d="a promise was created in a "+n+"handler "+o+"but was not returned from it, see http://goo.gl/rRqMUw"+s;r._warn(d,!0,e)}},setBounds:function(t,e){if(z()){for(var n,r,i=(t.stack||"").split("\n"),o=(e.stack||"").split("\n"),s=-1,a=-1,c=0;c<i.length;++c)if(l=W(i[c])){n=l.fileName,s=l.line;break}for(c=0;c<o.length;++c){var l;if(l=W(o[c])){r=l.fileName,a=l.line;break}}s<0||a<0||!n||!r||n!==r||s>=a||(G=function(t){if(h.test(t))return!0;var e=W(t);return!!(e&&e.fileName===n&&s<=e.line&&e.line<=a)})}},warn:U,deprecated:function(t,e){var n=t+" is deprecated and will be removed in a future version.";return e&&(n+=" Use "+e+" instead."),U(n)},CapturedTrace:K,fireDomEvent:j,fireGlobalEvent:E}}},{"./errors":12,"./es5":13,"./util":36}],10:[function(t,e,n){"use strict";e.exports=function(t){function e(){return this.value}function n(){throw this.reason}t.prototype.return=t.prototype.thenReturn=function(n){return n instanceof t&&n.suppressUnhandledRejections(),this._then(e,void 0,void 0,{value:n},void 0)},t.prototype.throw=t.prototype.thenThrow=function(t){return this._then(n,void 0,void 0,{reason:t},void 0)},t.prototype.catchThrow=function(t){if(arguments.length<=1)return this._then(void 0,n,void 0,{reason:t},void 0);var e=arguments[1];return this.caught(t,function(){throw e})},t.prototype.catchReturn=function(n){if(arguments.length<=1)return n instanceof t&&n.suppressUnhandledRejections(),this._then(void 0,e,void 0,{value:n},void 0);var r=arguments[1];r instanceof t&&r.suppressUnhandledRejections();return this.caught(n,function(){return r})}}},{}],11:[function(t,e,n){"use strict";e.exports=function(t,e){var n=t.reduce,r=t.all;function i(){return r(this)}t.prototype.each=function(t){return n(this,t,e,0)._then(i,void 0,void 0,this,void 0)},t.prototype.mapSeries=function(t){return n(this,t,e,e)},t.each=function(t,r){return n(t,r,e,0)._then(i,void 0,void 0,t,void 0)},t.mapSeries=function(t,r){return n(t,r,e,e)}}},{}],12:[function(t,e,n){"use strict";var r,i,o=t("./es5"),s=o.freeze,a=t("./util"),c=a.inherits,l=a.notEnumerableProp;function u(t,e){function n(r){if(!(this instanceof n))return new n(r);l(this,"message","string"==typeof r?r:e),l(this,"name",t),Error.captureStackTrace?Error.captureStackTrace(this,this.constructor):Error.call(this)}return c(n,Error),n}var p=u("Warning","warning"),h=u("CancellationError","cancellation error"),f=u("TimeoutError","timeout error"),_=u("AggregateError","aggregate error");try{r=TypeError,i=RangeError}catch(t){r=u("TypeError","type error"),i=u("RangeError","range error")}for(var d="join pop push shift unshift slice filter forEach some every map indexOf lastIndexOf reduce reduceRight sort reverse".split(" "),v=0;v<d.length;++v)"function"==typeof Array.prototype[d[v]]&&(_.prototype[d[v]]=Array.prototype[d[v]]);o.defineProperty(_.prototype,"length",{value:0,configurable:!1,writable:!0,enumerable:!0}),_.prototype.isOperational=!0;var y=0;function m(t){if(!(this instanceof m))return new m(t);l(this,"name","OperationalError"),l(this,"message",t),this.cause=t,this.isOperational=!0,t instanceof Error?(l(this,"message",t.message),l(this,"stack",t.stack)):Error.captureStackTrace&&Error.captureStackTrace(this,this.constructor)}_.prototype.toString=function(){var t=Array(4*y+1).join(" "),e="\n"+t+"AggregateError of:\n";y++,t=Array(4*y+1).join(" ");for(var n=0;n<this.length;++n){for(var r=this[n]===this?"[Circular AggregateError]":this[n]+"",i=r.split("\n"),o=0;o<i.length;++o)i[o]=t+i[o];e+=(r=i.join("\n"))+"\n"}return y--,e},c(m,Error);var g=Error.__BluebirdErrorTypes__;g||(g=s({CancellationError:h,TimeoutError:f,OperationalError:m,RejectionError:m,AggregateError:_}),o.defineProperty(Error,"__BluebirdErrorTypes__",{value:g,writable:!1,enumerable:!1,configurable:!1})),e.exports={Error:Error,TypeError:r,RangeError:i,CancellationError:g.CancellationError,OperationalError:g.OperationalError,TimeoutError:g.TimeoutError,AggregateError:g.AggregateError,Warning:p}},{"./es5":13,"./util":36}],13:[function(t,e,n){var r=function(){"use strict";return void 0===this}();if(r)e.exports={freeze:Object.freeze,defineProperty:Object.defineProperty,getDescriptor:Object.getOwnPropertyDescriptor,keys:Object.keys,names:Object.getOwnPropertyNames,getPrototypeOf:Object.getPrototypeOf,isArray:Array.isArray,isES5:r,propertyIsWritable:function(t,e){var n=Object.getOwnPropertyDescriptor(t,e);return!(n&&!n.writable&&!n.set)}};else{var i={}.hasOwnProperty,o={}.toString,s={}.constructor.prototype,a=function(t){var e=[];for(var n in t)i.call(t,n)&&e.push(n);return e};e.exports={isArray:function(t){try{return"[object Array]"===o.call(t)}catch(t){return!1}},keys:a,names:a,defineProperty:function(t,e,n){return t[e]=n.value,t},getDescriptor:function(t,e){return{value:t[e]}},freeze:function(t){return t},getPrototypeOf:function(t){try{return Object(t).constructor.prototype}catch(t){return s}},isES5:r,propertyIsWritable:function(){return!0}}}},{}],14:[function(t,e,n){"use strict";e.exports=function(t,e){var n=t.map;t.prototype.filter=function(t,r){return n(this,t,r,e)},t.filter=function(t,r,i){return n(t,r,i,e)}}},{}],15:[function(t,e,n){"use strict";e.exports=function(e,n,r){var i=t("./util"),o=e.CancellationError,s=i.errorObj,a=t("./catch_filter")(r);function c(t,e,n){this.promise=t,this.type=e,this.handler=n,this.called=!1,this.cancelPromise=null}function l(t){this.finallyHandler=t}function u(t,e){return null!=t.cancelPromise&&(arguments.length>1?t.cancelPromise._reject(e):t.cancelPromise._cancel(),t.cancelPromise=null,!0)}function p(){return f.call(this,this.promise._target()._settledValue())}function h(t){if(!u(this,t))return s.e=t,s}function f(t){var i=this.promise,a=this.handler;if(!this.called){this.called=!0;var c=this.isFinallyHandler()?a.call(i._boundValue()):a.call(i._boundValue(),t);if(c===r)return c;if(void 0!==c){i._setReturnedNonUndefined();var f=n(c,i);if(f instanceof e){if(null!=this.cancelPromise){if(f._isCancelled()){var _=new o("late cancellation observer");return i._attachExtraTrace(_),s.e=_,s}f.isPending()&&f._attachCancellationCallback(new l(this))}return f._then(p,h,void 0,this,void 0)}}}return i.isRejected()?(u(this),s.e=t,s):(u(this),t)}return c.prototype.isFinallyHandler=function(){return 0===this.type},l.prototype._resultCancelled=function(){u(this.finallyHandler)},e.prototype._passThrough=function(t,e,n,r){return"function"!=typeof t?this.then():this._then(n,r,void 0,new c(this,e,t),void 0)},e.prototype.lastly=e.prototype.finally=function(t){return this._passThrough(t,0,f,f)},e.prototype.tap=function(t){return this._passThrough(t,1,f)},e.prototype.tapCatch=function(t){var n=arguments.length;if(1===n)return this._passThrough(t,1,void 0,f);var r,o=new Array(n-1),s=0;for(r=0;r<n-1;++r){var c=arguments[r];if(!i.isObject(c))return e.reject(new TypeError("tapCatch statement predicate: expecting an object but got "+i.classString(c)));o[s++]=c}o.length=s;var l=arguments[r];return this._passThrough(a(o,l,this),1,void 0,f)},c}},{"./catch_filter":7,"./util":36}],16:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o,s){var a=t("./errors").TypeError,c=t("./util"),l=c.errorObj,u=c.tryCatch,p=[];function h(t,n,i,o){if(s.cancellation()){var a=new e(r),c=this._finallyPromise=new e(r);this._promise=a.lastly(function(){return c}),a._captureStackTrace(),a._setOnCancel(this)}else{(this._promise=new e(r))._captureStackTrace()}this._stack=o,this._generatorFunction=t,this._receiver=n,this._generator=void 0,this._yieldHandlers="function"==typeof i?[i].concat(p):p,this._yieldedPromise=null,this._cancellationPhase=!1}c.inherits(h,o),h.prototype._isResolved=function(){return null===this._promise},h.prototype._cleanup=function(){this._promise=this._generator=null,s.cancellation()&&null!==this._finallyPromise&&(this._finallyPromise._fulfill(),this._finallyPromise=null)},h.prototype._promiseCancelled=function(){if(!this._isResolved()){var t;if(void 0!==this._generator.return)this._promise._pushContext(),t=u(this._generator.return).call(this._generator,void 0),this._promise._popContext();else{var n=new e.CancellationError("generator .return() sentinel");e.coroutine.returnSentinel=n,this._promise._attachExtraTrace(n),this._promise._pushContext(),t=u(this._generator.throw).call(this._generator,n),this._promise._popContext()}this._cancellationPhase=!0,this._yieldedPromise=null,this._continue(t)}},h.prototype._promiseFulfilled=function(t){this._yieldedPromise=null,this._promise._pushContext();var e=u(this._generator.next).call(this._generator,t);this._promise._popContext(),this._continue(e)},h.prototype._promiseRejected=function(t){this._yieldedPromise=null,this._promise._attachExtraTrace(t),this._promise._pushContext();var e=u(this._generator.throw).call(this._generator,t);this._promise._popContext(),this._continue(e)},h.prototype._resultCancelled=function(){if(this._yieldedPromise instanceof e){var t=this._yieldedPromise;this._yieldedPromise=null,t.cancel()}},h.prototype.promise=function(){return this._promise},h.prototype._run=function(){this._generator=this._generatorFunction.call(this._receiver),this._receiver=this._generatorFunction=void 0,this._promiseFulfilled(void 0)},h.prototype._continue=function(t){var n=this._promise;if(t===l)return this._cleanup(),this._cancellationPhase?n.cancel():n._rejectCallback(t.e,!1);var r=t.value;if(!0===t.done)return this._cleanup(),this._cancellationPhase?n.cancel():n._resolveCallback(r);var o=i(r,this._promise);if(o instanceof e||null!==(o=function(t,n,r){for(var o=0;o<n.length;++o){r._pushContext();var s=u(n[o])(t);if(r._popContext(),s===l){r._pushContext();var a=e.reject(l.e);return r._popContext(),a}var c=i(s,r);if(c instanceof e)return c}return null}(o,this._yieldHandlers,this._promise))){var s=(o=o._target())._bitField;0==(50397184&s)?(this._yieldedPromise=o,o._proxy(this,null)):0!=(33554432&s)?e._async.invoke(this._promiseFulfilled,this,o._value()):0!=(16777216&s)?e._async.invoke(this._promiseRejected,this,o._reason()):this._promiseCancelled()}else this._promiseRejected(new a("A value %s was yielded that could not be treated as a promise\n\n    See http://goo.gl/MqrFmX\n\n".replace("%s",String(r))+"From coroutine:\n"+this._stack.split("\n").slice(1,-7).join("\n")))},e.coroutine=function(t,e){if("function"!=typeof t)throw new a("generatorFunction must be a function\n\n    See http://goo.gl/MqrFmX\n");var n=Object(e).yieldHandler,r=h,i=(new Error).stack;return function(){var e=t.apply(this,arguments),o=new r(void 0,void 0,n,i),s=o.promise();return o._generator=e,o._promiseFulfilled(void 0),s}},e.coroutine.addYieldHandler=function(t){if("function"!=typeof t)throw new a("expecting a function but got "+c.classString(t));p.push(t)},e.spawn=function(t){if(s.deprecated("Promise.spawn()","Promise.coroutine()"),"function"!=typeof t)return n("generatorFunction must be a function\n\n    See http://goo.gl/MqrFmX\n");var r=new h(t,this),i=r.promise();return r._run(e.spawn),i}}},{"./errors":12,"./util":36}],17:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o,s){var a=t("./util");a.canEvaluate,a.tryCatch,a.errorObj;e.join=function(){var t,e=arguments.length-1;e>0&&"function"==typeof arguments[e]&&(t=arguments[e]);var r=[].slice.call(arguments);t&&r.pop();var i=new n(r).promise();return void 0!==t?i.spread(t):i}}},{"./util":36}],18:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o,s){var a=e._getDomain,c=t("./util"),l=c.tryCatch,u=c.errorObj,p=e._async;function h(t,e,n,r){this.constructor$(t),this._promise._captureStackTrace();var i=a();this._callback=null===i?e:c.domainBind(i,e),this._preservedValues=r===o?new Array(this.length()):null,this._limit=n,this._inFlight=0,this._queue=[],p.invoke(this._asyncInit,this,void 0)}function f(t,n,i,o){if("function"!=typeof n)return r("expecting a function but got "+c.classString(n));var s=0;if(void 0!==i){if("object"!=typeof i||null===i)return e.reject(new TypeError("options argument must be an object but it is "+c.classString(i)));if("number"!=typeof i.concurrency)return e.reject(new TypeError("'concurrency' must be a number but it is "+c.classString(i.concurrency)));s=i.concurrency}return new h(t,n,s="number"==typeof s&&isFinite(s)&&s>=1?s:0,o).promise()}c.inherits(h,n),h.prototype._asyncInit=function(){this._init$(void 0,-2)},h.prototype._init=function(){},h.prototype._promiseFulfilled=function(t,n){var r=this._values,o=this.length(),a=this._preservedValues,c=this._limit;if(n<0){if(r[n=-1*n-1]=t,c>=1&&(this._inFlight--,this._drainQueue(),this._isResolved()))return!0}else{if(c>=1&&this._inFlight>=c)return r[n]=t,this._queue.push(n),!1;null!==a&&(a[n]=t);var p=this._promise,h=this._callback,f=p._boundValue();p._pushContext();var _=l(h).call(f,t,n,o),d=p._popContext();if(s.checkForgottenReturns(_,d,null!==a?"Promise.filter":"Promise.map",p),_===u)return this._reject(_.e),!0;var v=i(_,this._promise);if(v instanceof e){var y=(v=v._target())._bitField;if(0==(50397184&y))return c>=1&&this._inFlight++,r[n]=v,v._proxy(this,-1*(n+1)),!1;if(0==(33554432&y))return 0!=(16777216&y)?(this._reject(v._reason()),!0):(this._cancel(),!0);_=v._value()}r[n]=_}return++this._totalResolved>=o&&(null!==a?this._filter(r,a):this._resolve(r),!0)},h.prototype._drainQueue=function(){for(var t=this._queue,e=this._limit,n=this._values;t.length>0&&this._inFlight<e;){if(this._isResolved())return;var r=t.pop();this._promiseFulfilled(n[r],r)}},h.prototype._filter=function(t,e){for(var n=e.length,r=new Array(n),i=0,o=0;o<n;++o)t[o]&&(r[i++]=e[o]);r.length=i,this._resolve(r)},h.prototype.preservedValues=function(){return this._preservedValues},e.prototype.map=function(t,e){return f(this,t,e,null)},e.map=function(t,e,n,r){return f(t,e,n,r)}}},{"./util":36}],19:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o){var s=t("./util"),a=s.tryCatch;e.method=function(t){if("function"!=typeof t)throw new e.TypeError("expecting a function but got "+s.classString(t));return function(){var r=new e(n);r._captureStackTrace(),r._pushContext();var i=a(t).apply(this,arguments),s=r._popContext();return o.checkForgottenReturns(i,s,"Promise.method",r),r._resolveFromSyncValue(i),r}},e.attempt=e.try=function(t){if("function"!=typeof t)return i("expecting a function but got "+s.classString(t));var r,c=new e(n);if(c._captureStackTrace(),c._pushContext(),arguments.length>1){o.deprecated("calling Promise.try with more than 1 argument");var l=arguments[1],u=arguments[2];r=s.isArray(l)?a(t).apply(u,l):a(t).call(u,l)}else r=a(t)();var p=c._popContext();return o.checkForgottenReturns(r,p,"Promise.try",c),c._resolveFromSyncValue(r),c},e.prototype._resolveFromSyncValue=function(t){t===s.errorObj?this._rejectCallback(t.e,!1):this._resolveCallback(t,!0)}}},{"./util":36}],20:[function(t,e,n){"use strict";var r=t("./util"),i=r.maybeWrapAsError,o=t("./errors").OperationalError,s=t("./es5");var a=/^(?:name|message|stack|cause)$/;function c(t){var e;if(function(t){return t instanceof Error&&s.getPrototypeOf(t)===Error.prototype}(t)){(e=new o(t)).name=t.name,e.message=t.message,e.stack=t.stack;for(var n=s.keys(t),i=0;i<n.length;++i){var c=n[i];a.test(c)||(e[c]=t[c])}return e}return r.markAsOriginatingFromRejection(t),t}e.exports=function(t,e){return function(n,r){if(null!==t){if(n){var o=c(i(n));t._attachExtraTrace(o),t._reject(o)}else if(e){var s=[].slice.call(arguments,1);t._fulfill(s)}else t._fulfill(r);t=null}}}},{"./errors":12,"./es5":13,"./util":36}],21:[function(t,e,n){"use strict";e.exports=function(e){var n=t("./util"),r=e._async,i=n.tryCatch,o=n.errorObj;function s(t,e){if(!n.isArray(t))return a.call(this,t,e);var s=i(e).apply(this._boundValue(),[null].concat(t));s===o&&r.throwLater(s.e)}function a(t,e){var n=this._boundValue(),s=void 0===t?i(e).call(n,null):i(e).call(n,null,t);s===o&&r.throwLater(s.e)}function c(t,e){if(!t){var n=new Error(t+"");n.cause=t,t=n}var s=i(e).call(this._boundValue(),t);s===o&&r.throwLater(s.e)}e.prototype.asCallback=e.prototype.nodeify=function(t,e){if("function"==typeof t){var n=a;void 0!==e&&Object(e).spread&&(n=s),this._then(n,c,void 0,this,t)}return this}}},{"./util":36}],22:[function(t,e,n){"use strict";e.exports=function(){var n=function(){return new f("circular promise resolution chain\n\n    See http://goo.gl/MqrFmX\n")},r=function(){return new x.PromiseInspection(this._target())},i=function(t){return x.reject(new f(t))};function o(){}var s,a={},c=t("./util");s=c.isNode?function(){var t=process.domain;return void 0===t&&(t=null),t}:function(){return null},c.notEnumerableProp(x,"_getDomain",s);var l=t("./es5"),u=t("./async"),p=new u;l.defineProperty(x,"_async",{value:p});var h=t("./errors"),f=x.TypeError=h.TypeError;x.RangeError=h.RangeError;var _=x.CancellationError=h.CancellationError;x.TimeoutError=h.TimeoutError,x.OperationalError=h.OperationalError,x.RejectionError=h.OperationalError,x.AggregateError=h.AggregateError;var d=function(){},v={},y={},m=t("./thenables")(x,d),g=t("./promise_array")(x,d,m,i,o),b=t("./context")(x),w=b.create,C=t("./debuggability")(x,b),j=(C.CapturedTrace,t("./finally")(x,m,y)),E=t("./catch_filter")(y),k=t("./nodeback"),F=c.errorObj,T=c.tryCatch;function x(t){t!==d&&function(t,e){if(null==t||t.constructor!==x)throw new f("the promise constructor cannot be invoked directly\n\n    See http://goo.gl/MqrFmX\n");if("function"!=typeof e)throw new f("expecting a function but got "+c.classString(e))}(this,t),this._bitField=0,this._fulfillmentHandler0=void 0,this._rejectionHandler0=void 0,this._promise0=void 0,this._receiver0=void 0,this._resolveFromExecutor(t),this._promiseCreated(),this._fireEvent("promiseCreated",this)}function P(t){this.promise._resolveCallback(t)}function S(t){this.promise._rejectCallback(t,!1)}function R(t){var e=new x(d);e._fulfillmentHandler0=t,e._rejectionHandler0=t,e._promise0=t,e._receiver0=t}return x.prototype.toString=function(){return"[object Promise]"},x.prototype.caught=x.prototype.catch=function(t){var e=arguments.length;if(e>1){var n,r=new Array(e-1),o=0;for(n=0;n<e-1;++n){var s=arguments[n];if(!c.isObject(s))return i("Catch statement predicate: expecting an object but got "+c.classString(s));r[o++]=s}if(r.length=o,"function"!=typeof(t=arguments[n]))throw new f("The last argument to .catch() must be a function, got "+c.toString(t));return this.then(void 0,E(r,t,this))}return this.then(void 0,t)},x.prototype.reflect=function(){return this._then(r,r,void 0,this,void 0)},x.prototype.then=function(t,e){if(C.warnings()&&arguments.length>0&&"function"!=typeof t&&"function"!=typeof e){var n=".then() only accepts functions but was passed: "+c.classString(t);arguments.length>1&&(n+=", "+c.classString(e)),this._warn(n)}return this._then(t,e,void 0,void 0,void 0)},x.prototype.done=function(t,e){this._then(t,e,void 0,void 0,void 0)._setIsFinal()},x.prototype.spread=function(t){return"function"!=typeof t?i("expecting a function but got "+c.classString(t)):this.all()._then(t,void 0,void 0,v,void 0)},x.prototype.toJSON=function(){var t={isFulfilled:!1,isRejected:!1,fulfillmentValue:void 0,rejectionReason:void 0};return this.isFulfilled()?(t.fulfillmentValue=this.value(),t.isFulfilled=!0):this.isRejected()&&(t.rejectionReason=this.reason(),t.isRejected=!0),t},x.prototype.all=function(){return arguments.length>0&&this._warn(".all() was passed arguments but it does not take any"),new g(this).promise()},x.prototype.error=function(t){return this.caught(c.originatesFromRejection,t)},x.getNewLibraryCopy=e.exports,x.is=function(t){return t instanceof x},x.fromNode=x.fromCallback=function(t){var e=new x(d);e._captureStackTrace();var n=arguments.length>1&&!!Object(arguments[1]).multiArgs,r=T(t)(k(e,n));return r===F&&e._rejectCallback(r.e,!0),e._isFateSealed()||e._setAsyncGuaranteed(),e},x.all=function(t){return new g(t).promise()},x.cast=function(t){var e=m(t);return e instanceof x||((e=new x(d))._captureStackTrace(),e._setFulfilled(),e._rejectionHandler0=t),e},x.resolve=x.fulfilled=x.cast,x.reject=x.rejected=function(t){var e=new x(d);return e._captureStackTrace(),e._rejectCallback(t,!0),e},x.setScheduler=function(t){if("function"!=typeof t)throw new f("expecting a function but got "+c.classString(t));return p.setScheduler(t)},x.prototype._then=function(t,e,n,r,i){var o=void 0!==i,a=o?i:new x(d),l=this._target(),u=l._bitField;o||(a._propagateFrom(this,3),a._captureStackTrace(),void 0===r&&0!=(2097152&this._bitField)&&(r=0!=(50397184&u)?this._boundValue():l===this?void 0:this._boundTo),this._fireEvent("promiseChained",this,a));var h=s();if(0!=(50397184&u)){var f,v,y=l._settlePromiseCtx;0!=(33554432&u)?(v=l._rejectionHandler0,f=t):0!=(16777216&u)?(v=l._fulfillmentHandler0,f=e,l._unsetRejectionIsUnhandled()):(y=l._settlePromiseLateCancellationObserver,v=new _("late cancellation observer"),l._attachExtraTrace(v),f=e),p.invoke(y,l,{handler:null===h?f:"function"==typeof f&&c.domainBind(h,f),promise:a,receiver:r,value:v})}else l._addCallbacks(t,e,a,r,h);return a},x.prototype._length=function(){return 65535&this._bitField},x.prototype._isFateSealed=function(){return 0!=(117506048&this._bitField)},x.prototype._isFollowing=function(){return 67108864==(67108864&this._bitField)},x.prototype._setLength=function(t){this._bitField=-65536&this._bitField|65535&t},x.prototype._setFulfilled=function(){this._bitField=33554432|this._bitField,this._fireEvent("promiseFulfilled",this)},x.prototype._setRejected=function(){this._bitField=16777216|this._bitField,this._fireEvent("promiseRejected",this)},x.prototype._setFollowing=function(){this._bitField=67108864|this._bitField,this._fireEvent("promiseResolved",this)},x.prototype._setIsFinal=function(){this._bitField=4194304|this._bitField},x.prototype._isFinal=function(){return(4194304&this._bitField)>0},x.prototype._unsetCancelled=function(){this._bitField=-65537&this._bitField},x.prototype._setCancelled=function(){this._bitField=65536|this._bitField,this._fireEvent("promiseCancelled",this)},x.prototype._setWillBeCancelled=function(){this._bitField=8388608|this._bitField},x.prototype._setAsyncGuaranteed=function(){p.hasCustomScheduler()||(this._bitField=134217728|this._bitField)},x.prototype._receiverAt=function(t){var e=0===t?this._receiver0:this[4*t-4+3];if(e!==a)return void 0===e&&this._isBound()?this._boundValue():e},x.prototype._promiseAt=function(t){return this[4*t-4+2]},x.prototype._fulfillmentHandlerAt=function(t){return this[4*t-4+0]},x.prototype._rejectionHandlerAt=function(t){return this[4*t-4+1]},x.prototype._boundValue=function(){},x.prototype._migrateCallback0=function(t){t._bitField;var e=t._fulfillmentHandler0,n=t._rejectionHandler0,r=t._promise0,i=t._receiverAt(0);void 0===i&&(i=a),this._addCallbacks(e,n,r,i,null)},x.prototype._migrateCallbackAt=function(t,e){var n=t._fulfillmentHandlerAt(e),r=t._rejectionHandlerAt(e),i=t._promiseAt(e),o=t._receiverAt(e);void 0===o&&(o=a),this._addCallbacks(n,r,i,o,null)},x.prototype._addCallbacks=function(t,e,n,r,i){var o=this._length();if(o>=65531&&(o=0,this._setLength(0)),0===o)this._promise0=n,this._receiver0=r,"function"==typeof t&&(this._fulfillmentHandler0=null===i?t:c.domainBind(i,t)),"function"==typeof e&&(this._rejectionHandler0=null===i?e:c.domainBind(i,e));else{var s=4*o-4;this[s+2]=n,this[s+3]=r,"function"==typeof t&&(this[s+0]=null===i?t:c.domainBind(i,t)),"function"==typeof e&&(this[s+1]=null===i?e:c.domainBind(i,e))}return this._setLength(o+1),o},x.prototype._proxy=function(t,e){this._addCallbacks(void 0,void 0,e,t,null)},x.prototype._resolveCallback=function(t,e){if(0==(117506048&this._bitField)){if(t===this)return this._rejectCallback(n(),!1);var r=m(t,this);if(!(r instanceof x))return this._fulfill(t);e&&this._propagateFrom(r,2);var i=r._target();if(i!==this){var o=i._bitField;if(0==(50397184&o)){var s=this._length();s>0&&i._migrateCallback0(this);for(var a=1;a<s;++a)i._migrateCallbackAt(this,a);this._setFollowing(),this._setLength(0),this._setFollowee(i)}else if(0!=(33554432&o))this._fulfill(i._value());else if(0!=(16777216&o))this._reject(i._reason());else{var c=new _("late cancellation observer");i._attachExtraTrace(c),this._reject(c)}}else this._reject(n())}},x.prototype._rejectCallback=function(t,e,n){var r=c.ensureErrorObject(t),i=r===t;if(!i&&!n&&C.warnings()){var o="a promise was rejected with a non-error: "+c.classString(t);this._warn(o,!0)}this._attachExtraTrace(r,!!e&&i),this._reject(t)},x.prototype._resolveFromExecutor=function(t){if(t!==d){var e=this;this._captureStackTrace(),this._pushContext();var n=!0,r=this._execute(t,function(t){e._resolveCallback(t)},function(t){e._rejectCallback(t,n)});n=!1,this._popContext(),void 0!==r&&e._rejectCallback(r,!0)}},x.prototype._settlePromiseFromHandler=function(t,e,n,r){var i=r._bitField;if(0==(65536&i)){var o;r._pushContext(),e===v?n&&"number"==typeof n.length?o=T(t).apply(this._boundValue(),n):(o=F).e=new f("cannot .spread() a non-array: "+c.classString(n)):o=T(t).call(e,n);var s=r._popContext();0==(65536&(i=r._bitField))&&(o===y?r._reject(n):o===F?r._rejectCallback(o.e,!1):(C.checkForgottenReturns(o,s,"",r,this),r._resolveCallback(o)))}},x.prototype._target=function(){for(var t=this;t._isFollowing();)t=t._followee();return t},x.prototype._followee=function(){return this._rejectionHandler0},x.prototype._setFollowee=function(t){this._rejectionHandler0=t},x.prototype._settlePromise=function(t,e,n,i){var s=t instanceof x,a=this._bitField,c=0!=(134217728&a);0!=(65536&a)?(s&&t._invokeInternalOnCancel(),n instanceof j&&n.isFinallyHandler()?(n.cancelPromise=t,T(e).call(n,i)===F&&t._reject(F.e)):e===r?t._fulfill(r.call(n)):n instanceof o?n._promiseCancelled(t):s||t instanceof g?t._cancel():n.cancel()):"function"==typeof e?s?(c&&t._setAsyncGuaranteed(),this._settlePromiseFromHandler(e,n,i,t)):e.call(n,i,t):n instanceof o?n._isResolved()||(0!=(33554432&a)?n._promiseFulfilled(i,t):n._promiseRejected(i,t)):s&&(c&&t._setAsyncGuaranteed(),0!=(33554432&a)?t._fulfill(i):t._reject(i))},x.prototype._settlePromiseLateCancellationObserver=function(t){var e=t.handler,n=t.promise,r=t.receiver,i=t.value;"function"==typeof e?n instanceof x?this._settlePromiseFromHandler(e,r,i,n):e.call(r,i,n):n instanceof x&&n._reject(i)},x.prototype._settlePromiseCtx=function(t){this._settlePromise(t.promise,t.handler,t.receiver,t.value)},x.prototype._settlePromise0=function(t,e,n){var r=this._promise0,i=this._receiverAt(0);this._promise0=void 0,this._receiver0=void 0,this._settlePromise(r,t,i,e)},x.prototype._clearCallbackDataAtIndex=function(t){var e=4*t-4;this[e+2]=this[e+3]=this[e+0]=this[e+1]=void 0},x.prototype._fulfill=function(t){var e=this._bitField;if(!((117506048&e)>>>16)){if(t===this){var r=n();return this._attachExtraTrace(r),this._reject(r)}this._setFulfilled(),this._rejectionHandler0=t,(65535&e)>0&&(0!=(134217728&e)?this._settlePromises():p.settlePromises(this),this._dereferenceTrace())}},x.prototype._reject=function(t){var e=this._bitField;if(!((117506048&e)>>>16)){if(this._setRejected(),this._fulfillmentHandler0=t,this._isFinal())return p.fatalError(t,c.isNode);(65535&e)>0?p.settlePromises(this):this._ensurePossibleRejectionHandled()}},x.prototype._fulfillPromises=function(t,e){for(var n=1;n<t;n++){var r=this._fulfillmentHandlerAt(n),i=this._promiseAt(n),o=this._receiverAt(n);this._clearCallbackDataAtIndex(n),this._settlePromise(i,r,o,e)}},x.prototype._rejectPromises=function(t,e){for(var n=1;n<t;n++){var r=this._rejectionHandlerAt(n),i=this._promiseAt(n),o=this._receiverAt(n);this._clearCallbackDataAtIndex(n),this._settlePromise(i,r,o,e)}},x.prototype._settlePromises=function(){var t=this._bitField,e=65535&t;if(e>0){if(0!=(16842752&t)){var n=this._fulfillmentHandler0;this._settlePromise0(this._rejectionHandler0,n,t),this._rejectPromises(e,n)}else{var r=this._rejectionHandler0;this._settlePromise0(this._fulfillmentHandler0,r,t),this._fulfillPromises(e,r)}this._setLength(0)}this._clearCancellationData()},x.prototype._settledValue=function(){var t=this._bitField;return 0!=(33554432&t)?this._rejectionHandler0:0!=(16777216&t)?this._fulfillmentHandler0:void 0},"undefined"!=typeof Symbol&&Symbol.toStringTag&&l.defineProperty(x.prototype,Symbol.toStringTag,{get:function(){return"Object"}}),x.defer=x.pending=function(){return C.deprecated("Promise.defer","new Promise"),{promise:new x(d),resolve:P,reject:S}},c.notEnumerableProp(x,"_makeSelfResolutionError",n),t("./method")(x,d,m,i,C),t("./bind")(x,d,m,C),t("./cancel")(x,g,i,C),t("./direct_resolve")(x),t("./synchronous_inspection")(x),t("./join")(x,g,m,d,p,s),x.Promise=x,x.version="3.5.5",t("./call_get.js")(x),t("./generators.js")(x,i,d,m,o,C),t("./map.js")(x,g,i,m,d,C),t("./nodeify.js")(x),t("./promisify.js")(x,d),t("./props.js")(x,g,m,i),t("./race.js")(x,d,m,i),t("./reduce.js")(x,g,i,m,d,C),t("./settle.js")(x,g,C),t("./some.js")(x,g,i),t("./timers.js")(x,d,C),t("./using.js")(x,i,m,w,d,C),t("./any.js")(x),t("./each.js")(x,d),t("./filter.js")(x,d),c.toFastProperties(x),c.toFastProperties(x.prototype),R({a:1}),R({b:2}),R({c:3}),R(1),R(function(){}),R(void 0),R(!1),R(new x(d)),C.setBounds(u.firstLineError,c.lastLineError),x}},{"./any.js":1,"./async":2,"./bind":3,"./call_get.js":5,"./cancel":6,"./catch_filter":7,"./context":8,"./debuggability":9,"./direct_resolve":10,"./each.js":11,"./errors":12,"./es5":13,"./filter.js":14,"./finally":15,"./generators.js":16,"./join":17,"./map.js":18,"./method":19,"./nodeback":20,"./nodeify.js":21,"./promise_array":23,"./promisify.js":24,"./props.js":25,"./race.js":27,"./reduce.js":28,"./settle.js":30,"./some.js":31,"./synchronous_inspection":32,"./thenables":33,"./timers.js":34,"./using.js":35,"./util":36}],23:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o){var s=t("./util");s.isArray;function a(t){var r=this._promise=new e(n);t instanceof e&&r._propagateFrom(t,3),r._setOnCancel(this),this._values=t,this._length=0,this._totalResolved=0,this._init(void 0,-2)}return s.inherits(a,o),a.prototype.length=function(){return this._length},a.prototype.promise=function(){return this._promise},a.prototype._init=function t(n,o){var a=r(this._values,this._promise);if(a instanceof e){var c=(a=a._target())._bitField;if(this._values=a,0==(50397184&c))return this._promise._setAsyncGuaranteed(),a._then(t,this._reject,void 0,this,o);if(0==(33554432&c))return 0!=(16777216&c)?this._reject(a._reason()):this._cancel();a=a._value()}if(null!==(a=s.asArray(a)))0!==a.length?this._iterate(a):-5===o?this._resolveEmptyArray():this._resolve(function(t){switch(t){case-2:return[];case-3:return{};case-6:return new Map}}(o));else{var l=i("expecting an array or an iterable object but got "+s.classString(a)).reason();this._promise._rejectCallback(l,!1)}},a.prototype._iterate=function(t){var n=this.getActualLength(t.length);this._length=n,this._values=this.shouldCopyValues()?new Array(n):this._values;for(var i=this._promise,o=!1,s=null,a=0;a<n;++a){var c=r(t[a],i);s=c instanceof e?(c=c._target())._bitField:null,o?null!==s&&c.suppressUnhandledRejections():null!==s?0==(50397184&s)?(c._proxy(this,a),this._values[a]=c):o=0!=(33554432&s)?this._promiseFulfilled(c._value(),a):0!=(16777216&s)?this._promiseRejected(c._reason(),a):this._promiseCancelled(a):o=this._promiseFulfilled(c,a)}o||i._setAsyncGuaranteed()},a.prototype._isResolved=function(){return null===this._values},a.prototype._resolve=function(t){this._values=null,this._promise._fulfill(t)},a.prototype._cancel=function(){!this._isResolved()&&this._promise._isCancellable()&&(this._values=null,this._promise._cancel())},a.prototype._reject=function(t){this._values=null,this._promise._rejectCallback(t,!1)},a.prototype._promiseFulfilled=function(t,e){return this._values[e]=t,++this._totalResolved>=this._length&&(this._resolve(this._values),!0)},a.prototype._promiseCancelled=function(){return this._cancel(),!0},a.prototype._promiseRejected=function(t){return this._totalResolved++,this._reject(t),!0},a.prototype._resultCancelled=function(){if(!this._isResolved()){var t=this._values;if(this._cancel(),t instanceof e)t.cancel();else for(var n=0;n<t.length;++n)t[n]instanceof e&&t[n].cancel()}},a.prototype.shouldCopyValues=function(){return!0},a.prototype.getActualLength=function(t){return t},a}},{"./util":36}],24:[function(t,e,n){"use strict";e.exports=function(e,n){var r={},i=t("./util"),o=t("./nodeback"),s=i.withAppended,a=i.maybeWrapAsError,c=i.canEvaluate,l=t("./errors").TypeError,u={__isPromisified__:!0},p=new RegExp("^(?:"+["arity","length","name","arguments","caller","callee","prototype","__isPromisified__"].join("|")+")$"),h=function(t){return i.isIdentifier(t)&&"_"!==t.charAt(0)&&"constructor"!==t};function f(t){return!p.test(t)}function _(t){try{return!0===t.__isPromisified__}catch(t){return!1}}function d(t,e,n){var r=i.getDataPropertyOrDefault(t,e+n,u);return!!r&&_(r)}function v(t,e,n,r){for(var o=i.inheritedDataKeys(t),s=[],a=0;a<o.length;++a){var c=o[a],u=t[c],p=r===h||h(c,u,t);"function"!=typeof u||_(u)||d(t,c,e)||!r(c,u,t,p)||s.push(c,u)}return function(t,e,n){for(var r=0;r<t.length;r+=2){var i=t[r];if(n.test(i))for(var o=i.replace(n,""),s=0;s<t.length;s+=2)if(t[s]===o)throw new l("Cannot promisify an API that has normal methods with '%s'-suffix\n\n    See http://goo.gl/MqrFmX\n".replace("%s",e))}}(s,e,n),s}var y,m=function(t){return t.replace(/([$])/,"\\$")};var g=c?y:function(t,c,l,u,p,h){var f=function(){return this}(),_=t;function d(){var i=c;c===r&&(i=this);var l=new e(n);l._captureStackTrace();var u="string"==typeof _&&this!==f?this[_]:t,p=o(l,h);try{u.apply(i,s(arguments,p))}catch(t){l._rejectCallback(a(t),!0,!0)}return l._isFateSealed()||l._setAsyncGuaranteed(),l}return"string"==typeof _&&(t=u),i.notEnumerableProp(d,"__isPromisified__",!0),d};function b(t,e,n,o,s){for(var a=new RegExp(m(e)+"$"),c=v(t,e,a,n),l=0,u=c.length;l<u;l+=2){var p=c[l],h=c[l+1],f=p+e;if(o===g)t[f]=g(p,r,p,h,e,s);else{var _=o(h,function(){return g(p,r,p,h,e,s)});i.notEnumerableProp(_,"__isPromisified__",!0),t[f]=_}}return i.toFastProperties(t),t}e.promisify=function(t,e){if("function"!=typeof t)throw new l("expecting a function but got "+i.classString(t));if(_(t))return t;var n=function(t,e,n){return g(t,e,void 0,t,null,n)}(t,void 0===(e=Object(e)).context?r:e.context,!!e.multiArgs);return i.copyDescriptors(t,n,f),n},e.promisifyAll=function(t,e){if("function"!=typeof t&&"object"!=typeof t)throw new l("the target of promisifyAll must be an object or a function\n\n    See http://goo.gl/MqrFmX\n");var n=!!(e=Object(e)).multiArgs,r=e.suffix;"string"!=typeof r&&(r="Async");var o=e.filter;"function"!=typeof o&&(o=h);var s=e.promisifier;if("function"!=typeof s&&(s=g),!i.isIdentifier(r))throw new RangeError("suffix must be a valid identifier\n\n    See http://goo.gl/MqrFmX\n");for(var a=i.inheritedDataKeys(t),c=0;c<a.length;++c){var u=t[a[c]];"constructor"!==a[c]&&i.isClass(u)&&(b(u.prototype,r,o,s,n),b(u,r,o,s,n))}return b(t,r,o,s,n)}}},{"./errors":12,"./nodeback":20,"./util":36}],25:[function(t,e,n){"use strict";e.exports=function(e,n,r,i){var o,s=t("./util"),a=s.isObject,c=t("./es5");"function"==typeof Map&&(o=Map);var l=function(){var t=0,e=0;function n(n,r){this[t]=n,this[t+e]=r,t++}return function(r){e=r.size,t=0;var i=new Array(2*r.size);return r.forEach(n,i),i}}();function u(t){var e,n=!1;if(void 0!==o&&t instanceof o)e=l(t),n=!0;else{var r=c.keys(t),i=r.length;e=new Array(2*i);for(var s=0;s<i;++s){var a=r[s];e[s]=t[a],e[s+i]=a}}this.constructor$(e),this._isMap=n,this._init$(void 0,n?-6:-3)}function p(t){var n,o=r(t);return a(o)?(n=o instanceof e?o._then(e.props,void 0,void 0,void 0,void 0):new u(o).promise(),o instanceof e&&n._propagateFrom(o,2),n):i("cannot await properties of a non-object\n\n    See http://goo.gl/MqrFmX\n")}s.inherits(u,n),u.prototype._init=function(){},u.prototype._promiseFulfilled=function(t,e){if(this._values[e]=t,++this._totalResolved>=this._length){var n;if(this._isMap)n=function(t){for(var e=new o,n=t.length/2|0,r=0;r<n;++r){var i=t[n+r],s=t[r];e.set(i,s)}return e}(this._values);else{n={};for(var r=this.length(),i=0,s=this.length();i<s;++i)n[this._values[i+r]]=this._values[i]}return this._resolve(n),!0}return!1},u.prototype.shouldCopyValues=function(){return!1},u.prototype.getActualLength=function(t){return t>>1},e.prototype.props=function(){return p(this)},e.props=function(t){return p(t)}}},{"./es5":13,"./util":36}],26:[function(t,e,n){"use strict";function r(t){this._capacity=t,this._length=0,this._front=0}r.prototype._willBeOverCapacity=function(t){return this._capacity<t},r.prototype._pushOne=function(t){var e=this.length();this._checkCapacity(e+1),this[this._front+e&this._capacity-1]=t,this._length=e+1},r.prototype.push=function(t,e,n){var r=this.length()+3;if(this._willBeOverCapacity(r))return this._pushOne(t),this._pushOne(e),void this._pushOne(n);var i=this._front+r-3;this._checkCapacity(r);var o=this._capacity-1;this[i+0&o]=t,this[i+1&o]=e,this[i+2&o]=n,this._length=r},r.prototype.shift=function(){var t=this._front,e=this[t];return this[t]=void 0,this._front=t+1&this._capacity-1,this._length--,e},r.prototype.length=function(){return this._length},r.prototype._checkCapacity=function(t){this._capacity<t&&this._resizeTo(this._capacity<<1)},r.prototype._resizeTo=function(t){var e=this._capacity;this._capacity=t,function(t,e,n,r,i){for(var o=0;o<i;++o)n[o+r]=t[o+e],t[o+e]=void 0}(this,0,this,e,this._front+this._length&e-1)},e.exports=r},{}],27:[function(t,e,n){"use strict";e.exports=function(e,n,r,i){var o=t("./util"),s=function(t){return t.then(function(e){return a(e,t)})};function a(t,a){var c=r(t);if(c instanceof e)return s(c);if(null===(t=o.asArray(t)))return i("expecting an array or an iterable object but got "+o.classString(t));var l=new e(n);void 0!==a&&l._propagateFrom(a,3);for(var u=l._fulfill,p=l._reject,h=0,f=t.length;h<f;++h){var _=t[h];(void 0!==_||h in t)&&e.cast(_)._then(u,p,void 0,l,null)}return l}e.race=function(t){return a(t,void 0)},e.prototype.race=function(){return a(this,void 0)}}},{"./util":36}],28:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o,s){var a=e._getDomain,c=t("./util"),l=c.tryCatch;function u(t,n,r,i){this.constructor$(t);var s=a();this._fn=null===s?n:c.domainBind(s,n),void 0!==r&&(r=e.resolve(r))._attachCancellationCallback(this),this._initialValue=r,this._currentCancellable=null,this._eachValues=i===o?Array(this._length):0===i?null:void 0,this._promise._captureStackTrace(),this._init$(void 0,-5)}function p(t,e){this.isFulfilled()?e._resolve(t):e._reject(t)}function h(t,e,n,i){return"function"!=typeof e?r("expecting a function but got "+c.classString(e)):new u(t,e,n,i).promise()}function f(t){this.accum=t,this.array._gotAccum(t);var n=i(this.value,this.array._promise);return n instanceof e?(this.array._currentCancellable=n,n._then(_,void 0,void 0,this,void 0)):_.call(this,n)}function _(t){var n,r=this.array,i=r._promise,o=l(r._fn);i._pushContext(),(n=void 0!==r._eachValues?o.call(i._boundValue(),t,this.index,this.length):o.call(i._boundValue(),this.accum,t,this.index,this.length))instanceof e&&(r._currentCancellable=n);var a=i._popContext();return s.checkForgottenReturns(n,a,void 0!==r._eachValues?"Promise.each":"Promise.reduce",i),n}c.inherits(u,n),u.prototype._gotAccum=function(t){void 0!==this._eachValues&&null!==this._eachValues&&t!==o&&this._eachValues.push(t)},u.prototype._eachComplete=function(t){return null!==this._eachValues&&this._eachValues.push(t),this._eachValues},u.prototype._init=function(){},u.prototype._resolveEmptyArray=function(){this._resolve(void 0!==this._eachValues?this._eachValues:this._initialValue)},u.prototype.shouldCopyValues=function(){return!1},u.prototype._resolve=function(t){this._promise._resolveCallback(t),this._values=null},u.prototype._resultCancelled=function(t){if(t===this._initialValue)return this._cancel();this._isResolved()||(this._resultCancelled$(),this._currentCancellable instanceof e&&this._currentCancellable.cancel(),this._initialValue instanceof e&&this._initialValue.cancel())},u.prototype._iterate=function(t){var n,r;this._values=t;var i=t.length;if(void 0!==this._initialValue?(n=this._initialValue,r=0):(n=e.resolve(t[0]),r=1),this._currentCancellable=n,!n.isRejected())for(;r<i;++r){var o={accum:null,value:t[r],index:r,length:i,array:this};n=n._then(f,void 0,void 0,o,void 0)}void 0!==this._eachValues&&(n=n._then(this._eachComplete,void 0,void 0,this,void 0)),n._then(p,p,void 0,n,this)},e.prototype.reduce=function(t,e){return h(this,t,e,null)},e.reduce=function(t,e,n,r){return h(t,e,n,r)}}},{"./util":36}],29:[function(t,e,n){"use strict";var r,i=t("./util"),o=i.getNativePromise();if(i.isNode&&"undefined"==typeof MutationObserver){var s=global.setImmediate,a=process.nextTick;r=i.isRecentNode?function(t){s.call(global,t)}:function(t){a.call(process,t)}}else if("function"==typeof o&&"function"==typeof o.resolve){var c=o.resolve();r=function(t){c.then(t)}}else r="undefined"!=typeof MutationObserver&&("undefined"==typeof window||!window.navigator||!window.navigator.standalone&&!window.cordova)&&"classList"in document.documentElement?function(){var t=document.createElement("div"),e={attributes:!0},n=!1,r=document.createElement("div");new MutationObserver(function(){t.classList.toggle("foo"),n=!1}).observe(r,e);return function(i){var o=new MutationObserver(function(){o.disconnect(),i()});o.observe(t,e),n||(n=!0,r.classList.toggle("foo"))}}():"undefined"!=typeof setImmediate?function(t){setImmediate(t)}:"undefined"!=typeof setTimeout?function(t){setTimeout(t,0)}:function(){throw new Error("No async scheduler available\n\n    See http://goo.gl/MqrFmX\n")};e.exports=r},{"./util":36}],30:[function(t,e,n){"use strict";e.exports=function(e,n,r){var i=e.PromiseInspection;function o(t){this.constructor$(t)}t("./util").inherits(o,n),o.prototype._promiseResolved=function(t,e){return this._values[t]=e,++this._totalResolved>=this._length&&(this._resolve(this._values),!0)},o.prototype._promiseFulfilled=function(t,e){var n=new i;return n._bitField=33554432,n._settledValueField=t,this._promiseResolved(e,n)},o.prototype._promiseRejected=function(t,e){var n=new i;return n._bitField=16777216,n._settledValueField=t,this._promiseResolved(e,n)},e.settle=function(t){return r.deprecated(".settle()",".reflect()"),new o(t).promise()},e.prototype.settle=function(){return e.settle(this)}}},{"./util":36}],31:[function(t,e,n){"use strict";e.exports=function(e,n,r){var i=t("./util"),o=t("./errors").RangeError,s=t("./errors").AggregateError,a=i.isArray,c={};function l(t){this.constructor$(t),this._howMany=0,this._unwrap=!1,this._initialized=!1}function u(t,e){if((0|e)!==e||e<0)return r("expecting a positive integer\n\n    See http://goo.gl/MqrFmX\n");var n=new l(t),i=n.promise();return n.setHowMany(e),n.init(),i}i.inherits(l,n),l.prototype._init=function(){if(this._initialized)if(0!==this._howMany){this._init$(void 0,-5);var t=a(this._values);!this._isResolved()&&t&&this._howMany>this._canPossiblyFulfill()&&this._reject(this._getRangeError(this.length()))}else this._resolve([])},l.prototype.init=function(){this._initialized=!0,this._init()},l.prototype.setUnwrap=function(){this._unwrap=!0},l.prototype.howMany=function(){return this._howMany},l.prototype.setHowMany=function(t){this._howMany=t},l.prototype._promiseFulfilled=function(t){return this._addFulfilled(t),this._fulfilled()===this.howMany()&&(this._values.length=this.howMany(),1===this.howMany()&&this._unwrap?this._resolve(this._values[0]):this._resolve(this._values),!0)},l.prototype._promiseRejected=function(t){return this._addRejected(t),this._checkOutcome()},l.prototype._promiseCancelled=function(){return this._values instanceof e||null==this._values?this._cancel():(this._addRejected(c),this._checkOutcome())},l.prototype._checkOutcome=function(){if(this.howMany()>this._canPossiblyFulfill()){for(var t=new s,e=this.length();e<this._values.length;++e)this._values[e]!==c&&t.push(this._values[e]);return t.length>0?this._reject(t):this._cancel(),!0}return!1},l.prototype._fulfilled=function(){return this._totalResolved},l.prototype._rejected=function(){return this._values.length-this.length()},l.prototype._addRejected=function(t){this._values.push(t)},l.prototype._addFulfilled=function(t){this._values[this._totalResolved++]=t},l.prototype._canPossiblyFulfill=function(){return this.length()-this._rejected()},l.prototype._getRangeError=function(t){var e="Input array must contain at least "+this._howMany+" items but contains only "+t+" items";return new o(e)},l.prototype._resolveEmptyArray=function(){this._reject(this._getRangeError(0))},e.some=function(t,e){return u(t,e)},e.prototype.some=function(t){return u(this,t)},e._SomePromiseArray=l}},{"./errors":12,"./util":36}],32:[function(t,e,n){"use strict";e.exports=function(t){function e(t){void 0!==t?(t=t._target(),this._bitField=t._bitField,this._settledValueField=t._isFateSealed()?t._settledValue():void 0):(this._bitField=0,this._settledValueField=void 0)}e.prototype._settledValue=function(){return this._settledValueField};var n=e.prototype.value=function(){if(!this.isFulfilled())throw new TypeError("cannot get fulfillment value of a non-fulfilled promise\n\n    See http://goo.gl/MqrFmX\n");return this._settledValue()},r=e.prototype.error=e.prototype.reason=function(){if(!this.isRejected())throw new TypeError("cannot get rejection reason of a non-rejected promise\n\n    See http://goo.gl/MqrFmX\n");return this._settledValue()},i=e.prototype.isFulfilled=function(){return 0!=(33554432&this._bitField)},o=e.prototype.isRejected=function(){return 0!=(16777216&this._bitField)},s=e.prototype.isPending=function(){return 0==(50397184&this._bitField)},a=e.prototype.isResolved=function(){return 0!=(50331648&this._bitField)};e.prototype.isCancelled=function(){return 0!=(8454144&this._bitField)},t.prototype.__isCancelled=function(){return 65536==(65536&this._bitField)},t.prototype._isCancelled=function(){return this._target().__isCancelled()},t.prototype.isCancelled=function(){return 0!=(8454144&this._target()._bitField)},t.prototype.isPending=function(){return s.call(this._target())},t.prototype.isRejected=function(){return o.call(this._target())},t.prototype.isFulfilled=function(){return i.call(this._target())},t.prototype.isResolved=function(){return a.call(this._target())},t.prototype.value=function(){return n.call(this._target())},t.prototype.reason=function(){var t=this._target();return t._unsetRejectionIsUnhandled(),r.call(t)},t.prototype._value=function(){return this._settledValue()},t.prototype._reason=function(){return this._unsetRejectionIsUnhandled(),this._settledValue()},t.PromiseInspection=e}},{}],33:[function(t,e,n){"use strict";e.exports=function(e,n){var r=t("./util"),i=r.errorObj,o=r.isObject;var s={}.hasOwnProperty;return function(t,a){if(o(t)){if(t instanceof e)return t;var c=function(t){try{return function(t){return t.then}(t)}catch(t){return i.e=t,i}}(t);if(c===i){a&&a._pushContext();var l=e.reject(c.e);return a&&a._popContext(),l}if("function"==typeof c)return function(t){try{return s.call(t,"_promise0")}catch(t){return!1}}(t)?(l=new e(n),t._then(l._fulfill,l._reject,void 0,l,null),l):function(t,o,s){var a=new e(n),c=a;s&&s._pushContext(),a._captureStackTrace(),s&&s._popContext();var l=!0,u=r.tryCatch(o).call(t,function(t){a&&(a._resolveCallback(t),a=null)},function(t){a&&(a._rejectCallback(t,l,!0),a=null)});return l=!1,a&&u===i&&(a._rejectCallback(u.e,!0,!0),a=null),c}(t,c,a)}return t}}},{"./util":36}],34:[function(t,e,n){"use strict";e.exports=function(e,n,r){var i=t("./util"),o=e.TimeoutError;function s(t){this.handle=t}s.prototype._resultCancelled=function(){clearTimeout(this.handle)};var a=function(t){return c(+this).thenReturn(t)},c=e.delay=function(t,i){var o,c;return void 0!==i?(o=e.resolve(i)._then(a,null,null,t,void 0),r.cancellation()&&i instanceof e&&o._setOnCancel(i)):(o=new e(n),c=setTimeout(function(){o._fulfill()},+t),r.cancellation()&&o._setOnCancel(new s(c)),o._captureStackTrace()),o._setAsyncGuaranteed(),o};e.prototype.delay=function(t){return c(t,this)};function l(t){return clearTimeout(this.handle),t}function u(t){throw clearTimeout(this.handle),t}e.prototype.timeout=function(t,e){var n,a;t=+t;var c=new s(setTimeout(function(){n.isPending()&&function(t,e,n){var r;r="string"!=typeof e?e instanceof Error?e:new o("operation timed out"):new o(e),i.markAsOriginatingFromRejection(r),t._attachExtraTrace(r),t._reject(r),null!=n&&n.cancel()}(n,e,a)},t));return r.cancellation()?(a=this.then(),(n=a._then(l,u,void 0,c,void 0))._setOnCancel(c)):n=this._then(l,u,void 0,c,void 0),n}}},{"./util":36}],35:[function(t,e,n){"use strict";e.exports=function(e,n,r,i,o,s){var a=t("./util"),c=t("./errors").TypeError,l=t("./util").inherits,u=a.errorObj,p=a.tryCatch,h={};function f(t){setTimeout(function(){throw t},0)}function _(t,n){var i=0,s=t.length,a=new e(o);return function o(){if(i>=s)return a._fulfill();var c=function(t){var e=r(t);return e!==t&&"function"==typeof t._isDisposable&&"function"==typeof t._getDisposer&&t._isDisposable()&&e._setDisposable(t._getDisposer()),e}(t[i++]);if(c instanceof e&&c._isDisposable()){try{c=r(c._getDisposer().tryDispose(n),t.promise)}catch(t){return f(t)}if(c instanceof e)return c._then(o,f,null,null,null)}o()}(),a}function d(t,e,n){this._data=t,this._promise=e,this._context=n}function v(t,e,n){this.constructor$(t,e,n)}function y(t){return d.isDisposer(t)?(this.resources[this.index]._setDisposable(t),t.promise()):t}function m(t){this.length=t,this.promise=null,this[t-1]=null}d.prototype.data=function(){return this._data},d.prototype.promise=function(){return this._promise},d.prototype.resource=function(){return this.promise().isFulfilled()?this.promise().value():h},d.prototype.tryDispose=function(t){var e=this.resource(),n=this._context;void 0!==n&&n._pushContext();var r=e!==h?this.doDispose(e,t):null;return void 0!==n&&n._popContext(),this._promise._unsetDisposable(),this._data=null,r},d.isDisposer=function(t){return null!=t&&"function"==typeof t.resource&&"function"==typeof t.tryDispose},l(v,d),v.prototype.doDispose=function(t,e){return this.data().call(t,t,e)},m.prototype._resultCancelled=function(){for(var t=this.length,n=0;n<t;++n){var r=this[n];r instanceof e&&r.cancel()}},e.using=function(){var t=arguments.length;if(t<2)return n("you must pass at least 2 arguments to Promise.using");var i,o=arguments[t-1];if("function"!=typeof o)return n("expecting a function but got "+a.classString(o));var c=!0;2===t&&Array.isArray(arguments[0])?(t=(i=arguments[0]).length,c=!1):(i=arguments,t--);for(var l=new m(t),h=0;h<t;++h){var f=i[h];if(d.isDisposer(f)){var v=f;(f=f.promise())._setDisposable(v)}else{var g=r(f);g instanceof e&&(f=g._then(y,null,null,{resources:l,index:h},void 0))}l[h]=f}var b=new Array(l.length);for(h=0;h<b.length;++h)b[h]=e.resolve(l[h]).reflect();var w=e.all(b).then(function(t){for(var e=0;e<t.length;++e){var n=t[e];if(n.isRejected())return u.e=n.error(),u;if(!n.isFulfilled())return void w.cancel();t[e]=n.value()}C._pushContext(),o=p(o);var r=c?o.apply(void 0,t):o(t),i=C._popContext();return s.checkForgottenReturns(r,i,"Promise.using",C),r}),C=w.lastly(function(){var t=new e.PromiseInspection(w);return _(l,t)});return l.promise=C,C._setOnCancel(l),C},e.prototype._setDisposable=function(t){this._bitField=131072|this._bitField,this._disposer=t},e.prototype._isDisposable=function(){return(131072&this._bitField)>0},e.prototype._getDisposer=function(){return this._disposer},e.prototype._unsetDisposable=function(){this._bitField=-131073&this._bitField,this._disposer=void 0},e.prototype.disposer=function(t){if("function"==typeof t)return new v(t,this,i());throw new c}}},{"./errors":12,"./util":36}],36:[function(t,e,n){"use strict";var r=t("./es5"),i="undefined"==typeof navigator,o={e:{}},s,a="undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:void 0!==this?this:null;function c(){try{var t=s;return s=null,t.apply(this,arguments)}catch(t){return o.e=t,o}}function l(t){return s=t,c}var u=function(t,e){var n={}.hasOwnProperty;function r(){for(var r in this.constructor=t,this.constructor$=e,e.prototype)n.call(e.prototype,r)&&"$"!==r.charAt(r.length-1)&&(this[r+"$"]=e.prototype[r])}return r.prototype=e.prototype,t.prototype=new r,t.prototype};function p(t){return null==t||!0===t||!1===t||"string"==typeof t||"number"==typeof t}function h(t){return"function"==typeof t||"object"==typeof t&&null!==t}function f(t){return p(t)?new Error(k(t)):t}function _(t,e){var n,r=t.length,i=new Array(r+1);for(n=0;n<r;++n)i[n]=t[n];return i[n]=e,i}function d(t,e,n){if(!r.isES5)return{}.hasOwnProperty.call(t,e)?t[e]:void 0;var i=Object.getOwnPropertyDescriptor(t,e);return null!=i?null==i.get&&null==i.set?i.value:n:void 0}function v(t,e,n){if(p(t))return t;var i={value:n,configurable:!0,enumerable:!1,writable:!0};return r.defineProperty(t,e,i),t}function y(t){throw t}var m=function(){var t=[Array.prototype,Object.prototype,Function.prototype],e=function(e){for(var n=0;n<t.length;++n)if(t[n]===e)return!0;return!1};if(r.isES5){var n=Object.getOwnPropertyNames;return function(t){for(var i=[],o=Object.create(null);null!=t&&!e(t);){var s;try{s=n(t)}catch(t){return i}for(var a=0;a<s.length;++a){var c=s[a];if(!o[c]){o[c]=!0;var l=Object.getOwnPropertyDescriptor(t,c);null!=l&&null==l.get&&null==l.set&&i.push(c)}}t=r.getPrototypeOf(t)}return i}}var i={}.hasOwnProperty;return function(n){if(e(n))return[];var r=[];t:for(var o in n)if(i.call(n,o))r.push(o);else{for(var s=0;s<t.length;++s)if(i.call(t[s],o))continue t;r.push(o)}return r}}(),g=/this\s*\.\s*\S+\s*=/;function b(t){try{if("function"==typeof t){var e=r.names(t.prototype),n=r.isES5&&e.length>1,i=e.length>0&&!(1===e.length&&"constructor"===e[0]),o=g.test(t+"")&&r.names(t).length>0;if(n||i||o)return!0}return!1}catch(t){return!1}}function w(t){function e(){}e.prototype=t;var n=new e;function r(){return typeof n.foo}return r(),r(),t}var C=/^[a-z$_][a-z$_0-9]*$/i;function j(t){return C.test(t)}function E(t,e,n){for(var r=new Array(t),i=0;i<t;++i)r[i]=e+i+n;return r}function k(t){try{return t+""}catch(t){return"[no string representation]"}}function F(t){return t instanceof Error||null!==t&&"object"==typeof t&&"string"==typeof t.message&&"string"==typeof t.name}function T(t){try{v(t,"isOperational",!0)}catch(t){}}function x(t){return null!=t&&(t instanceof Error.__BluebirdErrorTypes__.OperationalError||!0===t.isOperational)}function P(t){return F(t)&&r.propertyIsWritable(t,"stack")}var S="stack"in new Error?function(t){return P(t)?t:new Error(k(t))}:function(t){if(P(t))return t;try{throw new Error(k(t))}catch(t){return t}};function R(t){return{}.toString.call(t)}function O(t,e,n){for(var i=r.names(t),o=0;o<i.length;++o){var s=i[o];if(n(s))try{r.defineProperty(e,s,r.getDescriptor(t,s))}catch(t){}}}var A=function(t){return r.isArray(t)?t:null};if("undefined"!=typeof Symbol&&Symbol.iterator){var D="function"==typeof Array.from?function(t){return Array.from(t)}:function(t){for(var e,n=[],r=t[Symbol.iterator]();!(e=r.next()).done;)n.push(e.value);return n};A=function(t){return r.isArray(t)?t:null!=t&&"function"==typeof t[Symbol.iterator]?D(t):null}}var V="undefined"!=typeof process&&"[object process]"===R(process).toLowerCase(),I="undefined"!=typeof process&&void 0!==process.env;function L(t){return I?process.env[t]:void 0}function H(){if("function"==typeof Promise)try{var t=new Promise(function(){});if("[object Promise]"==={}.toString.call(t))return Promise}catch(t){}}function N(t,e){return t.bind(e)}var U={isClass:b,isIdentifier:j,inheritedDataKeys:m,getDataPropertyOrDefault:d,thrower:y,isArray:r.isArray,asArray:A,notEnumerableProp:v,isPrimitive:p,isObject:h,isError:F,canEvaluate:i,errorObj:o,tryCatch:l,inherits:u,withAppended:_,maybeWrapAsError:f,toFastProperties:w,filledRange:E,toString:k,canAttachTrace:P,ensureErrorObject:S,originatesFromRejection:x,markAsOriginatingFromRejection:T,classString:R,copyDescriptors:O,hasDevTools:"undefined"!=typeof chrome&&chrome&&"function"==typeof chrome.loadTimes,isNode:V,hasEnvVariables:I,env:L,global:a,getNativePromise:H,domainBind:N},B;U.isRecentNode=U.isNode&&(process.versions&&process.versions.node?B=process.versions.node.split(".").map(Number):process.version&&(B=process.version.split(".").map(Number)),0===B[0]&&B[1]>10||B[0]>0),U.isNode&&U.toFastProperties(process);try{throw new Error}catch(t){U.lastLineError=t}e.exports=U},{"./es5":13}]},{},[4])(4)}),"undefined"!=typeof window&&null!==window?window.P=window.Promise:"undefined"!=typeof self&&null!==self&&(self.P=self.Promise);
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+module.exports = require('./lib/axios');
+},{"./lib/axios":3}],2:[function(require,module,exports){
+'use strict';
 
-}).call(this,_dereq_('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},_dereq_("timers").setImmediate)
-},{"_process":2,"timers":10}],2:[function(_dereq_,module,exports){
-var cachedSetTimeout,cachedClearTimeout,process=module.exports={};function defaultSetTimout(){throw new Error("setTimeout has not been defined")}function defaultClearTimeout(){throw new Error("clearTimeout has not been defined")}function runTimeout(e){if(cachedSetTimeout===setTimeout)return setTimeout(e,0);if((cachedSetTimeout===defaultSetTimout||!cachedSetTimeout)&&setTimeout)return cachedSetTimeout=setTimeout,setTimeout(e,0);try{return cachedSetTimeout(e,0)}catch(t){try{return cachedSetTimeout.call(null,e,0)}catch(t){return cachedSetTimeout.call(this,e,0)}}}function runClearTimeout(e){if(cachedClearTimeout===clearTimeout)return clearTimeout(e);if((cachedClearTimeout===defaultClearTimeout||!cachedClearTimeout)&&clearTimeout)return cachedClearTimeout=clearTimeout,clearTimeout(e);try{return cachedClearTimeout(e)}catch(t){try{return cachedClearTimeout.call(null,e)}catch(t){return cachedClearTimeout.call(this,e)}}}!function(){try{cachedSetTimeout="function"==typeof setTimeout?setTimeout:defaultSetTimout}catch(e){cachedSetTimeout=defaultSetTimout}try{cachedClearTimeout="function"==typeof clearTimeout?clearTimeout:defaultClearTimeout}catch(e){cachedClearTimeout=defaultClearTimeout}}();var currentQueue,queue=[],draining=!1,queueIndex=-1;function cleanUpNextTick(){draining&&currentQueue&&(draining=!1,currentQueue.length?queue=currentQueue.concat(queue):queueIndex=-1,queue.length&&drainQueue())}function drainQueue(){if(!draining){var e=runTimeout(cleanUpNextTick);draining=!0;for(var t=queue.length;t;){for(currentQueue=queue,queue=[];++queueIndex<t;)currentQueue&&currentQueue[queueIndex].run();queueIndex=-1,t=queue.length}currentQueue=null,draining=!1,runClearTimeout(e)}}function Item(e,t){this.fun=e,this.array=t}function noop(){}process.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)t[r-1]=arguments[r];queue.push(new Item(e,t)),1!==queue.length||draining||runTimeout(drainQueue)},Item.prototype.run=function(){this.fun.apply(null,this.array)},process.title="browser",process.browser=!0,process.env={},process.argv=[],process.version="",process.versions={},process.on=noop,process.addListener=noop,process.once=noop,process.off=noop,process.removeListener=noop,process.removeAllListeners=noop,process.emit=noop,process.prependListener=noop,process.prependOnceListener=noop,process.listeners=function(e){return[]},process.binding=function(e){throw new Error("process.binding is not supported")},process.cwd=function(){return"/"},process.chdir=function(e){throw new Error("process.chdir is not supported")},process.umask=function(){return 0};
+var utils = require('./../utils');
+var settle = require('./../core/settle');
+var cookies = require('./../helpers/cookies');
+var buildURL = require('./../helpers/buildURL');
+var buildFullPath = require('../core/buildFullPath');
+var parseHeaders = require('./../helpers/parseHeaders');
+var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
+var transitionalDefaults = require('../defaults/transitional');
+var AxiosError = require('../core/AxiosError');
+var CanceledError = require('../cancel/CanceledError');
+var parseProtocol = require('../helpers/parseProtocol');
 
-},{}],3:[function(_dereq_,module,exports){
-"use strict";function _toConsumableArray(t){return _arrayWithoutHoles(t)||_iterableToArray(t)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance")}function _iterableToArray(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}function _arrayWithoutHoles(t){if(Array.isArray(t)){for(var r=0,e=new Array(t.length);r<t.length;r++)e[r]=t[r];return e}}function Agent(){this._defaults=[]}["use","on","once","set","query","type","accept","auth","withCredentials","sortQuery","retry","ok","redirects","timeout","buffer","serialize","parse","ca","key","pfx","cert"].forEach(function(t){Agent.prototype[t]=function(){for(var r=arguments.length,e=new Array(r),n=0;n<r;n++)e[n]=arguments[n];return this._defaults.push({fn:t,args:e}),this}}),Agent.prototype._setDefaults=function(t){this._defaults.forEach(function(r){t[r.fn].apply(t,_toConsumableArray(r.args))})},module.exports=Agent;
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+    var responseType = config.responseType;
+    var onCanceled;
+    function done() {
+      if (config.cancelToken) {
+        config.cancelToken.unsubscribe(onCanceled);
+      }
 
-},{}],4:[function(_dereq_,module,exports){
-"use strict";function _typeof(e){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e})(e)}var root;"undefined"!=typeof window?root=window:"undefined"==typeof self?(console.warn("Using browser-only version of superagent in non-browser environment"),root=void 0):root=self;var Emitter=_dereq_("component-emitter"),RequestBase=_dereq_("./request-base"),isObject=_dereq_("./is-object"),ResponseBase=_dereq_("./response-base"),Agent=_dereq_("./agent-base");function noop(){}module.exports=function(e,t){return"function"==typeof t?new exports.Request("GET",e).end(t):1===arguments.length?new exports.Request("GET",e):new exports.Request(e,t)},exports=module.exports;var request=exports;exports.Request=Request,request.getXHR=function(){if(root.XMLHttpRequest&&(!root.location||"file:"!==root.location.protocol||!root.ActiveXObject))return new XMLHttpRequest;try{return new ActiveXObject("Microsoft.XMLHTTP")}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.6.0")}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP.3.0")}catch(e){}try{return new ActiveXObject("Msxml2.XMLHTTP")}catch(e){}throw new Error("Browser-only version of superagent could not find XHR")};var trim="".trim?function(e){return e.trim()}:function(e){return e.replace(/(^\s*|\s*$)/g,"")};function serialize(e){if(!isObject(e))return e;var t=[];for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&pushEncodedKeyValuePair(t,r,e[r]);return t.join("&")}function pushEncodedKeyValuePair(e,t,r){if(void 0!==r)if(null!==r)if(Array.isArray(r))r.forEach(function(r){pushEncodedKeyValuePair(e,t,r)});else if(isObject(r))for(var s in r)Object.prototype.hasOwnProperty.call(r,s)&&pushEncodedKeyValuePair(e,"".concat(t,"[").concat(s,"]"),r[s]);else e.push(encodeURIComponent(t)+"="+encodeURIComponent(r));else e.push(encodeURIComponent(t))}function parseString(e){for(var t,r,s={},o=e.split("&"),n=0,i=o.length;n<i;++n)-1===(r=(t=o[n]).indexOf("="))?s[decodeURIComponent(t)]="":s[decodeURIComponent(t.slice(0,r))]=decodeURIComponent(t.slice(r+1));return s}function parseHeader(e){for(var t,r,s,o,n=e.split(/\r?\n/),i={},u=0,a=n.length;u<a;++u)-1!==(t=(r=n[u]).indexOf(":"))&&(s=r.slice(0,t).toLowerCase(),o=trim(r.slice(t+1)),i[s]=o);return i}function isJSON(e){return/[\/+]json($|[^-\w])/.test(e)}function Response(e){this.req=e,this.xhr=this.req.xhr,this.text="HEAD"!==this.req.method&&(""===this.xhr.responseType||"text"===this.xhr.responseType)||void 0===this.xhr.responseType?this.xhr.responseText:null,this.statusText=this.req.xhr.statusText;var t=this.xhr.status;1223===t&&(t=204),this._setStatusProperties(t),this.headers=parseHeader(this.xhr.getAllResponseHeaders()),this.header=this.headers,this.header["content-type"]=this.xhr.getResponseHeader("content-type"),this._setHeaderProperties(this.header),null===this.text&&e._responseType?this.body=this.xhr.response:this.body="HEAD"===this.req.method?null:this._parseBody(this.text?this.text:this.xhr.response)}function Request(e,t){var r=this;this._query=this._query||[],this.method=e,this.url=t,this.header={},this._header={},this.on("end",function(){var e,t=null,s=null;try{s=new Response(r)}catch(e){return(t=new Error("Parser is unable to parse the response")).parse=!0,t.original=e,r.xhr?(t.rawResponse=void 0===r.xhr.responseType?r.xhr.responseText:r.xhr.response,t.status=r.xhr.status?r.xhr.status:null,t.statusCode=t.status):(t.rawResponse=null,t.status=null),r.callback(t)}r.emit("response",s);try{r._isResponseOK(s)||(e=new Error(s.statusText||"Unsuccessful HTTP response"))}catch(t){e=t}e?(e.original=t,e.response=s,e.status=s.status,r.callback(e,s)):r.callback(null,s)})}function del(e,t,r){var s=request("DELETE",e);return"function"==typeof t&&(r=t,t=null),t&&s.send(t),r&&s.end(r),s}request.serializeObject=serialize,request.parseString=parseString,request.types={html:"text/html",json:"application/json",xml:"text/xml",urlencoded:"application/x-www-form-urlencoded",form:"application/x-www-form-urlencoded","form-data":"application/x-www-form-urlencoded"},request.serialize={"application/x-www-form-urlencoded":serialize,"application/json":JSON.stringify},request.parse={"application/x-www-form-urlencoded":parseString,"application/json":JSON.parse},ResponseBase(Response.prototype),Response.prototype._parseBody=function(e){var t=request.parse[this.type];return this.req._parser?this.req._parser(this,e):(!t&&isJSON(this.type)&&(t=request.parse["application/json"]),t&&e&&(e.length>0||e instanceof Object)?t(e):null)},Response.prototype.toError=function(){var e=this.req,t=e.method,r=e.url,s="cannot ".concat(t," ").concat(r," (").concat(this.status,")"),o=new Error(s);return o.status=this.status,o.method=t,o.url=r,o},request.Response=Response,Emitter(Request.prototype),RequestBase(Request.prototype),Request.prototype.type=function(e){return this.set("Content-Type",request.types[e]||e),this},Request.prototype.accept=function(e){return this.set("Accept",request.types[e]||e),this},Request.prototype.auth=function(e,t,r){1===arguments.length&&(t=""),"object"===_typeof(t)&&null!==t&&(r=t,t=""),r||(r={type:"function"==typeof btoa?"basic":"auto"});return this._auth(e,t,r,function(e){if("function"==typeof btoa)return btoa(e);throw new Error("Cannot use basic auth, btoa is not a function")})},Request.prototype.query=function(e){return"string"!=typeof e&&(e=serialize(e)),e&&this._query.push(e),this},Request.prototype.attach=function(e,t,r){if(t){if(this._data)throw new Error("superagent can't mix .send() and .attach()");this._getFormData().append(e,t,r||t.name)}return this},Request.prototype._getFormData=function(){return this._formData||(this._formData=new root.FormData),this._formData},Request.prototype.callback=function(e,t){if(this._shouldRetry(e,t))return this._retry();var r=this._callback;this.clearTimeout(),e&&(this._maxRetries&&(e.retries=this._retries-1),this.emit("error",e)),r(e,t)},Request.prototype.crossDomainError=function(){var e=new Error("Request has been terminated\nPossible causes: the network is offline, Origin is not allowed by Access-Control-Allow-Origin, the page is being unloaded, etc.");e.crossDomain=!0,e.status=this.status,e.method=this.method,e.url=this.url,this.callback(e)},Request.prototype.agent=function(){return console.warn("This is not supported in browser version of superagent"),this},Request.prototype.buffer=Request.prototype.ca,Request.prototype.ca=Request.prototype.agent,Request.prototype.write=function(){throw new Error("Streaming is not supported in browser version of superagent")},Request.prototype.pipe=Request.prototype.write,Request.prototype._isHost=function(e){return e&&"object"===_typeof(e)&&!Array.isArray(e)&&"[object Object]"!==Object.prototype.toString.call(e)},Request.prototype.end=function(e){this._endCalled&&console.warn("Warning: .end() was called twice. This is not supported in superagent"),this._endCalled=!0,this._callback=e||noop,this._finalizeQueryString(),this._end()},Request.prototype._setUploadTimeout=function(){var e=this;this._uploadTimeout&&!this._uploadTimeoutTimer&&(this._uploadTimeoutTimer=setTimeout(function(){e._timeoutError("Upload timeout of ",e._uploadTimeout,"ETIMEDOUT")},this._uploadTimeout))},Request.prototype._end=function(){if(this._aborted)return this.callback(new Error("The request has been aborted even before .end() was called"));var e=this;this.xhr=request.getXHR();var t=this.xhr,r=this._formData||this._data;this._setTimeouts(),t.onreadystatechange=function(){var r=t.readyState;if(r>=2&&e._responseTimeoutTimer&&clearTimeout(e._responseTimeoutTimer),4===r){var s;try{s=t.status}catch(e){s=0}if(!s){if(e.timedout||e._aborted)return;return e.crossDomainError()}e.emit("end")}};var s=function(t,r){r.total>0&&(r.percent=r.loaded/r.total*100,100===r.percent&&clearTimeout(e._uploadTimeoutTimer)),r.direction=t,e.emit("progress",r)};if(this.hasListeners("progress"))try{t.addEventListener("progress",s.bind(null,"download")),t.upload&&t.upload.addEventListener("progress",s.bind(null,"upload"))}catch(e){}t.upload&&this._setUploadTimeout();try{this.username&&this.password?t.open(this.method,this.url,!0,this.username,this.password):t.open(this.method,this.url,!0)}catch(e){return this.callback(e)}if(this._withCredentials&&(t.withCredentials=!0),!this._formData&&"GET"!==this.method&&"HEAD"!==this.method&&"string"!=typeof r&&!this._isHost(r)){var o=this._header["content-type"],n=this._serializer||request.serialize[o?o.split(";")[0]:""];!n&&isJSON(o)&&(n=request.serialize["application/json"]),n&&(r=n(r))}for(var i in this.header)null!==this.header[i]&&Object.prototype.hasOwnProperty.call(this.header,i)&&t.setRequestHeader(i,this.header[i]);this._responseType&&(t.responseType=this._responseType),this.emit("request",this),t.send(void 0===r?null:r)},request.agent=function(){return new Agent},["GET","POST","OPTIONS","PATCH","PUT","DELETE"].forEach(function(e){Agent.prototype[e.toLowerCase()]=function(t,r){var s=new request.Request(e,t);return this._setDefaults(s),r&&s.end(r),s}}),Agent.prototype.del=Agent.prototype.delete,request.get=function(e,t,r){var s=request("GET",e);return"function"==typeof t&&(r=t,t=null),t&&s.query(t),r&&s.end(r),s},request.head=function(e,t,r){var s=request("HEAD",e);return"function"==typeof t&&(r=t,t=null),t&&s.query(t),r&&s.end(r),s},request.options=function(e,t,r){var s=request("OPTIONS",e);return"function"==typeof t&&(r=t,t=null),t&&s.send(t),r&&s.end(r),s},request.del=del,request.delete=del,request.patch=function(e,t,r){var s=request("PATCH",e);return"function"==typeof t&&(r=t,t=null),t&&s.send(t),r&&s.end(r),s},request.post=function(e,t,r){var s=request("POST",e);return"function"==typeof t&&(r=t,t=null),t&&s.send(t),r&&s.end(r),s},request.put=function(e,t,r){var s=request("PUT",e);return"function"==typeof t&&(r=t,t=null),t&&s.send(t),r&&s.end(r),s};
+      if (config.signal) {
+        config.signal.removeEventListener('abort', onCanceled);
+      }
+    }
 
-},{"./agent-base":3,"./is-object":5,"./request-base":6,"./response-base":7,"component-emitter":9}],5:[function(_dereq_,module,exports){
-"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function isObject(t){return null!==t&&"object"===_typeof(t)}module.exports=isObject;
+    if (utils.isFormData(requestData) && utils.isStandardBrowserEnv()) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
 
-},{}],6:[function(_dereq_,module,exports){
-"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}var isObject=_dereq_("./is-object");function RequestBase(t){if(t)return mixin(t)}function mixin(t){for(var e in RequestBase.prototype)Object.prototype.hasOwnProperty.call(RequestBase.prototype,e)&&(t[e]=RequestBase.prototype[e]);return t}module.exports=RequestBase,RequestBase.prototype.clearTimeout=function(){return clearTimeout(this._timer),clearTimeout(this._responseTimeoutTimer),clearTimeout(this._uploadTimeoutTimer),delete this._timer,delete this._responseTimeoutTimer,delete this._uploadTimeoutTimer,this},RequestBase.prototype.parse=function(t){return this._parser=t,this},RequestBase.prototype.responseType=function(t){return this._responseType=t,this},RequestBase.prototype.serialize=function(t){return this._serializer=t,this},RequestBase.prototype.timeout=function(t){if(!t||"object"!==_typeof(t))return this._timeout=t,this._responseTimeout=0,this._uploadTimeout=0,this;for(var e in t)if(Object.prototype.hasOwnProperty.call(t,e))switch(e){case"deadline":this._timeout=t.deadline;break;case"response":this._responseTimeout=t.response;break;case"upload":this._uploadTimeout=t.upload;break;default:console.warn("Unknown timeout option",e)}return this},RequestBase.prototype.retry=function(t,e){return 0!==arguments.length&&!0!==t||(t=1),t<=0&&(t=0),this._maxRetries=t,this._retries=0,this._retryCallback=e,this};var ERROR_CODES=["ECONNRESET","ETIMEDOUT","EADDRINFO","ESOCKETTIMEDOUT"];RequestBase.prototype._shouldRetry=function(t,e){if(!this._maxRetries||this._retries++>=this._maxRetries)return!1;if(this._retryCallback)try{var r=this._retryCallback(t,e);if(!0===r)return!0;if(!1===r)return!1}catch(t){console.error(t)}if(e&&e.status&&e.status>=500&&501!==e.status)return!0;if(t){if(t.code&&-1!==ERROR_CODES.indexOf(t.code))return!0;if(t.timeout&&"ECONNABORTED"===t.code)return!0;if(t.crossDomain)return!0}return!1},RequestBase.prototype._retry=function(){return this.clearTimeout(),this.req&&(this.req=null,this.req=this.request()),this._aborted=!1,this.timedout=!1,this._end()},RequestBase.prototype.then=function(t,e){var r=this;if(!this._fullfilledPromise){var s=this;this._endCalled&&console.warn("Warning: superagent request was sent twice, because both .end() and .then() were called. Never call .end() if you use promises"),this._fullfilledPromise=new Promise(function(t,e){s.on("abort",function(){var t=new Error("Aborted");t.code="ABORTED",t.status=r.status,t.method=r.method,t.url=r.url,e(t)}),s.end(function(r,s){r?e(r):t(s)})})}return this._fullfilledPromise.then(t,e)},RequestBase.prototype.catch=function(t){return this.then(void 0,t)},RequestBase.prototype.use=function(t){return t(this),this},RequestBase.prototype.ok=function(t){if("function"!=typeof t)throw new Error("Callback required");return this._okCallback=t,this},RequestBase.prototype._isResponseOK=function(t){return!!t&&(this._okCallback?this._okCallback(t):t.status>=200&&t.status<300)},RequestBase.prototype.get=function(t){return this._header[t.toLowerCase()]},RequestBase.prototype.getHeader=RequestBase.prototype.get,RequestBase.prototype.set=function(t,e){if(isObject(t)){for(var r in t)Object.prototype.hasOwnProperty.call(t,r)&&this.set(r,t[r]);return this}return this._header[t.toLowerCase()]=e,this.header[t]=e,this},RequestBase.prototype.unset=function(t){return delete this._header[t.toLowerCase()],delete this.header[t],this},RequestBase.prototype.field=function(t,e){if(null==t)throw new Error(".field(name, val) name can not be empty");if(this._data)throw new Error(".field() can't be used if .send() is used. Please use only .send() or only .field() & .attach()");if(isObject(t)){for(var r in t)Object.prototype.hasOwnProperty.call(t,r)&&this.field(r,t[r]);return this}if(Array.isArray(e)){for(var s in e)Object.prototype.hasOwnProperty.call(e,s)&&this.field(t,e[s]);return this}if(null==e)throw new Error(".field(name, val) val can not be empty");return"boolean"==typeof e&&(e=String(e)),this._getFormData().append(t,e),this},RequestBase.prototype.abort=function(){return this._aborted?this:(this._aborted=!0,this.xhr&&this.xhr.abort(),this.req&&this.req.abort(),this.clearTimeout(),this.emit("abort"),this)},RequestBase.prototype._auth=function(t,e,r,s){switch(r.type){case"basic":this.set("Authorization","Basic ".concat(s("".concat(t,":").concat(e))));break;case"auto":this.username=t,this.password=e;break;case"bearer":this.set("Authorization","Bearer ".concat(t))}return this},RequestBase.prototype.withCredentials=function(t){return void 0===t&&(t=!0),this._withCredentials=t,this},RequestBase.prototype.redirects=function(t){return this._maxRedirects=t,this},RequestBase.prototype.maxResponseSize=function(t){if("number"!=typeof t)throw new TypeError("Invalid argument");return this._maxResponseSize=t,this},RequestBase.prototype.toJSON=function(){return{method:this.method,url:this.url,data:this._data,headers:this._header}},RequestBase.prototype.send=function(t){var e=isObject(t),r=this._header["content-type"];if(this._formData)throw new Error(".send() can't be used if .attach() or .field() is used. Please use only .send() or only .field() & .attach()");if(e&&!this._data)Array.isArray(t)?this._data=[]:this._isHost(t)||(this._data={});else if(t&&this._data&&this._isHost(this._data))throw new Error("Can't merge these send calls");if(e&&isObject(this._data))for(var s in t)Object.prototype.hasOwnProperty.call(t,s)&&(this._data[s]=t[s]);else"string"==typeof t?(r||this.type("form"),r=this._header["content-type"],this._data="application/x-www-form-urlencoded"===r?this._data?"".concat(this._data,"&").concat(t):t:(this._data||"")+t):this._data=t;return!e||this._isHost(t)?this:(r||this.type("json"),this)},RequestBase.prototype.sortQuery=function(t){return this._sort=void 0===t||t,this},RequestBase.prototype._finalizeQueryString=function(){var t=this._query.join("&");if(t&&(this.url+=(this.url.indexOf("?")>=0?"&":"?")+t),this._query.length=0,this._sort){var e=this.url.indexOf("?");if(e>=0){var r=this.url.substring(e+1).split("&");"function"==typeof this._sort?r.sort(this._sort):r.sort(),this.url=this.url.substring(0,e)+"?"+r.join("&")}}},RequestBase.prototype._appendQueryString=function(){console.warn("Unsupported")},RequestBase.prototype._timeoutError=function(t,e,r){if(!this._aborted){var s=new Error("".concat(t+e,"ms exceeded"));s.timeout=e,s.code="ECONNABORTED",s.errno=r,this.timedout=!0,this.abort(),this.callback(s)}},RequestBase.prototype._setTimeouts=function(){var t=this;this._timeout&&!this._timer&&(this._timer=setTimeout(function(){t._timeoutError("Timeout of ",t._timeout,"ETIME")},this._timeout)),this._responseTimeout&&!this._responseTimeoutTimer&&(this._responseTimeoutTimer=setTimeout(function(){t._timeoutError("Response timeout of ",t._responseTimeout,"ETIMEDOUT")},this._responseTimeout))};
+    var request = new XMLHttpRequest();
 
-},{"./is-object":5}],7:[function(_dereq_,module,exports){
-"use strict";var utils=_dereq_("./utils");function ResponseBase(t){if(t)return mixin(t)}function mixin(t){for(var e in ResponseBase.prototype)Object.prototype.hasOwnProperty.call(ResponseBase.prototype,e)&&(t[e]=ResponseBase.prototype[e]);return t}module.exports=ResponseBase,ResponseBase.prototype.get=function(t){return this.header[t.toLowerCase()]},ResponseBase.prototype._setHeaderProperties=function(t){var e=t["content-type"]||"";this.type=utils.type(e);var s=utils.params(e);for(var r in s)Object.prototype.hasOwnProperty.call(s,r)&&(this[r]=s[r]);this.links={};try{t.link&&(this.links=utils.parseLinks(t.link))}catch(t){}},ResponseBase.prototype._setStatusProperties=function(t){var e=t/100|0;this.statusCode=t,this.status=this.statusCode,this.statusType=e,this.info=1===e,this.ok=2===e,this.redirect=3===e,this.clientError=4===e,this.serverError=5===e,this.error=(4===e||5===e)&&this.toError(),this.created=201===t,this.accepted=202===t,this.noContent=204===t,this.badRequest=400===t,this.unauthorized=401===t,this.notAcceptable=406===t,this.forbidden=403===t,this.notFound=404===t,this.unprocessableEntity=422===t};
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
 
-},{"./utils":8}],8:[function(_dereq_,module,exports){
-"use strict";exports.type=function(e){return e.split(/ *; */).shift()},exports.params=function(e){return e.split(/ *; */).reduce(function(e,t){var n=t.split(/ *= */),r=n.shift(),i=n.shift();return r&&i&&(e[r]=i),e},{})},exports.parseLinks=function(e){return e.split(/ *, */).reduce(function(e,t){var n=t.split(/ *; */),r=n[0].slice(1,-1);return e[n[1].split(/ *= */)[1].slice(1,-1)]=r,e},{})},exports.cleanHeader=function(e,t){return delete e["content-type"],delete e["content-length"],delete e["transfer-encoding"],delete e.host,t&&(delete e.authorization,delete e.cookie),e};
+    var fullPath = buildFullPath(config.baseURL, config.url);
 
-},{}],9:[function(_dereq_,module,exports){
-function Emitter(t){if(t)return mixin(t)}function mixin(t){for(var e in Emitter.prototype)t[e]=Emitter.prototype[e];return t}"undefined"!=typeof module&&(module.exports=Emitter),Emitter.prototype.on=Emitter.prototype.addEventListener=function(t,e){return this._callbacks=this._callbacks||{},(this._callbacks["$"+t]=this._callbacks["$"+t]||[]).push(e),this},Emitter.prototype.once=function(t,e){function i(){this.off(t,i),e.apply(this,arguments)}return i.fn=e,this.on(t,i),this},Emitter.prototype.off=Emitter.prototype.removeListener=Emitter.prototype.removeAllListeners=Emitter.prototype.removeEventListener=function(t,e){if(this._callbacks=this._callbacks||{},0==arguments.length)return this._callbacks={},this;var i,r=this._callbacks["$"+t];if(!r)return this;if(1==arguments.length)return delete this._callbacks["$"+t],this;for(var s=0;s<r.length;s++)if((i=r[s])===e||i.fn===e){r.splice(s,1);break}return 0===r.length&&delete this._callbacks["$"+t],this},Emitter.prototype.emit=function(t){this._callbacks=this._callbacks||{};for(var e=new Array(arguments.length-1),i=this._callbacks["$"+t],r=1;r<arguments.length;r++)e[r-1]=arguments[r];if(i){r=0;for(var s=(i=i.slice(0)).length;r<s;++r)i[r].apply(this,e)}return this},Emitter.prototype.listeners=function(t){return this._callbacks=this._callbacks||{},this._callbacks["$"+t]||[]},Emitter.prototype.hasListeners=function(t){return!!this.listeners(t).length};
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
 
-},{}],10:[function(_dereq_,module,exports){
-(function (setImmediate,clearImmediate){
-var nextTick=_dereq_("process/browser.js").nextTick,apply=Function.prototype.apply,slice=Array.prototype.slice,immediateIds={},nextImmediateId=0;function Timeout(e,t){this._id=e,this._clearFn=t}exports.setTimeout=function(){return new Timeout(apply.call(setTimeout,window,arguments),clearTimeout)},exports.setInterval=function(){return new Timeout(apply.call(setInterval,window,arguments),clearInterval)},exports.clearTimeout=exports.clearInterval=function(e){e.close()},Timeout.prototype.unref=Timeout.prototype.ref=function(){},Timeout.prototype.close=function(){this._clearFn.call(window,this._id)},exports.enroll=function(e,t){clearTimeout(e._idleTimeoutId),e._idleTimeout=t},exports.unenroll=function(e){clearTimeout(e._idleTimeoutId),e._idleTimeout=-1},exports._unrefActive=exports.active=function(e){clearTimeout(e._idleTimeoutId);var t=e._idleTimeout;t>=0&&(e._idleTimeoutId=setTimeout(function(){e._onTimeout&&e._onTimeout()},t))},exports.setImmediate="function"==typeof setImmediate?setImmediate:function(e){var t=nextImmediateId++,i=!(arguments.length<2)&&slice.call(arguments,1);return immediateIds[t]=!0,nextTick(function(){immediateIds[t]&&(i?e.apply(null,i):e.call(null),exports.clearImmediate(t))}),t},exports.clearImmediate="function"==typeof clearImmediate?clearImmediate:function(e){delete immediateIds[e]};
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
 
-}).call(this,_dereq_("timers").setImmediate,_dereq_("timers").clearImmediate)
-},{"process/browser.js":2,"timers":10}],11:[function(_dereq_,module,exports){
-GHInput=function(t,n){this.set(t,n)},GHInput.prototype.round=function(t,n){return void 0===n&&(n=1e6),Math.round(t*n)/n},GHInput.prototype.setCoord=function(t,n){this.lat=this.round(t),this.lng=this.round(n),this.input=this.toString()},GHInput.isObject=function(t){return"[object object]"===Object.prototype.toString.call(t).toLowerCase()},GHInput.isString=function(t){return"[object string]"===Object.prototype.toString.call(t).toLowerCase()},GHInput.prototype.set=function(t,n){if(n)this.setCoord(t,n);else if(this.input=t,GHInput.isObject(t))this.setCoord(t.lat,t.lng);else if(GHInput.isString(t)){var o=t.indexOf(",");o>=0&&(this.lat=this.round(parseFloat(t.substr(0,o))),this.lng=this.round(parseFloat(t.substr(o+1))))}},GHInput.prototype.toString=function(){if(void 0!==this.lat&&void 0!==this.lng)return this.lat+","+this.lng},module.exports=GHInput;
+    function onloadend() {
+      if (!request) {
+        return;
+      }
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
+        request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
 
-},{}],12:[function(_dereq_,module,exports){
-var GHUtil=function(){};GHUtil.prototype.clone=function(t){var r={};for(var e in t)t.hasOwnProperty(e)&&(r[e]=t[e]);return r},GHUtil.prototype.copyProperties=function(t,r){if(!t)return r;for(var e in t)t.hasOwnProperty(e)&&void 0!==t[e]&&(r[e]=t[e]);return r},GHUtil.prototype.decodePath=function(t,r){for(var e=t.length,o=0,n=[],i=0,p=0,a=0;o<e;){var s,c=0,l=0;do{l|=(31&(s=t.charCodeAt(o++)-63))<<c,c+=5}while(s>=32);i+=1&l?~(l>>1):l>>1,c=0,l=0;do{l|=(31&(s=t.charCodeAt(o++)-63))<<c,c+=5}while(s>=32);if(p+=1&l?~(l>>1):l>>1,r){c=0,l=0;do{l|=(31&(s=t.charCodeAt(o++)-63))<<c,c+=5}while(s>=32);a+=1&l?~(l>>1):l>>1,n.push([1e-5*p,1e-5*i,a/100])}else n.push([1e-5*p,1e-5*i])}return n},GHUtil.prototype.extractError=function(t,r){var e;return t&&t.body?(e=t.body).hints&&e.hints[0]&&e.hints[0].message?e=e.hints[0].message:e.message&&(e=e.message):e=t,new Error(e+" - for url "+r)},GHUtil.prototype.isArray=function(t){return"[object array]"===Object.prototype.toString.call(t).toLowerCase()},GHUtil.prototype.isObject=function(t){return"[object object]"===Object.prototype.toString.call(t).toLowerCase()},GHUtil.prototype.isString=function(t){return"string"==typeof t},module.exports=GHUtil;
+      settle(function _resolve(value) {
+        resolve(value);
+        done();
+      }, function _reject(err) {
+        reject(err);
+        done();
+      }, response);
 
-},{}],13:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperGeocoding=function(e){this.location_bias,this.query,this.host="https://graphhopper.com/api/1",this.debug=!1,this.locale="en",this.basePath="/geocode",this.timeout=1e4,ghUtil.copyProperties(e,this)},GraphHopperGeocoding.prototype.clearLocation=function(){this.location_bias=void 0},GraphHopperGeocoding.prototype.getParametersAsQueryString=function(e){var t="locale="+e.locale;return e.query?(t+="&q="+encodeURIComponent(e.query),e.location_bias?t+="&point="+encodeURIComponent(e.location_bias.toString()):e.point&&(t+="&point="+encodeURIComponent(e.point.toString()))):(t+="&reverse=true",e.point&&(t+="&point="+encodeURIComponent(e.point.toString()))),e.debug&&(t+="&debug=true"),e.limit&&(t+="&limit="+e.limit),t},GraphHopperGeocoding.prototype.doRequest=function(e){var t=this;return new Promise(function(o,i){var r=ghUtil.clone(t);e&&(r=ghUtil.copyProperties(e,r));var n=r.host+r.basePath+"?"+t.getParametersAsQueryString(r)+"&key="+r.key;request.get(n).accept("application/json").timeout(r.timeout).end(function(e,t){e||!t.ok?i(ghUtil.extractError(t,n)):t&&o(t.body)})})},module.exports=GraphHopperGeocoding;
+      // Clean up request
+      request = null;
+    }
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],14:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperIsochrone=function(e){this.time_limit=600,this.distance_limit=0,this.buckets=3,this.vehicle="car",this.point,this.host="https://graphhopper.com/api/1",this.debug=!1,this.basePath="/isochrone",this.timeout=3e4,this.reverse_flow=!1,ghUtil.copyProperties(e,this)},GraphHopperIsochrone.prototype.getParametersAsQueryString=function(e){var t="point="+e.point;return t+="&time_limit="+e.time_limit,t+="&distance_limit="+e.distance_limit,t+="&buckets="+e.buckets,t+="&vehicle="+e.vehicle,t+="&reverse_flow="+e.reverse_flow,e.debug&&(t+="&debug=true"),t},GraphHopperIsochrone.prototype.doRequest=function(e){var t=this;return new Promise(function(i,r){var o=ghUtil.clone(t);e&&(o=ghUtil.copyProperties(e,o));var s=o.host+o.basePath+"?"+t.getParametersAsQueryString(o)+"&key="+o.key;request.get(s).accept("application/json").timeout(o.timeout).end(function(e,t){e||!t.ok?r(ghUtil.extractError(t,s)):t&&i(t.body)})})},module.exports=GraphHopperIsochrone;
+    if ('onloadend' in request) {
+      // Use onloadend if available
+      request.onloadend = onloadend;
+    } else {
+      // Listen for ready state to emulate onloadend
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],15:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperMapMatching=function(e){this.host="https://graphhopper.com/api/1",this.vehicle="car",this.gps_accuracy=20,this.max_visited_nodes=3e3,this.debug=!1,this.data_type="json",this.locale="en",this.points_encoded=!0,this.instructions=!0,this.elevation=!0,this.basePath="/match",this.timeout=1e5,ghUtil.copyProperties(e,this)},GraphHopperMapMatching.prototype.getParametersAsQueryString=function(e){var t="locale="+e.locale;return e.debug&&(t+="&debug=true"),t+="&gps_accuracy="+e.gps_accuracy,t+="&max_visited_nodes="+e.max_visited_nodes,t+="&type="+e.data_type,e.instructions&&(t+="&instructions="+e.instructions),e.points_encoded&&(t+="&points_encoded="+e.points_encoded),e.elevation&&(t+="&elevation="+e.elevation),e.vehicle&&(t+="&vehicle="+e.vehicle),t},GraphHopperMapMatching.prototype.doRequest=function(e,t){var i=this;return new Promise(function(o,a){var s=ghUtil.clone(i);t&&(s=ghUtil.copyProperties(t,s));var r=s.host+s.basePath+"?"+i.getParametersAsQueryString(s);s.key&&(r+="&key="+s.key),request.post(r).send(e).accept("application/json").type("application/xml").timeout(s.timeout).end(function(e,t){if(e||!t.ok)a(ghUtil.extractError(t,r));else if(t){if(t.body.paths)for(var s=0;s<t.body.paths.length;s++){var n=t.body.paths[s];if(n.points_encoded){var p=ghUtil.decodePath(n.points,i.elevation);n.points={type:"LineString",coordinates:p},delete n.snapped_waypoints}}o(t.body)}})})},module.exports=GraphHopperMapMatching;
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate handler is calling before onerror or ontimeout handlers,
+        // so we should call onloadend on the next 'tick'
+        setTimeout(onloadend);
+      };
+    }
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],16:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperMatrix=function(t){this.host="https://graphhopper.com/api/1",this.vehicle="car",this.debug=!1,this.from_points=[],this.to_points=[],this.out_arrays=[],this.basePath="/matrix",this.graphhopper_maps_host="https://graphhopper.com/maps/?",this.timeout=3e4,ghUtil.copyProperties(t,this)},GraphHopperMatrix.prototype.addPoint=function(t){this.addFromPoint(t),this.addToPoint(t)},GraphHopperMatrix.prototype.addFromPoint=function(t){this.from_points.push(t)},GraphHopperMatrix.prototype.addToPoint=function(t){this.to_points.push(t)},GraphHopperMatrix.prototype.clearPoints=function(){this.from_points.length=0,this.to_points.length=0},GraphHopperMatrix.prototype.addOutArray=function(t){this.out_arrays.push(t)},GraphHopperMatrix.prototype.doRequest=function(t){var o=this;return new Promise(function(r,i){var e=ghUtil.clone(o);t&&(e=ghUtil.copyProperties(t,e));var p=e.host+e.basePath+"?vehicle="+e.vehicle+"&key="+e.key;for(var n in e.from_points){var a=e.from_points[n];p+="&from_point="+encodeURIComponent(a.toString())}for(var n in e.to_points){a=e.to_points[n];p+="&to_point="+encodeURIComponent(a.toString())}if(e.out_arrays)for(var n in e.out_arrays){var s=e.out_arrays[n];p+="&out_array="+s}e.debug&&(p+="&debug=true"),request.get(p).accept("application/json").timeout(e.timeout).end(function(t,o){t||!o.ok?i(ghUtil.extractError(o,p)):o&&r(o.body)})})},GraphHopperMatrix.prototype.toHtmlTable=function(t){var o="<table border='1' cellpadding='10'>";for(var r in o+="<tr>",o+="<td>&#8595; from &#92; to &#8594;</td>",this.to_points)o+="<td><b>"+this.to_points[r]+"</b></td>";for(var i in o+="</tr>",t){o+="<tr>",o+="<td><b>"+this.from_points[i]+"</b></td>";var e=t[i];for(var r in e){o+="<td> <a href='"+(this.graphhopper_maps_host+"point="+encodeURIComponent(this.from_points[i])+"&point="+encodeURIComponent(this.to_points[r])+"&vehicle="+this.vehicle)+"'>"+e[r]+"</a> </td>"}o+="</tr>\n"}return o+="</table>"},module.exports=GraphHopperMatrix;
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],17:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperOptimization=function(e){this.points=[],this.host="https://graphhopper.com/api/1",this.key=e.key,this.profile=e.profile,this.basePath="/vrp",this.waitInMillis=1e3,this.timeout=1e4,this.postTimeout=15e3,ghUtil.copyProperties(e,this)},GraphHopperOptimization.prototype.addPoint=function(e){this.points.push(e)},GraphHopperOptimization.prototype.clear=function(){this.points.length=0},GraphHopperOptimization.prototype.doTSPRequest=function(){return this.doVRPRequest(1)},GraphHopperOptimization.prototype.doVRPRequest=function(e){var i=this.points[0],t=[];for(var r in this.points)if(!(r<1)){var s=this.points[r],o={id:"_"+r,type:"pickup",name:"maintenance "+r,address:{location_id:"_location_"+r,lon:s.lng,lat:s.lat}};t.push(o)}for(var a=[],n=0;n<e;n++)a.push({vehicle_id:"_vehicle_"+n,start_address:{location_id:"_start_location",lon:i.lng,lat:i.lat},type_id:"_vtype_1"});var p={algorithm:{problem_type:"min-max"},vehicles:a,vehicle_types:[{type_id:"_vtype_1",profile:this.profile}],services:t};return this.doRequest(p)},GraphHopperOptimization.prototype.doRawRequest=function(e,i){var t=this;return new Promise(function(r,s){var o=ghUtil.clone(t);i&&(o=ghUtil.copyProperties(i,o));var a=o.host+o.basePath+"/optimize?key="+o.key;request.post(a).send(JSON.stringify(e)).accept("application/json; charset=utf-8").type("application/json").timeout(o.postTimeout).end(function(e,i){if(e||!i.ok)s(ghUtil.extractError(i,a));else if(i){var n,p=o.host+o.basePath+"/solution/"+i.body.job_id+"?key="+o.key,l=function(){request.get(p).accept("application/json").timeout(o.timeout).end(function(e,i){e||!i.ok||void 0===i.body?(clearInterval(n),s(ghUtil.extractError(i,a))):i&&("finished"===i.body.status?(clearInterval(n),r(i.body)):i.body.message&&(clearInterval(n),r(i.body)))})};t.waitInMillis>0?n=setInterval(l,t.waitInMillis):l()}})})},GraphHopperOptimization.prototype.doRequest=function(e,i){var t={},r={},s={},o={},a={},n={},p=!1,l=!1;if(e.cost_matrices&&e.cost_matrices.length>0&&(l=!0),e.configuration&&!l&&!0===e.configuration.routing.calc_points&&(p=!0),p||e.configuration||l||(e.configuration={routing:{calc_points:!0}}),e.vehicle_types)for(var d=0;d<e.vehicle_types.length;d++){var c=e.vehicle_types[d];t[c.type_id]=c.profile,r[c.type_id]=c}if(e.services)for(var h=0;h<e.services.length;h++){var u=e.services[h];n[u.address.location_id]=u.address,o[u.id]=u}if(e.shipments)for(var v=0;v<e.shipments.length;v++){var _=e.shipments[v];n[_.pickup.address.location_id]=_.pickup.address,n[_.delivery.address.location_id]=_.delivery.address,a[_.id]=_}var f={},y={};if(e.vehicles)for(var g=0;g<e.vehicles.length;g++){var m=e.vehicles[g];y[m.vehicle_id]=m;var b=null;if(null!==m.type_id?(b=t[m.type_id],s[m.vehicle_id]=null!==b?b:"car"):s[m.vehicle_id]="car",m.start_address&&(n[m.start_address.location_id]=m.start_address),m.end_address&&(n[m.end_address.location_id]=m.end_address),m.break){var k=m.vehicle_id+"_break";f[k]=m.break}}var q=this.doRawRequest(e,i);return q.then(function(e){if(e.solution){var i=e.solution;e.raw_solution=JSON.parse(JSON.stringify(i)),i.calc_points=p;for(var t=0;t<i.routes.length;t++){var l=i.routes[t],d=l.vehicle_id,c=s[d];l.profile=c;for(var h=0;h<l.activities.length;h++){var u=l.activities[h];if(u.address=n[u.location_id],u.id){f[u.id]?u.break=f[u.id]:o[u.id]?u.service=o[u.id]:a[u.id]&&(u.shipment=a[u.id])}else{var v=y[d];u.vehicle=v,u.vehicle_type=r[v.type_id]}}}for(var _=new Array,g=0;g<i.unassigned.services.length;g++){var m=i.unassigned.services[g];_.push(o[m])}i.unassigned_services=_;var b=new Array;for(g=0;g<i.unassigned.shipments.length;g++){var k=i.unassigned.shipments[g];b.push(a[k])}i.unassigned_shipments=b}return e}),q},module.exports=GraphHopperOptimization;
+      reject(new AxiosError('Request aborted', AxiosError.ECONNABORTED, config, request));
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],18:[function(_dereq_,module,exports){
-var request=_dereq_("superagent"),Promise=_dereq_("bluebird"),GHUtil=_dereq_("./GHUtil"),ghUtil=new GHUtil;GraphHopperRouting=function(t){this.points=[],this.host="https://graphhopper.com/api/1",this.vehicle="car",this.debug=!1,this.data_type="application/json",this.locale="en",this.points_encoded=!0,this.instructions=!0,this.elevation=!1,this.optimize="false",this.basePath="/route",this.timeout=1e4,this.skip={skip:!0,host:!0,basePath:!0,graphhopper_maps_host:!0,turn_sign_map:!0,timeout:!0,data_type:!0},this.graphhopper_maps_host="https://graphhopper.com/maps/?",this.turn_sign_map={"-6":"leave roundabout","-3":"turn sharp left","-2":"turn left","-1":"turn slight left",0:"continue",1:"turn slight right",2:"turn right",3:"turn sharp right",4:"finish",5:"reached via point",6:"enter roundabout"},ghUtil.copyProperties(t,this)},GraphHopperRouting.prototype.clearPoints=function(){this.points.length=0},GraphHopperRouting.prototype.addPoint=function(t){this.points.push(t)},GraphHopperRouting.prototype.getParametersAsQueryString=function(t,e){var r="";for(var i in t)if(!e||!e[i]){var o=t[i];r+="points"===i?this.createPointParams(o):this.flatParameter(i,o)}return r},GraphHopperRouting.prototype.createPointParams=function(t){if(!ghUtil.isArray(t))return"";var e,r,i,o="";for(r=0,i=t.length;r<i;r++)r>0&&(o+="&"),(e=t[r]).lat?o+="point="+encodeURIComponent(e.lat+","+e.lng):ghUtil.isArray(e)&&2===e.length?o+="point="+encodeURIComponent(e[1]+","+e[0]):o+="point="+encodeURIComponent(e.toString());return o},GraphHopperRouting.prototype.flatParameter=function(t,e){var r,i,o="";if(ghUtil.isObject(e)){for(i in r=Object.keys(e)){var n=r[i];o+=this.flatParameter(t+"."+n,e[n])}return o}if(ghUtil.isArray(e)){for(i in r=e)o+=this.flatParameter(t,r[i]);return o}return"&"+encodeURIComponent(t)+"="+encodeURIComponent(e)},GraphHopperRouting.prototype.doRequest=function(t){var e=this;return new Promise(function(r,i){var o=ghUtil.clone(e),n=o.host+o.basePath+"?";t?ghUtil.isObject(t)?(o=ghUtil.copyProperties(t,o),n+=e.getParametersAsQueryString(o,e.skip)):ghUtil.isString(t)?n+=t:i(new Error("The reqArgs have to bei either String, an Object, or null")):n+=e.getParametersAsQueryString(o,e.skip),request.get(n).accept(o.data_type).timeout(o.timeout).end(function(t,o){if(t||!o.ok)i(ghUtil.extractError(o,n));else if(o){if(o.body.paths)for(var p=0;p<o.body.paths.length;p++){var a=o.body.paths[p];if(a.points_encoded){var s=ghUtil.decodePath(a.points,e.elevation);a.points={type:"LineString",coordinates:s};var h=ghUtil.decodePath(a.snapped_waypoints,e.elevation);a.snapped_waypoints={type:"LineString",coordinates:h}}if(a.instructions)for(var u=0;u<a.instructions.length;u++){var g=a.instructions[u].interval;a.instructions[u].points=a.points.coordinates.slice([g[0],g[1]+1])}}r(o.body)}})})},GraphHopperRouting.prototype.info=function(t){var e=this;return new Promise(function(r,i){var o=ghUtil.clone(e);t&&(o=ghUtil.copyProperties(t,o));var n=o.host+"/info?key="+o.key;request.get(n).accept(o.data_type).timeout(o.timeout).end(function(t,e){t||!e.ok?i(ghUtil.extractError(e,n)):e&&r(e.body)})})},GraphHopperRouting.prototype.i18n=function(t){var e=this;return new Promise(function(r,i){var o=ghUtil.clone(e);t&&(o=ghUtil.copyProperties(t,o));var n=o.host+"/i18n/"+o.locale+"?key="+o.key;request.get(n).accept(o.data_type).timeout(o.timeout).end(function(t,e){t||!e.ok?i(ghUtil.extractError(e,n)):e&&r(e.body)})})},GraphHopperRouting.prototype.getGraphHopperMapsLink=function(){return this.graphhopper_maps_host+this.getParametersAsQueryString(this)},GraphHopperRouting.prototype.getTurnText=function(t){return this.turn_sign_map[t]},module.exports=GraphHopperRouting;
+      // Clean up request
+      request = null;
+    };
 
-},{"./GHUtil":12,"bluebird":1,"superagent":4}],19:[function(_dereq_,module,exports){
-var GHUtil=_dereq_("./GHUtil.js"),GHInput=_dereq_("./GHInput.js"),GraphHopperGeocoding=_dereq_("./GraphHopperGeocoding.js"),GraphHopperIsochrone=_dereq_("./GraphHopperIsochrone.js"),GraphHopperMapMatching=_dereq_("./GraphHopperMapMatching.js"),GraphHopperMatrix=_dereq_("./GraphHopperMatrix.js"),GraphHopperOptimization=_dereq_("./GraphHopperOptimization.js"),GraphHopperRouting=_dereq_("./GraphHopperRouting.js"),GraphHopper={Util:GHUtil,Input:GHInput,Geocoding:GraphHopperGeocoding,Isochrone:GraphHopperIsochrone,MapMatching:GraphHopperMapMatching,Optimization:GraphHopperOptimization,Routing:GraphHopperRouting,Matrix:GraphHopperMatrix};"object"==typeof module&&"object"==typeof module.exports?module.exports.GraphHopper=GraphHopper:"function"==typeof define&&define.amd&&define(GraphHopper),"undefined"!=typeof window&&(window.GraphHopper=GraphHopper);
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request, request));
 
-},{"./GHInput.js":11,"./GHUtil.js":12,"./GraphHopperGeocoding.js":13,"./GraphHopperIsochrone.js":14,"./GraphHopperMapMatching.js":15,"./GraphHopperMatrix.js":16,"./GraphHopperOptimization.js":17,"./GraphHopperRouting.js":18}]},{},[19]);
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      var timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
+      var transitional = config.transitional || transitionalDefaults;
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(new AxiosError(
+        timeoutErrorMessage,
+        transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
+        config,
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // Add responseType to request if needed
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken || config.signal) {
+      // Handle cancellation
+      // eslint-disable-next-line func-names
+      onCanceled = function(cancel) {
+        if (!request) {
+          return;
+        }
+        reject(!cancel || (cancel && cancel.type) ? new CanceledError() : cancel);
+        request.abort();
+        request = null;
+      };
+
+      config.cancelToken && config.cancelToken.subscribe(onCanceled);
+      if (config.signal) {
+        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
+      }
+    }
+
+    if (!requestData) {
+      requestData = null;
+    }
+
+    var protocol = parseProtocol(fullPath);
+
+    if (protocol && [ 'http', 'https', 'file' ].indexOf(protocol) === -1) {
+      reject(new AxiosError('Unsupported protocol ' + protocol + ':', AxiosError.ERR_BAD_REQUEST, config));
+      return;
+    }
+
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+},{"../cancel/CanceledError":5,"../core/AxiosError":8,"../core/buildFullPath":10,"../defaults/transitional":16,"../helpers/parseProtocol":28,"./../core/settle":13,"./../helpers/buildURL":19,"./../helpers/cookies":21,"./../helpers/isURLSameOrigin":24,"./../helpers/parseHeaders":27,"./../utils":32}],3:[function(require,module,exports){
+'use strict';
+
+var utils = require('./utils');
+var bind = require('./helpers/bind');
+var Axios = require('./core/Axios');
+var mergeConfig = require('./core/mergeConfig');
+var defaults = require('./defaults');
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  // Factory for creating new instances
+  instance.create = function create(instanceConfig) {
+    return createInstance(mergeConfig(defaultConfig, instanceConfig));
+  };
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Expose Cancel & CancelToken
+axios.CanceledError = require('./cancel/CanceledError');
+axios.CancelToken = require('./cancel/CancelToken');
+axios.isCancel = require('./cancel/isCancel');
+axios.VERSION = require('./env/data').version;
+axios.toFormData = require('./helpers/toFormData');
+
+// Expose AxiosError class
+axios.AxiosError = require('../lib/core/AxiosError');
+
+// alias for CanceledError for backward compatibility
+axios.Cancel = axios.CanceledError;
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = require('./helpers/spread');
+
+// Expose isAxiosError
+axios.isAxiosError = require('./helpers/isAxiosError');
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+},{"../lib/core/AxiosError":8,"./cancel/CancelToken":4,"./cancel/CanceledError":5,"./cancel/isCancel":6,"./core/Axios":7,"./core/mergeConfig":12,"./defaults":15,"./env/data":17,"./helpers/bind":18,"./helpers/isAxiosError":23,"./helpers/spread":29,"./helpers/toFormData":30,"./utils":32}],4:[function(require,module,exports){
+'use strict';
+
+var CanceledError = require('./CanceledError');
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+
+  // eslint-disable-next-line func-names
+  this.promise.then(function(cancel) {
+    if (!token._listeners) return;
+
+    var i;
+    var l = token._listeners.length;
+
+    for (i = 0; i < l; i++) {
+      token._listeners[i](cancel);
+    }
+    token._listeners = null;
+  });
+
+  // eslint-disable-next-line func-names
+  this.promise.then = function(onfulfilled) {
+    var _resolve;
+    // eslint-disable-next-line func-names
+    var promise = new Promise(function(resolve) {
+      token.subscribe(resolve);
+      _resolve = resolve;
+    }).then(onfulfilled);
+
+    promise.cancel = function reject() {
+      token.unsubscribe(_resolve);
+    };
+
+    return promise;
+  };
+
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new CanceledError(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `CanceledError` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Subscribe to the cancel signal
+ */
+
+CancelToken.prototype.subscribe = function subscribe(listener) {
+  if (this.reason) {
+    listener(this.reason);
+    return;
+  }
+
+  if (this._listeners) {
+    this._listeners.push(listener);
+  } else {
+    this._listeners = [listener];
+  }
+};
+
+/**
+ * Unsubscribe from the cancel signal
+ */
+
+CancelToken.prototype.unsubscribe = function unsubscribe(listener) {
+  if (!this._listeners) {
+    return;
+  }
+  var index = this._listeners.indexOf(listener);
+  if (index !== -1) {
+    this._listeners.splice(index, 1);
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+},{"./CanceledError":5}],5:[function(require,module,exports){
+'use strict';
+
+var AxiosError = require('../core/AxiosError');
+var utils = require('../utils');
+
+/**
+ * A `CanceledError` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function CanceledError(message) {
+  // eslint-disable-next-line no-eq-null,eqeqeq
+  AxiosError.call(this, message == null ? 'canceled' : message, AxiosError.ERR_CANCELED);
+  this.name = 'CanceledError';
+}
+
+utils.inherits(CanceledError, AxiosError, {
+  __CANCEL__: true
+});
+
+module.exports = CanceledError;
+
+},{"../core/AxiosError":8,"../utils":32}],6:[function(require,module,exports){
+'use strict';
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+},{}],7:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+var buildURL = require('../helpers/buildURL');
+var InterceptorManager = require('./InterceptorManager');
+var dispatchRequest = require('./dispatchRequest');
+var mergeConfig = require('./mergeConfig');
+var buildFullPath = require('./buildFullPath');
+var validator = require('../helpers/validator');
+
+var validators = validator.validators;
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(configOrUrl, config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof configOrUrl === 'string') {
+    config = config || {};
+    config.url = configOrUrl;
+  } else {
+    config = configOrUrl || {};
+  }
+
+  config = mergeConfig(this.defaults, config);
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
+
+  var transitional = config.transitional;
+
+  if (transitional !== undefined) {
+    validator.assertOptions(transitional, {
+      silentJSONParsing: validators.transitional(validators.boolean),
+      forcedJSONParsing: validators.transitional(validators.boolean),
+      clarifyTimeoutError: validators.transitional(validators.boolean)
+    }, false);
+  }
+
+  // filter out skipped interceptors
+  var requestInterceptorChain = [];
+  var synchronousRequestInterceptors = true;
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+      return;
+    }
+
+    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+
+    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  var responseInterceptorChain = [];
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  var promise;
+
+  if (!synchronousRequestInterceptors) {
+    var chain = [dispatchRequest, undefined];
+
+    Array.prototype.unshift.apply(chain, requestInterceptorChain);
+    chain = chain.concat(responseInterceptorChain);
+
+    promise = Promise.resolve(config);
+    while (chain.length) {
+      promise = promise.then(chain.shift(), chain.shift());
+    }
+
+    return promise;
+  }
+
+
+  var newConfig = config;
+  while (requestInterceptorChain.length) {
+    var onFulfilled = requestInterceptorChain.shift();
+    var onRejected = requestInterceptorChain.shift();
+    try {
+      newConfig = onFulfilled(newConfig);
+    } catch (error) {
+      onRejected(error);
+      break;
+    }
+  }
+
+  try {
+    promise = dispatchRequest(newConfig);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  while (responseInterceptorChain.length) {
+    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
+  }
+
+  return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  var fullPath = buildFullPath(config.baseURL, config.url);
+  return buildURL(fullPath, config.params, config.paramsSerializer);
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(mergeConfig(config || {}, {
+      method: method,
+      url: url,
+      data: (config || {}).data
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+
+  function generateHTTPMethod(isForm) {
+    return function httpMethod(url, data, config) {
+      return this.request(mergeConfig(config || {}, {
+        method: method,
+        headers: isForm ? {
+          'Content-Type': 'multipart/form-data'
+        } : {},
+        url: url,
+        data: data
+      }));
+    };
+  }
+
+  Axios.prototype[method] = generateHTTPMethod();
+
+  Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+});
+
+module.exports = Axios;
+
+},{"../helpers/buildURL":19,"../helpers/validator":31,"./../utils":32,"./InterceptorManager":9,"./buildFullPath":10,"./dispatchRequest":11,"./mergeConfig":12}],8:[function(require,module,exports){
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [config] The config.
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+function AxiosError(message, code, config, request, response) {
+  Error.call(this);
+  this.message = message;
+  this.name = 'AxiosError';
+  code && (this.code = code);
+  config && (this.config = config);
+  request && (this.request = request);
+  response && (this.response = response);
+}
+
+utils.inherits(AxiosError, Error, {
+  toJSON: function toJSON() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code,
+      status: this.response && this.response.status ? this.response.status : null
+    };
+  }
+});
+
+var prototype = AxiosError.prototype;
+var descriptors = {};
+
+[
+  'ERR_BAD_OPTION_VALUE',
+  'ERR_BAD_OPTION',
+  'ECONNABORTED',
+  'ETIMEDOUT',
+  'ERR_NETWORK',
+  'ERR_FR_TOO_MANY_REDIRECTS',
+  'ERR_DEPRECATED',
+  'ERR_BAD_RESPONSE',
+  'ERR_BAD_REQUEST',
+  'ERR_CANCELED'
+// eslint-disable-next-line func-names
+].forEach(function(code) {
+  descriptors[code] = {value: code};
+});
+
+Object.defineProperties(AxiosError, descriptors);
+Object.defineProperty(prototype, 'isAxiosError', {value: true});
+
+// eslint-disable-next-line func-names
+AxiosError.from = function(error, code, config, request, response, customProps) {
+  var axiosError = Object.create(prototype);
+
+  utils.toFlatObject(error, axiosError, function filter(obj) {
+    return obj !== Error.prototype;
+  });
+
+  AxiosError.call(axiosError, error.message, code, config, request, response);
+
+  axiosError.name = error.name;
+
+  customProps && Object.assign(axiosError, customProps);
+
+  return axiosError;
+};
+
+module.exports = AxiosError;
+
+},{"../utils":32}],9:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected,
+    synchronous: options ? options.synchronous : false,
+    runWhen: options ? options.runWhen : null
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+},{"./../utils":32}],10:[function(require,module,exports){
+'use strict';
+
+var isAbsoluteURL = require('../helpers/isAbsoluteURL');
+var combineURLs = require('../helpers/combineURLs');
+
+/**
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
+ */
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
+  }
+  return requestedURL;
+};
+
+},{"../helpers/combineURLs":20,"../helpers/isAbsoluteURL":22}],11:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+var transformData = require('./transformData');
+var isCancel = require('../cancel/isCancel');
+var defaults = require('../defaults');
+var CanceledError = require('../cancel/CanceledError');
+
+/**
+ * Throws a `CanceledError` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+
+  if (config.signal && config.signal.aborted) {
+    throw new CanceledError();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData.call(
+    config,
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData.call(
+      config,
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData.call(
+          config,
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+},{"../cancel/CanceledError":5,"../cancel/isCancel":6,"../defaults":15,"./../utils":32,"./transformData":14}],12:[function(require,module,exports){
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  function getMergedValue(target, source) {
+    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
+      return utils.merge(target, source);
+    } else if (utils.isPlainObject(source)) {
+      return utils.merge({}, source);
+    } else if (utils.isArray(source)) {
+      return source.slice();
+    }
+    return source;
+  }
+
+  // eslint-disable-next-line consistent-return
+  function mergeDeepProperties(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(config1[prop], config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function valueFromConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(undefined, config2[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function defaultToConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(undefined, config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function mergeDirectKeys(prop) {
+    if (prop in config2) {
+      return getMergedValue(config1[prop], config2[prop]);
+    } else if (prop in config1) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  var mergeMap = {
+    'url': valueFromConfig2,
+    'method': valueFromConfig2,
+    'data': valueFromConfig2,
+    'baseURL': defaultToConfig2,
+    'transformRequest': defaultToConfig2,
+    'transformResponse': defaultToConfig2,
+    'paramsSerializer': defaultToConfig2,
+    'timeout': defaultToConfig2,
+    'timeoutMessage': defaultToConfig2,
+    'withCredentials': defaultToConfig2,
+    'adapter': defaultToConfig2,
+    'responseType': defaultToConfig2,
+    'xsrfCookieName': defaultToConfig2,
+    'xsrfHeaderName': defaultToConfig2,
+    'onUploadProgress': defaultToConfig2,
+    'onDownloadProgress': defaultToConfig2,
+    'decompress': defaultToConfig2,
+    'maxContentLength': defaultToConfig2,
+    'maxBodyLength': defaultToConfig2,
+    'beforeRedirect': defaultToConfig2,
+    'transport': defaultToConfig2,
+    'httpAgent': defaultToConfig2,
+    'httpsAgent': defaultToConfig2,
+    'cancelToken': defaultToConfig2,
+    'socketPath': defaultToConfig2,
+    'responseEncoding': defaultToConfig2,
+    'validateStatus': mergeDirectKeys
+  };
+
+  utils.forEach(Object.keys(config1).concat(Object.keys(config2)), function computeConfigValue(prop) {
+    var merge = mergeMap[prop] || mergeDeepProperties;
+    var configValue = merge(prop);
+    (utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
+  });
+
+  return config;
+};
+
+},{"../utils":32}],13:[function(require,module,exports){
+'use strict';
+
+var AxiosError = require('./AxiosError');
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(new AxiosError(
+      'Request failed with status code ' + response.status,
+      [AxiosError.ERR_BAD_REQUEST, AxiosError.ERR_BAD_RESPONSE][Math.floor(response.status / 100) - 4],
+      response.config,
+      response.request,
+      response
+    ));
+  }
+};
+
+},{"./AxiosError":8}],14:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+var defaults = require('../defaults');
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  var context = this || defaults;
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn.call(context, data, headers);
+  });
+
+  return data;
+};
+
+},{"../defaults":15,"./../utils":32}],15:[function(require,module,exports){
+(function (process){(function (){
+'use strict';
+
+var utils = require('../utils');
+var normalizeHeaderName = require('../helpers/normalizeHeaderName');
+var AxiosError = require('../core/AxiosError');
+var transitionalDefaults = require('./transitional');
+var toFormData = require('../helpers/toFormData');
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = require('../adapters/xhr');
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = require('../adapters/http');
+  }
+  return adapter;
+}
+
+function stringifySafely(rawValue, parser, encoder) {
+  if (utils.isString(rawValue)) {
+    try {
+      (parser || JSON.parse)(rawValue);
+      return utils.trim(rawValue);
+    } catch (e) {
+      if (e.name !== 'SyntaxError') {
+        throw e;
+      }
+    }
+  }
+
+  return (encoder || JSON.stringify)(rawValue);
+}
+
+var defaults = {
+
+  transitional: transitionalDefaults,
+
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+
+    var isObjectPayload = utils.isObject(data);
+    var contentType = headers && headers['Content-Type'];
+
+    var isFileList;
+
+    if ((isFileList = utils.isFileList(data)) || (isObjectPayload && contentType === 'multipart/form-data')) {
+      var _FormData = this.env && this.env.FormData;
+      return toFormData(isFileList ? {'files[]': data} : data, _FormData && new _FormData());
+    } else if (isObjectPayload || contentType === 'application/json') {
+      setContentTypeIfUnset(headers, 'application/json');
+      return stringifySafely(data);
+    }
+
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    var transitional = this.transitional || defaults.transitional;
+    var silentJSONParsing = transitional && transitional.silentJSONParsing;
+    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
+    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
+
+    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        if (strictJSONParsing) {
+          if (e.name === 'SyntaxError') {
+            throw AxiosError.from(e, AxiosError.ERR_BAD_RESPONSE, this, null, this.response);
+          }
+          throw e;
+        }
+      }
+    }
+
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+  maxBodyLength: -1,
+
+  env: {
+    FormData: require('./env/FormData')
+  },
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  },
+
+  headers: {
+    common: {
+      'Accept': 'application/json, text/plain, */*'
+    }
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+}).call(this)}).call(this,require('_process'))
+},{"../adapters/http":2,"../adapters/xhr":2,"../core/AxiosError":8,"../helpers/normalizeHeaderName":25,"../helpers/toFormData":30,"../utils":32,"./env/FormData":26,"./transitional":16,"_process":36}],16:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  silentJSONParsing: true,
+  forcedJSONParsing: true,
+  clarifyTimeoutError: false
+};
+
+},{}],17:[function(require,module,exports){
+module.exports = {
+  "version": "0.27.2"
+};
+},{}],18:[function(require,module,exports){
+'use strict';
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+},{}],19:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+},{"./../utils":32}],20:[function(require,module,exports){
+'use strict';
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+},{}],21:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+},{"./../utils":32}],22:[function(require,module,exports){
+'use strict';
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
+};
+
+},{}],23:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+/**
+ * Determines whether the payload is an error thrown by Axios
+ *
+ * @param {*} payload The value to test
+ * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
+ */
+module.exports = function isAxiosError(payload) {
+  return utils.isObject(payload) && (payload.isAxiosError === true);
+};
+
+},{"./../utils":32}],24:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+},{"./../utils":32}],25:[function(require,module,exports){
+'use strict';
+
+var utils = require('../utils');
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+},{"../utils":32}],26:[function(require,module,exports){
+// eslint-disable-next-line strict
+module.exports = null;
+
+},{}],27:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+},{"./../utils":32}],28:[function(require,module,exports){
+'use strict';
+
+module.exports = function parseProtocol(url) {
+  var match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
+  return match && match[1] || '';
+};
+
+},{}],29:[function(require,module,exports){
+'use strict';
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+},{}],30:[function(require,module,exports){
+(function (Buffer){(function (){
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Convert a data object to FormData
+ * @param {Object} obj
+ * @param {?Object} [formData]
+ * @returns {Object}
+ **/
+
+function toFormData(obj, formData) {
+  // eslint-disable-next-line no-param-reassign
+  formData = formData || new FormData();
+
+  var stack = [];
+
+  function convertValue(value) {
+    if (value === null) return '';
+
+    if (utils.isDate(value)) {
+      return value.toISOString();
+    }
+
+    if (utils.isArrayBuffer(value) || utils.isTypedArray(value)) {
+      return typeof Blob === 'function' ? new Blob([value]) : Buffer.from(value);
+    }
+
+    return value;
+  }
+
+  function build(data, parentKey) {
+    if (utils.isPlainObject(data) || utils.isArray(data)) {
+      if (stack.indexOf(data) !== -1) {
+        throw Error('Circular reference detected in ' + parentKey);
+      }
+
+      stack.push(data);
+
+      utils.forEach(data, function each(value, key) {
+        if (utils.isUndefined(value)) return;
+        var fullKey = parentKey ? parentKey + '.' + key : key;
+        var arr;
+
+        if (value && !parentKey && typeof value === 'object') {
+          if (utils.endsWith(key, '{}')) {
+            // eslint-disable-next-line no-param-reassign
+            value = JSON.stringify(value);
+          } else if (utils.endsWith(key, '[]') && (arr = utils.toArray(value))) {
+            // eslint-disable-next-line func-names
+            arr.forEach(function(el) {
+              !utils.isUndefined(el) && formData.append(fullKey, convertValue(el));
+            });
+            return;
+          }
+        }
+
+        build(value, fullKey);
+      });
+
+      stack.pop();
+    } else {
+      formData.append(parentKey, convertValue(data));
+    }
+  }
+
+  build(obj);
+
+  return formData;
+}
+
+module.exports = toFormData;
+
+}).call(this)}).call(this,require("buffer").Buffer)
+},{"../utils":32,"buffer":34}],31:[function(require,module,exports){
+'use strict';
+
+var VERSION = require('../env/data').version;
+var AxiosError = require('../core/AxiosError');
+
+var validators = {};
+
+// eslint-disable-next-line func-names
+['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
+  validators[type] = function validator(thing) {
+    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
+  };
+});
+
+var deprecatedWarnings = {};
+
+/**
+ * Transitional option validator
+ * @param {function|boolean?} validator - set to false if the transitional option has been removed
+ * @param {string?} version - deprecated version / removed since version
+ * @param {string?} message - some message with additional info
+ * @returns {function}
+ */
+validators.transitional = function transitional(validator, version, message) {
+  function formatMessage(opt, desc) {
+    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+  }
+
+  // eslint-disable-next-line func-names
+  return function(value, opt, opts) {
+    if (validator === false) {
+      throw new AxiosError(
+        formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')),
+        AxiosError.ERR_DEPRECATED
+      );
+    }
+
+    if (version && !deprecatedWarnings[opt]) {
+      deprecatedWarnings[opt] = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        formatMessage(
+          opt,
+          ' has been deprecated since v' + version + ' and will be removed in the near future'
+        )
+      );
+    }
+
+    return validator ? validator(value, opt, opts) : true;
+  };
+};
+
+/**
+ * Assert object's properties type
+ * @param {object} options
+ * @param {object} schema
+ * @param {boolean?} allowUnknown
+ */
+
+function assertOptions(options, schema, allowUnknown) {
+  if (typeof options !== 'object') {
+    throw new AxiosError('options must be an object', AxiosError.ERR_BAD_OPTION_VALUE);
+  }
+  var keys = Object.keys(options);
+  var i = keys.length;
+  while (i-- > 0) {
+    var opt = keys[i];
+    var validator = schema[opt];
+    if (validator) {
+      var value = options[opt];
+      var result = value === undefined || validator(value, opt, options);
+      if (result !== true) {
+        throw new AxiosError('option ' + opt + ' must be ' + result, AxiosError.ERR_BAD_OPTION_VALUE);
+      }
+      continue;
+    }
+    if (allowUnknown !== true) {
+      throw new AxiosError('Unknown option ' + opt, AxiosError.ERR_BAD_OPTION);
+    }
+  }
+}
+
+module.exports = {
+  assertOptions: assertOptions,
+  validators: validators
+};
+
+},{"../core/AxiosError":8,"../env/data":17}],32:[function(require,module,exports){
+'use strict';
+
+var bind = require('./helpers/bind');
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+// eslint-disable-next-line func-names
+var kindOf = (function(cache) {
+  // eslint-disable-next-line func-names
+  return function(thing) {
+    var str = toString.call(thing);
+    return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
+  };
+})(Object.create(null));
+
+function kindOfTest(type) {
+  type = type.toLowerCase();
+  return function isKindOf(thing) {
+    return kindOf(thing) === type;
+  };
+}
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return Array.isArray(val);
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+var isArrayBuffer = kindOfTest('ArrayBuffer');
+
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (isArrayBuffer(val.buffer));
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a plain Object
+ *
+ * @param {Object} val The value to test
+ * @return {boolean} True if value is a plain Object, otherwise false
+ */
+function isPlainObject(val) {
+  if (kindOf(val) !== 'object') {
+    return false;
+  }
+
+  var prototype = Object.getPrototypeOf(val);
+  return prototype === null || prototype === Object.prototype;
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+var isDate = kindOfTest('Date');
+
+/**
+ * Determine if a value is a File
+ *
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+var isFile = kindOfTest('File');
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+var isBlob = kindOfTest('Blob');
+
+/**
+ * Determine if a value is a FileList
+ *
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+var isFileList = kindOfTest('FileList');
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} thing The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(thing) {
+  var pattern = '[object FormData]';
+  return thing && (
+    (typeof FormData === 'function' && thing instanceof FormData) ||
+    toString.call(thing) === pattern ||
+    (isFunction(thing.toString) && thing.toString() === pattern)
+  );
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ * @function
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+var isURLSearchParams = kindOfTest('URLSearchParams');
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (isPlainObject(result[key]) && isPlainObject(val)) {
+      result[key] = merge(result[key], val);
+    } else if (isPlainObject(val)) {
+      result[key] = merge({}, val);
+    } else if (isArray(val)) {
+      result[key] = val.slice();
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+/**
+ * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+ *
+ * @param {string} content with BOM
+ * @return {string} content value without BOM
+ */
+function stripBOM(content) {
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return content;
+}
+
+/**
+ * Inherit the prototype methods from one constructor into another
+ * @param {function} constructor
+ * @param {function} superConstructor
+ * @param {object} [props]
+ * @param {object} [descriptors]
+ */
+
+function inherits(constructor, superConstructor, props, descriptors) {
+  constructor.prototype = Object.create(superConstructor.prototype, descriptors);
+  constructor.prototype.constructor = constructor;
+  props && Object.assign(constructor.prototype, props);
+}
+
+/**
+ * Resolve object with deep prototype chain to a flat object
+ * @param {Object} sourceObj source object
+ * @param {Object} [destObj]
+ * @param {Function} [filter]
+ * @returns {Object}
+ */
+
+function toFlatObject(sourceObj, destObj, filter) {
+  var props;
+  var i;
+  var prop;
+  var merged = {};
+
+  destObj = destObj || {};
+
+  do {
+    props = Object.getOwnPropertyNames(sourceObj);
+    i = props.length;
+    while (i-- > 0) {
+      prop = props[i];
+      if (!merged[prop]) {
+        destObj[prop] = sourceObj[prop];
+        merged[prop] = true;
+      }
+    }
+    sourceObj = Object.getPrototypeOf(sourceObj);
+  } while (sourceObj && (!filter || filter(sourceObj, destObj)) && sourceObj !== Object.prototype);
+
+  return destObj;
+}
+
+/*
+ * determines whether a string ends with the characters of a specified string
+ * @param {String} str
+ * @param {String} searchString
+ * @param {Number} [position= 0]
+ * @returns {boolean}
+ */
+function endsWith(str, searchString, position) {
+  str = String(str);
+  if (position === undefined || position > str.length) {
+    position = str.length;
+  }
+  position -= searchString.length;
+  var lastIndex = str.indexOf(searchString, position);
+  return lastIndex !== -1 && lastIndex === position;
+}
+
+
+/**
+ * Returns new array from array like object
+ * @param {*} [thing]
+ * @returns {Array}
+ */
+function toArray(thing) {
+  if (!thing) return null;
+  var i = thing.length;
+  if (isUndefined(i)) return null;
+  var arr = new Array(i);
+  while (i-- > 0) {
+    arr[i] = thing[i];
+  }
+  return arr;
+}
+
+// eslint-disable-next-line func-names
+var isTypedArray = (function(TypedArray) {
+  // eslint-disable-next-line func-names
+  return function(thing) {
+    return TypedArray && thing instanceof TypedArray;
+  };
+})(typeof Uint8Array !== 'undefined' && Object.getPrototypeOf(Uint8Array));
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isPlainObject: isPlainObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim,
+  stripBOM: stripBOM,
+  inherits: inherits,
+  toFlatObject: toFlatObject,
+  kindOf: kindOf,
+  kindOfTest: kindOfTest,
+  endsWith: endsWith,
+  toArray: toArray,
+  isTypedArray: isTypedArray,
+  isFileList: isFileList
+};
+
+},{"./helpers/bind":18}],33:[function(require,module,exports){
+'use strict'
+
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
+}
+
+// Support decoding URL-safe base64 strings, as Node.js does.
+// See: https://en.wikipedia.org/wiki/Base64#URL_applications
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function getLens (b64) {
+  var len = b64.length
+
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // Trim off extra bytes after placeholder bytes are found
+  // See: https://github.com/beatgammit/base64-js/issues/42
+  var validLen = b64.indexOf('=')
+  if (validLen === -1) validLen = len
+
+  var placeHoldersLen = validLen === len
+    ? 0
+    : 4 - (validLen % 4)
+
+  return [validLen, placeHoldersLen]
+}
+
+// base64 is 4/3 + up to two characters of the original data
+function byteLength (b64) {
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function _byteLength (b64, validLen, placeHoldersLen) {
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function toByteArray (b64) {
+  var tmp
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+
+  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+
+  var curByte = 0
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  var len = placeHoldersLen > 0
+    ? validLen - 4
+    : validLen
+
+  var i
+  for (i = 0; i < len; i += 4) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 18) |
+      (revLookup[b64.charCodeAt(i + 1)] << 12) |
+      (revLookup[b64.charCodeAt(i + 2)] << 6) |
+      revLookup[b64.charCodeAt(i + 3)]
+    arr[curByte++] = (tmp >> 16) & 0xFF
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 2) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 2) |
+      (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 1) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 10) |
+      (revLookup[b64.charCodeAt(i + 1)] << 4) |
+      (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp =
+      ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
+  }
+
+  return parts.join('')
+}
+
+},{}],34:[function(require,module,exports){
+(function (Buffer){(function (){
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+/* eslint-disable no-proto */
+
+'use strict'
+
+var base64 = require('base64-js')
+var ieee754 = require('ieee754')
+
+exports.Buffer = Buffer
+exports.SlowBuffer = SlowBuffer
+exports.INSPECT_MAX_BYTES = 50
+
+var K_MAX_LENGTH = 0x7fffffff
+exports.kMaxLength = K_MAX_LENGTH
+
+/**
+ * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ *   === true    Use Uint8Array implementation (fastest)
+ *   === false   Print warning and recommend using `buffer` v4.x which has an Object
+ *               implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * We report that the browser does not support typed arrays if the are not subclassable
+ * using __proto__. Firefox 4-29 lacks support for adding new properties to `Uint8Array`
+ * (See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438). IE 10 lacks support
+ * for __proto__ and has a buggy typed array implementation.
+ */
+Buffer.TYPED_ARRAY_SUPPORT = typedArraySupport()
+
+if (!Buffer.TYPED_ARRAY_SUPPORT && typeof console !== 'undefined' &&
+    typeof console.error === 'function') {
+  console.error(
+    'This browser lacks typed array (Uint8Array) support which is required by ' +
+    '`buffer` v5.x. Use `buffer` v4.x if you require old browser support.'
+  )
+}
+
+function typedArraySupport () {
+  // Can typed array instances can be augmented?
+  try {
+    var arr = new Uint8Array(1)
+    arr.__proto__ = { __proto__: Uint8Array.prototype, foo: function () { return 42 } }
+    return arr.foo() === 42
+  } catch (e) {
+    return false
+  }
+}
+
+Object.defineProperty(Buffer.prototype, 'parent', {
+  enumerable: true,
+  get: function () {
+    if (!Buffer.isBuffer(this)) return undefined
+    return this.buffer
+  }
+})
+
+Object.defineProperty(Buffer.prototype, 'offset', {
+  enumerable: true,
+  get: function () {
+    if (!Buffer.isBuffer(this)) return undefined
+    return this.byteOffset
+  }
+})
+
+function createBuffer (length) {
+  if (length > K_MAX_LENGTH) {
+    throw new RangeError('The value "' + length + '" is invalid for option "size"')
+  }
+  // Return an augmented `Uint8Array` instance
+  var buf = new Uint8Array(length)
+  buf.__proto__ = Buffer.prototype
+  return buf
+}
+
+/**
+ * The Buffer constructor returns instances of `Uint8Array` that have their
+ * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
+ * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
+ * and the `Uint8Array` methods. Square bracket notation works as expected -- it
+ * returns a single octet.
+ *
+ * The `Uint8Array` prototype remains unmodified.
+ */
+
+function Buffer (arg, encodingOrOffset, length) {
+  // Common case.
+  if (typeof arg === 'number') {
+    if (typeof encodingOrOffset === 'string') {
+      throw new TypeError(
+        'The "string" argument must be of type string. Received type number'
+      )
+    }
+    return allocUnsafe(arg)
+  }
+  return from(arg, encodingOrOffset, length)
+}
+
+// Fix subarray() in ES2016. See: https://github.com/feross/buffer/pull/97
+if (typeof Symbol !== 'undefined' && Symbol.species != null &&
+    Buffer[Symbol.species] === Buffer) {
+  Object.defineProperty(Buffer, Symbol.species, {
+    value: null,
+    configurable: true,
+    enumerable: false,
+    writable: false
+  })
+}
+
+Buffer.poolSize = 8192 // not used by this implementation
+
+function from (value, encodingOrOffset, length) {
+  if (typeof value === 'string') {
+    return fromString(value, encodingOrOffset)
+  }
+
+  if (ArrayBuffer.isView(value)) {
+    return fromArrayLike(value)
+  }
+
+  if (value == null) {
+    throw TypeError(
+      'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
+      'or Array-like Object. Received type ' + (typeof value)
+    )
+  }
+
+  if (isInstance(value, ArrayBuffer) ||
+      (value && isInstance(value.buffer, ArrayBuffer))) {
+    return fromArrayBuffer(value, encodingOrOffset, length)
+  }
+
+  if (typeof value === 'number') {
+    throw new TypeError(
+      'The "value" argument must not be of type number. Received type number'
+    )
+  }
+
+  var valueOf = value.valueOf && value.valueOf()
+  if (valueOf != null && valueOf !== value) {
+    return Buffer.from(valueOf, encodingOrOffset, length)
+  }
+
+  var b = fromObject(value)
+  if (b) return b
+
+  if (typeof Symbol !== 'undefined' && Symbol.toPrimitive != null &&
+      typeof value[Symbol.toPrimitive] === 'function') {
+    return Buffer.from(
+      value[Symbol.toPrimitive]('string'), encodingOrOffset, length
+    )
+  }
+
+  throw new TypeError(
+    'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
+    'or Array-like Object. Received type ' + (typeof value)
+  )
+}
+
+/**
+ * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
+ * if value is a number.
+ * Buffer.from(str[, encoding])
+ * Buffer.from(array)
+ * Buffer.from(buffer)
+ * Buffer.from(arrayBuffer[, byteOffset[, length]])
+ **/
+Buffer.from = function (value, encodingOrOffset, length) {
+  return from(value, encodingOrOffset, length)
+}
+
+// Note: Change prototype *after* Buffer.from is defined to workaround Chrome bug:
+// https://github.com/feross/buffer/pull/148
+Buffer.prototype.__proto__ = Uint8Array.prototype
+Buffer.__proto__ = Uint8Array
+
+function assertSize (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('"size" argument must be of type number')
+  } else if (size < 0) {
+    throw new RangeError('The value "' + size + '" is invalid for option "size"')
+  }
+}
+
+function alloc (size, fill, encoding) {
+  assertSize(size)
+  if (size <= 0) {
+    return createBuffer(size)
+  }
+  if (fill !== undefined) {
+    // Only pay attention to encoding if it's a string. This
+    // prevents accidentally sending in a number that would
+    // be interpretted as a start offset.
+    return typeof encoding === 'string'
+      ? createBuffer(size).fill(fill, encoding)
+      : createBuffer(size).fill(fill)
+  }
+  return createBuffer(size)
+}
+
+/**
+ * Creates a new filled Buffer instance.
+ * alloc(size[, fill[, encoding]])
+ **/
+Buffer.alloc = function (size, fill, encoding) {
+  return alloc(size, fill, encoding)
+}
+
+function allocUnsafe (size) {
+  assertSize(size)
+  return createBuffer(size < 0 ? 0 : checked(size) | 0)
+}
+
+/**
+ * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
+ * */
+Buffer.allocUnsafe = function (size) {
+  return allocUnsafe(size)
+}
+/**
+ * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
+ */
+Buffer.allocUnsafeSlow = function (size) {
+  return allocUnsafe(size)
+}
+
+function fromString (string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') {
+    encoding = 'utf8'
+  }
+
+  if (!Buffer.isEncoding(encoding)) {
+    throw new TypeError('Unknown encoding: ' + encoding)
+  }
+
+  var length = byteLength(string, encoding) | 0
+  var buf = createBuffer(length)
+
+  var actual = buf.write(string, encoding)
+
+  if (actual !== length) {
+    // Writing a hex string, for example, that contains invalid characters will
+    // cause everything after the first invalid character to be ignored. (e.g.
+    // 'abxxcd' will be treated as 'ab')
+    buf = buf.slice(0, actual)
+  }
+
+  return buf
+}
+
+function fromArrayLike (array) {
+  var length = array.length < 0 ? 0 : checked(array.length) | 0
+  var buf = createBuffer(length)
+  for (var i = 0; i < length; i += 1) {
+    buf[i] = array[i] & 255
+  }
+  return buf
+}
+
+function fromArrayBuffer (array, byteOffset, length) {
+  if (byteOffset < 0 || array.byteLength < byteOffset) {
+    throw new RangeError('"offset" is outside of buffer bounds')
+  }
+
+  if (array.byteLength < byteOffset + (length || 0)) {
+    throw new RangeError('"length" is outside of buffer bounds')
+  }
+
+  var buf
+  if (byteOffset === undefined && length === undefined) {
+    buf = new Uint8Array(array)
+  } else if (length === undefined) {
+    buf = new Uint8Array(array, byteOffset)
+  } else {
+    buf = new Uint8Array(array, byteOffset, length)
+  }
+
+  // Return an augmented `Uint8Array` instance
+  buf.__proto__ = Buffer.prototype
+  return buf
+}
+
+function fromObject (obj) {
+  if (Buffer.isBuffer(obj)) {
+    var len = checked(obj.length) | 0
+    var buf = createBuffer(len)
+
+    if (buf.length === 0) {
+      return buf
+    }
+
+    obj.copy(buf, 0, 0, len)
+    return buf
+  }
+
+  if (obj.length !== undefined) {
+    if (typeof obj.length !== 'number' || numberIsNaN(obj.length)) {
+      return createBuffer(0)
+    }
+    return fromArrayLike(obj)
+  }
+
+  if (obj.type === 'Buffer' && Array.isArray(obj.data)) {
+    return fromArrayLike(obj.data)
+  }
+}
+
+function checked (length) {
+  // Note: cannot use `length < K_MAX_LENGTH` here because that fails when
+  // length is NaN (which is otherwise coerced to zero.)
+  if (length >= K_MAX_LENGTH) {
+    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+                         'size: 0x' + K_MAX_LENGTH.toString(16) + ' bytes')
+  }
+  return length | 0
+}
+
+function SlowBuffer (length) {
+  if (+length != length) { // eslint-disable-line eqeqeq
+    length = 0
+  }
+  return Buffer.alloc(+length)
+}
+
+Buffer.isBuffer = function isBuffer (b) {
+  return b != null && b._isBuffer === true &&
+    b !== Buffer.prototype // so Buffer.isBuffer(Buffer.prototype) will be false
+}
+
+Buffer.compare = function compare (a, b) {
+  if (isInstance(a, Uint8Array)) a = Buffer.from(a, a.offset, a.byteLength)
+  if (isInstance(b, Uint8Array)) b = Buffer.from(b, b.offset, b.byteLength)
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+    throw new TypeError(
+      'The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array'
+    )
+  }
+
+  if (a === b) return 0
+
+  var x = a.length
+  var y = b.length
+
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i]
+      y = b[i]
+      break
+    }
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+Buffer.isEncoding = function isEncoding (encoding) {
+  switch (String(encoding).toLowerCase()) {
+    case 'hex':
+    case 'utf8':
+    case 'utf-8':
+    case 'ascii':
+    case 'latin1':
+    case 'binary':
+    case 'base64':
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      return true
+    default:
+      return false
+  }
+}
+
+Buffer.concat = function concat (list, length) {
+  if (!Array.isArray(list)) {
+    throw new TypeError('"list" argument must be an Array of Buffers')
+  }
+
+  if (list.length === 0) {
+    return Buffer.alloc(0)
+  }
+
+  var i
+  if (length === undefined) {
+    length = 0
+    for (i = 0; i < list.length; ++i) {
+      length += list[i].length
+    }
+  }
+
+  var buffer = Buffer.allocUnsafe(length)
+  var pos = 0
+  for (i = 0; i < list.length; ++i) {
+    var buf = list[i]
+    if (isInstance(buf, Uint8Array)) {
+      buf = Buffer.from(buf)
+    }
+    if (!Buffer.isBuffer(buf)) {
+      throw new TypeError('"list" argument must be an Array of Buffers')
+    }
+    buf.copy(buffer, pos)
+    pos += buf.length
+  }
+  return buffer
+}
+
+function byteLength (string, encoding) {
+  if (Buffer.isBuffer(string)) {
+    return string.length
+  }
+  if (ArrayBuffer.isView(string) || isInstance(string, ArrayBuffer)) {
+    return string.byteLength
+  }
+  if (typeof string !== 'string') {
+    throw new TypeError(
+      'The "string" argument must be one of type string, Buffer, or ArrayBuffer. ' +
+      'Received type ' + typeof string
+    )
+  }
+
+  var len = string.length
+  var mustMatch = (arguments.length > 2 && arguments[2] === true)
+  if (!mustMatch && len === 0) return 0
+
+  // Use a for loop to avoid recursion
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'ascii':
+      case 'latin1':
+      case 'binary':
+        return len
+      case 'utf8':
+      case 'utf-8':
+        return utf8ToBytes(string).length
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return len * 2
+      case 'hex':
+        return len >>> 1
+      case 'base64':
+        return base64ToBytes(string).length
+      default:
+        if (loweredCase) {
+          return mustMatch ? -1 : utf8ToBytes(string).length // assume utf8
+        }
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+Buffer.byteLength = byteLength
+
+function slowToString (encoding, start, end) {
+  var loweredCase = false
+
+  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+  // property of a typed array.
+
+  // This behaves neither like String nor Uint8Array in that we set start/end
+  // to their upper/lower bounds if the value passed is out of range.
+  // undefined is handled specially as per ECMA-262 6th Edition,
+  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
+  if (start === undefined || start < 0) {
+    start = 0
+  }
+  // Return early if start > this.length. Done here to prevent potential uint32
+  // coercion fail below.
+  if (start > this.length) {
+    return ''
+  }
+
+  if (end === undefined || end > this.length) {
+    end = this.length
+  }
+
+  if (end <= 0) {
+    return ''
+  }
+
+  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
+  end >>>= 0
+  start >>>= 0
+
+  if (end <= start) {
+    return ''
+  }
+
+  if (!encoding) encoding = 'utf8'
+
+  while (true) {
+    switch (encoding) {
+      case 'hex':
+        return hexSlice(this, start, end)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Slice(this, start, end)
+
+      case 'ascii':
+        return asciiSlice(this, start, end)
+
+      case 'latin1':
+      case 'binary':
+        return latin1Slice(this, start, end)
+
+      case 'base64':
+        return base64Slice(this, start, end)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return utf16leSlice(this, start, end)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = (encoding + '').toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+// This property is used by `Buffer.isBuffer` (and the `is-buffer` npm package)
+// to detect a Buffer instance. It's not possible to use `instanceof Buffer`
+// reliably in a browserify context because there could be multiple different
+// copies of the 'buffer' package in use. This method works even for Buffer
+// instances that were created from another copy of the `buffer` package.
+// See: https://github.com/feross/buffer/issues/154
+Buffer.prototype._isBuffer = true
+
+function swap (b, n, m) {
+  var i = b[n]
+  b[n] = b[m]
+  b[m] = i
+}
+
+Buffer.prototype.swap16 = function swap16 () {
+  var len = this.length
+  if (len % 2 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 16-bits')
+  }
+  for (var i = 0; i < len; i += 2) {
+    swap(this, i, i + 1)
+  }
+  return this
+}
+
+Buffer.prototype.swap32 = function swap32 () {
+  var len = this.length
+  if (len % 4 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 32-bits')
+  }
+  for (var i = 0; i < len; i += 4) {
+    swap(this, i, i + 3)
+    swap(this, i + 1, i + 2)
+  }
+  return this
+}
+
+Buffer.prototype.swap64 = function swap64 () {
+  var len = this.length
+  if (len % 8 !== 0) {
+    throw new RangeError('Buffer size must be a multiple of 64-bits')
+  }
+  for (var i = 0; i < len; i += 8) {
+    swap(this, i, i + 7)
+    swap(this, i + 1, i + 6)
+    swap(this, i + 2, i + 5)
+    swap(this, i + 3, i + 4)
+  }
+  return this
+}
+
+Buffer.prototype.toString = function toString () {
+  var length = this.length
+  if (length === 0) return ''
+  if (arguments.length === 0) return utf8Slice(this, 0, length)
+  return slowToString.apply(this, arguments)
+}
+
+Buffer.prototype.toLocaleString = Buffer.prototype.toString
+
+Buffer.prototype.equals = function equals (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return true
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.inspect = function inspect () {
+  var str = ''
+  var max = exports.INSPECT_MAX_BYTES
+  str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
+  if (this.length > max) str += ' ... '
+  return '<Buffer ' + str + '>'
+}
+
+Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
+  if (isInstance(target, Uint8Array)) {
+    target = Buffer.from(target, target.offset, target.byteLength)
+  }
+  if (!Buffer.isBuffer(target)) {
+    throw new TypeError(
+      'The "target" argument must be one of type Buffer or Uint8Array. ' +
+      'Received type ' + (typeof target)
+    )
+  }
+
+  if (start === undefined) {
+    start = 0
+  }
+  if (end === undefined) {
+    end = target ? target.length : 0
+  }
+  if (thisStart === undefined) {
+    thisStart = 0
+  }
+  if (thisEnd === undefined) {
+    thisEnd = this.length
+  }
+
+  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
+    throw new RangeError('out of range index')
+  }
+
+  if (thisStart >= thisEnd && start >= end) {
+    return 0
+  }
+  if (thisStart >= thisEnd) {
+    return -1
+  }
+  if (start >= end) {
+    return 1
+  }
+
+  start >>>= 0
+  end >>>= 0
+  thisStart >>>= 0
+  thisEnd >>>= 0
+
+  if (this === target) return 0
+
+  var x = thisEnd - thisStart
+  var y = end - start
+  var len = Math.min(x, y)
+
+  var thisCopy = this.slice(thisStart, thisEnd)
+  var targetCopy = target.slice(start, end)
+
+  for (var i = 0; i < len; ++i) {
+    if (thisCopy[i] !== targetCopy[i]) {
+      x = thisCopy[i]
+      y = targetCopy[i]
+      break
+    }
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
+// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
+//
+// Arguments:
+// - buffer - a Buffer to search
+// - val - a string, Buffer, or number
+// - byteOffset - an index into `buffer`; will be clamped to an int32
+// - encoding - an optional encoding, relevant is val is a string
+// - dir - true for indexOf, false for lastIndexOf
+function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
+  // Empty buffer means no match
+  if (buffer.length === 0) return -1
+
+  // Normalize byteOffset
+  if (typeof byteOffset === 'string') {
+    encoding = byteOffset
+    byteOffset = 0
+  } else if (byteOffset > 0x7fffffff) {
+    byteOffset = 0x7fffffff
+  } else if (byteOffset < -0x80000000) {
+    byteOffset = -0x80000000
+  }
+  byteOffset = +byteOffset // Coerce to Number.
+  if (numberIsNaN(byteOffset)) {
+    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
+    byteOffset = dir ? 0 : (buffer.length - 1)
+  }
+
+  // Normalize byteOffset: negative offsets start from the end of the buffer
+  if (byteOffset < 0) byteOffset = buffer.length + byteOffset
+  if (byteOffset >= buffer.length) {
+    if (dir) return -1
+    else byteOffset = buffer.length - 1
+  } else if (byteOffset < 0) {
+    if (dir) byteOffset = 0
+    else return -1
+  }
+
+  // Normalize val
+  if (typeof val === 'string') {
+    val = Buffer.from(val, encoding)
+  }
+
+  // Finally, search either indexOf (if dir is true) or lastIndexOf
+  if (Buffer.isBuffer(val)) {
+    // Special case: looking for empty string/buffer always fails
+    if (val.length === 0) {
+      return -1
+    }
+    return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
+  } else if (typeof val === 'number') {
+    val = val & 0xFF // Search for a byte value [0-255]
+    if (typeof Uint8Array.prototype.indexOf === 'function') {
+      if (dir) {
+        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
+      } else {
+        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
+      }
+    }
+    return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
+  }
+
+  throw new TypeError('val must be string, number or Buffer')
+}
+
+function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
+  var indexSize = 1
+  var arrLength = arr.length
+  var valLength = val.length
+
+  if (encoding !== undefined) {
+    encoding = String(encoding).toLowerCase()
+    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
+        encoding === 'utf16le' || encoding === 'utf-16le') {
+      if (arr.length < 2 || val.length < 2) {
+        return -1
+      }
+      indexSize = 2
+      arrLength /= 2
+      valLength /= 2
+      byteOffset /= 2
+    }
+  }
+
+  function read (buf, i) {
+    if (indexSize === 1) {
+      return buf[i]
+    } else {
+      return buf.readUInt16BE(i * indexSize)
+    }
+  }
+
+  var i
+  if (dir) {
+    var foundIndex = -1
+    for (i = byteOffset; i < arrLength; i++) {
+      if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
+        if (foundIndex === -1) foundIndex = i
+        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
+      } else {
+        if (foundIndex !== -1) i -= i - foundIndex
+        foundIndex = -1
+      }
+    }
+  } else {
+    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
+    for (i = byteOffset; i >= 0; i--) {
+      var found = true
+      for (var j = 0; j < valLength; j++) {
+        if (read(arr, i + j) !== read(val, j)) {
+          found = false
+          break
+        }
+      }
+      if (found) return i
+    }
+  }
+
+  return -1
+}
+
+Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
+  return this.indexOf(val, byteOffset, encoding) !== -1
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
+  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
+}
+
+Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
+  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
+}
+
+function hexWrite (buf, string, offset, length) {
+  offset = Number(offset) || 0
+  var remaining = buf.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+
+  var strLen = string.length
+
+  if (length > strLen / 2) {
+    length = strLen / 2
+  }
+  for (var i = 0; i < length; ++i) {
+    var parsed = parseInt(string.substr(i * 2, 2), 16)
+    if (numberIsNaN(parsed)) return i
+    buf[offset + i] = parsed
+  }
+  return i
+}
+
+function utf8Write (buf, string, offset, length) {
+  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+function asciiWrite (buf, string, offset, length) {
+  return blitBuffer(asciiToBytes(string), buf, offset, length)
+}
+
+function latin1Write (buf, string, offset, length) {
+  return asciiWrite(buf, string, offset, length)
+}
+
+function base64Write (buf, string, offset, length) {
+  return blitBuffer(base64ToBytes(string), buf, offset, length)
+}
+
+function ucs2Write (buf, string, offset, length) {
+  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+Buffer.prototype.write = function write (string, offset, length, encoding) {
+  // Buffer#write(string)
+  if (offset === undefined) {
+    encoding = 'utf8'
+    length = this.length
+    offset = 0
+  // Buffer#write(string, encoding)
+  } else if (length === undefined && typeof offset === 'string') {
+    encoding = offset
+    length = this.length
+    offset = 0
+  // Buffer#write(string, offset[, length][, encoding])
+  } else if (isFinite(offset)) {
+    offset = offset >>> 0
+    if (isFinite(length)) {
+      length = length >>> 0
+      if (encoding === undefined) encoding = 'utf8'
+    } else {
+      encoding = length
+      length = undefined
+    }
+  } else {
+    throw new Error(
+      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
+    )
+  }
+
+  var remaining = this.length - offset
+  if (length === undefined || length > remaining) length = remaining
+
+  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+    throw new RangeError('Attempt to write outside buffer bounds')
+  }
+
+  if (!encoding) encoding = 'utf8'
+
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'hex':
+        return hexWrite(this, string, offset, length)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Write(this, string, offset, length)
+
+      case 'ascii':
+        return asciiWrite(this, string, offset, length)
+
+      case 'latin1':
+      case 'binary':
+        return latin1Write(this, string, offset, length)
+
+      case 'base64':
+        // Warning: maxLength not taken into account in base64Write
+        return base64Write(this, string, offset, length)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return ucs2Write(this, string, offset, length)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.toJSON = function toJSON () {
+  return {
+    type: 'Buffer',
+    data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+function base64Slice (buf, start, end) {
+  if (start === 0 && end === buf.length) {
+    return base64.fromByteArray(buf)
+  } else {
+    return base64.fromByteArray(buf.slice(start, end))
+  }
+}
+
+function utf8Slice (buf, start, end) {
+  end = Math.min(buf.length, end)
+  var res = []
+
+  var i = start
+  while (i < end) {
+    var firstByte = buf[i]
+    var codePoint = null
+    var bytesPerSequence = (firstByte > 0xEF) ? 4
+      : (firstByte > 0xDF) ? 3
+        : (firstByte > 0xBF) ? 2
+          : 1
+
+    if (i + bytesPerSequence <= end) {
+      var secondByte, thirdByte, fourthByte, tempCodePoint
+
+      switch (bytesPerSequence) {
+        case 1:
+          if (firstByte < 0x80) {
+            codePoint = firstByte
+          }
+          break
+        case 2:
+          secondByte = buf[i + 1]
+          if ((secondByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
+            if (tempCodePoint > 0x7F) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 3:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
+            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 4:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          fourthByte = buf[i + 3]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
+            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+              codePoint = tempCodePoint
+            }
+          }
+      }
+    }
+
+    if (codePoint === null) {
+      // we did not generate a valid codePoint so insert a
+      // replacement char (U+FFFD) and advance only 1 byte
+      codePoint = 0xFFFD
+      bytesPerSequence = 1
+    } else if (codePoint > 0xFFFF) {
+      // encode to utf16 (surrogate pair dance)
+      codePoint -= 0x10000
+      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
+      codePoint = 0xDC00 | codePoint & 0x3FF
+    }
+
+    res.push(codePoint)
+    i += bytesPerSequence
+  }
+
+  return decodeCodePointsArray(res)
+}
+
+// Based on http://stackoverflow.com/a/22747272/680742, the browser with
+// the lowest limit is Chrome, with 0x10000 args.
+// We go 1 magnitude less, for safety
+var MAX_ARGUMENTS_LENGTH = 0x1000
+
+function decodeCodePointsArray (codePoints) {
+  var len = codePoints.length
+  if (len <= MAX_ARGUMENTS_LENGTH) {
+    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
+  }
+
+  // Decode in chunks to avoid "call stack size exceeded".
+  var res = ''
+  var i = 0
+  while (i < len) {
+    res += String.fromCharCode.apply(
+      String,
+      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+    )
+  }
+  return res
+}
+
+function asciiSlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; ++i) {
+    ret += String.fromCharCode(buf[i] & 0x7F)
+  }
+  return ret
+}
+
+function latin1Slice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; ++i) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
+}
+
+function hexSlice (buf, start, end) {
+  var len = buf.length
+
+  if (!start || start < 0) start = 0
+  if (!end || end < 0 || end > len) end = len
+
+  var out = ''
+  for (var i = start; i < end; ++i) {
+    out += toHex(buf[i])
+  }
+  return out
+}
+
+function utf16leSlice (buf, start, end) {
+  var bytes = buf.slice(start, end)
+  var res = ''
+  for (var i = 0; i < bytes.length; i += 2) {
+    res += String.fromCharCode(bytes[i] + (bytes[i + 1] * 256))
+  }
+  return res
+}
+
+Buffer.prototype.slice = function slice (start, end) {
+  var len = this.length
+  start = ~~start
+  end = end === undefined ? len : ~~end
+
+  if (start < 0) {
+    start += len
+    if (start < 0) start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0) end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start) end = start
+
+  var newBuf = this.subarray(start, end)
+  // Return an augmented `Uint8Array` instance
+  newBuf.__proto__ = Buffer.prototype
+  return newBuf
+}
+
+/*
+ * Need to make sure that buffer isn't trying to write out of bounds.
+ */
+function checkOffset (offset, ext, length) {
+  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) {
+    checkOffset(offset, byteLength, this.length)
+  }
+
+  var val = this[offset + --byteLength]
+  var mul = 1
+  while (byteLength > 0 && (mul *= 0x100)) {
+    val += this[offset + --byteLength] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  return this[offset]
+}
+
+Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return this[offset] | (this[offset + 1] << 8)
+}
+
+Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return (this[offset] << 8) | this[offset + 1]
+}
+
+Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return ((this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16)) +
+      (this[offset + 3] * 0x1000000)
+}
+
+Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] * 0x1000000) +
+    ((this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    this[offset + 3])
+}
+
+Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var i = byteLength
+  var mul = 1
+  var val = this[offset + --i]
+  while (i > 0 && (mul *= 0x100)) {
+    val += this[offset + --i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80)) return (this[offset])
+  return ((0xff - this[offset] + 1) * -1)
+}
+
+Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset] | (this[offset + 1] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset + 1] | (this[offset] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset]) |
+    (this[offset + 1] << 8) |
+    (this[offset + 2] << 16) |
+    (this[offset + 3] << 24)
+}
+
+Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] << 24) |
+    (this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    (this[offset + 3])
+}
+
+Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, true, 23, 4)
+}
+
+Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, false, 23, 4)
+}
+
+Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, true, 52, 8)
+}
+
+Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+  offset = offset >>> 0
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, false, 52, 8)
+}
+
+function checkInt (buf, value, offset, ext, max, min) {
+  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+}
+
+Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
+
+  var mul = 1
+  var i = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert) {
+    var maxBytes = Math.pow(2, 8 * byteLength) - 1
+    checkInt(this, value, offset, byteLength, maxBytes, 0)
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  this[offset] = (value & 0xff)
+  this[offset + 1] = (value >>> 8)
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  this[offset] = (value >>> 8)
+  this[offset + 1] = (value & 0xff)
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  this[offset + 3] = (value >>> 24)
+  this[offset + 2] = (value >>> 16)
+  this[offset + 1] = (value >>> 8)
+  this[offset] = (value & 0xff)
+  return offset + 4
+}
+
+Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  this[offset] = (value >>> 24)
+  this[offset + 1] = (value >>> 16)
+  this[offset + 2] = (value >>> 8)
+  this[offset + 3] = (value & 0xff)
+  return offset + 4
+}
+
+Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    var limit = Math.pow(2, (8 * byteLength) - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = 0
+  var mul = 1
+  var sub = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
+      sub = 1
+    }
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    var limit = Math.pow(2, (8 * byteLength) - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  var sub = 0
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
+      sub = 1
+    }
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (value < 0) value = 0xff + value + 1
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  this[offset] = (value & 0xff)
+  this[offset + 1] = (value >>> 8)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  this[offset] = (value >>> 8)
+  this[offset + 1] = (value & 0xff)
+  return offset + 2
+}
+
+Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  this[offset] = (value & 0xff)
+  this[offset + 1] = (value >>> 8)
+  this[offset + 2] = (value >>> 16)
+  this[offset + 3] = (value >>> 24)
+  return offset + 4
+}
+
+Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (value < 0) value = 0xffffffff + value + 1
+  this[offset] = (value >>> 24)
+  this[offset + 1] = (value >>> 16)
+  this[offset + 2] = (value >>> 8)
+  this[offset + 3] = (value & 0xff)
+  return offset + 4
+}
+
+function checkIEEE754 (buf, value, offset, ext, max, min) {
+  if (offset + ext > buf.length) throw new RangeError('Index out of range')
+  if (offset < 0) throw new RangeError('Index out of range')
+}
+
+function writeFloat (buf, value, offset, littleEndian, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  return offset + 4
+}
+
+Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, false, noAssert)
+}
+
+function writeDouble (buf, value, offset, littleEndian, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  return offset + 8
+}
+
+Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, false, noAssert)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function copy (target, targetStart, start, end) {
+  if (!Buffer.isBuffer(target)) throw new TypeError('argument should be a Buffer')
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (targetStart >= target.length) targetStart = target.length
+  if (!targetStart) targetStart = 0
+  if (end > 0 && end < start) end = start
+
+  // Copy 0 bytes; we're done
+  if (end === start) return 0
+  if (target.length === 0 || this.length === 0) return 0
+
+  // Fatal error conditions
+  if (targetStart < 0) {
+    throw new RangeError('targetStart out of bounds')
+  }
+  if (start < 0 || start >= this.length) throw new RangeError('Index out of range')
+  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length) end = this.length
+  if (target.length - targetStart < end - start) {
+    end = target.length - targetStart + start
+  }
+
+  var len = end - start
+
+  if (this === target && typeof Uint8Array.prototype.copyWithin === 'function') {
+    // Use built-in when available, missing from IE11
+    this.copyWithin(targetStart, start, end)
+  } else if (this === target && start < targetStart && targetStart < end) {
+    // descending copy from end
+    for (var i = len - 1; i >= 0; --i) {
+      target[i + targetStart] = this[i + start]
+    }
+  } else {
+    Uint8Array.prototype.set.call(
+      target,
+      this.subarray(start, end),
+      targetStart
+    )
+  }
+
+  return len
+}
+
+// Usage:
+//    buffer.fill(number[, offset[, end]])
+//    buffer.fill(buffer[, offset[, end]])
+//    buffer.fill(string[, offset[, end]][, encoding])
+Buffer.prototype.fill = function fill (val, start, end, encoding) {
+  // Handle string cases:
+  if (typeof val === 'string') {
+    if (typeof start === 'string') {
+      encoding = start
+      start = 0
+      end = this.length
+    } else if (typeof end === 'string') {
+      encoding = end
+      end = this.length
+    }
+    if (encoding !== undefined && typeof encoding !== 'string') {
+      throw new TypeError('encoding must be a string')
+    }
+    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
+      throw new TypeError('Unknown encoding: ' + encoding)
+    }
+    if (val.length === 1) {
+      var code = val.charCodeAt(0)
+      if ((encoding === 'utf8' && code < 128) ||
+          encoding === 'latin1') {
+        // Fast path: If `val` fits into a single byte, use that numeric value.
+        val = code
+      }
+    }
+  } else if (typeof val === 'number') {
+    val = val & 255
+  }
+
+  // Invalid ranges are not set to a default, so can range check early.
+  if (start < 0 || this.length < start || this.length < end) {
+    throw new RangeError('Out of range index')
+  }
+
+  if (end <= start) {
+    return this
+  }
+
+  start = start >>> 0
+  end = end === undefined ? this.length : end >>> 0
+
+  if (!val) val = 0
+
+  var i
+  if (typeof val === 'number') {
+    for (i = start; i < end; ++i) {
+      this[i] = val
+    }
+  } else {
+    var bytes = Buffer.isBuffer(val)
+      ? val
+      : Buffer.from(val, encoding)
+    var len = bytes.length
+    if (len === 0) {
+      throw new TypeError('The value "' + val +
+        '" is invalid for argument "value"')
+    }
+    for (i = 0; i < end - start; ++i) {
+      this[i + start] = bytes[i % len]
+    }
+  }
+
+  return this
+}
+
+// HELPER FUNCTIONS
+// ================
+
+var INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
+
+function base64clean (str) {
+  // Node takes equal signs as end of the Base64 encoding
+  str = str.split('=')[0]
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = str.trim().replace(INVALID_BASE64_RE, '')
+  // Node converts strings with length < 2 to ''
+  if (str.length < 2) return ''
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
+}
+
+function utf8ToBytes (string, units) {
+  units = units || Infinity
+  var codePoint
+  var length = string.length
+  var leadSurrogate = null
+  var bytes = []
+
+  for (var i = 0; i < length; ++i) {
+    codePoint = string.charCodeAt(i)
+
+    // is surrogate component
+    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+      // last char was a lead
+      if (!leadSurrogate) {
+        // no lead yet
+        if (codePoint > 0xDBFF) {
+          // unexpected trail
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        } else if (i + 1 === length) {
+          // unpaired lead
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        }
+
+        // valid lead
+        leadSurrogate = codePoint
+
+        continue
+      }
+
+      // 2 leads in a row
+      if (codePoint < 0xDC00) {
+        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+        leadSurrogate = codePoint
+        continue
+      }
+
+      // valid surrogate pair
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
+    } else if (leadSurrogate) {
+      // valid bmp char, but last char was a lead
+      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+    }
+
+    leadSurrogate = null
+
+    // encode utf8
+    if (codePoint < 0x80) {
+      if ((units -= 1) < 0) break
+      bytes.push(codePoint)
+    } else if (codePoint < 0x800) {
+      if ((units -= 2) < 0) break
+      bytes.push(
+        codePoint >> 0x6 | 0xC0,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x10000) {
+      if ((units -= 3) < 0) break
+      bytes.push(
+        codePoint >> 0xC | 0xE0,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x110000) {
+      if ((units -= 4) < 0) break
+      bytes.push(
+        codePoint >> 0x12 | 0xF0,
+        codePoint >> 0xC & 0x3F | 0x80,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else {
+      throw new Error('Invalid code point')
+    }
+  }
+
+  return bytes
+}
+
+function asciiToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; ++i) {
+    // Node's code seems to be doing this and not & 0x7F..
+    byteArray.push(str.charCodeAt(i) & 0xFF)
+  }
+  return byteArray
+}
+
+function utf16leToBytes (str, units) {
+  var c, hi, lo
+  var byteArray = []
+  for (var i = 0; i < str.length; ++i) {
+    if ((units -= 2) < 0) break
+
+    c = str.charCodeAt(i)
+    hi = c >> 8
+    lo = c % 256
+    byteArray.push(lo)
+    byteArray.push(hi)
+  }
+
+  return byteArray
+}
+
+function base64ToBytes (str) {
+  return base64.toByteArray(base64clean(str))
+}
+
+function blitBuffer (src, dst, offset, length) {
+  for (var i = 0; i < length; ++i) {
+    if ((i + offset >= dst.length) || (i >= src.length)) break
+    dst[i + offset] = src[i]
+  }
+  return i
+}
+
+// ArrayBuffer or Uint8Array objects from other contexts (i.e. iframes) do not pass
+// the `instanceof` check but they should be treated as of that type.
+// See: https://github.com/feross/buffer/issues/166
+function isInstance (obj, type) {
+  return obj instanceof type ||
+    (obj != null && obj.constructor != null && obj.constructor.name != null &&
+      obj.constructor.name === type.name)
+}
+function numberIsNaN (obj) {
+  // For IE11 support
+  return obj !== obj // eslint-disable-line no-self-compare
+}
+
+}).call(this)}).call(this,require("buffer").Buffer)
+},{"base64-js":33,"buffer":34,"ieee754":35}],35:[function(require,module,exports){
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = ((value * c) - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+},{}],36:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],37:[function(require,module,exports){
+GHInput = function (input, input2) {
+    this.set(input, input2);
+};
+
+GHInput.prototype.round = function (val, precision) {
+    if (precision === undefined)
+        precision = 1e6;
+    return Math.round(val * precision) / precision;
+};
+
+GHInput.prototype.setCoord = function (lat, lng) {
+    this.lat = this.round(lat);
+    this.lng = this.round(lng);
+    this.input = this.toString();
+};
+
+GHInput.isObject = function (value) {
+    var stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object object]");
+};
+
+GHInput.isString = function (value) {
+    var stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object string]");
+};
+
+GHInput.prototype.set = function (strOrObject, input2) {
+    if (input2) {
+        this.setCoord(strOrObject, input2);
+        return;
+    }
+
+    // either text or coordinates or object
+    this.input = strOrObject;
+
+    if (GHInput.isObject(strOrObject)) {
+        this.setCoord(strOrObject.lat, strOrObject.lng);
+    } else if (GHInput.isString(strOrObject)) {
+        var index = strOrObject.indexOf(",");
+        if (index >= 0) {
+            this.lat = this.round(parseFloat(strOrObject.substr(0, index)));
+            this.lng = this.round(parseFloat(strOrObject.substr(index + 1)));
+        }
+    }
+};
+
+GHInput.prototype.toString = function () {
+    if (this.lat !== undefined && this.lng !== undefined)
+        return this.lat + "," + this.lng;
+    return undefined;
+};
+
+module.exports = GHInput;
+},{}],38:[function(require,module,exports){
+let GHUtil = function () {
+};
+
+GHUtil.prototype.clone = function (obj) {
+    let newObj = {};
+    for (let prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            newObj[prop] = obj[prop];
+        }
+    }
+    return newObj;
+};
+
+GHUtil.prototype.decodePath = function (encoded, is3D) {
+    let len = encoded.length;
+    let index = 0;
+    let array = [];
+    let lat = 0;
+    let lng = 0;
+    let ele = 0;
+
+    while (index < len) {
+        let b;
+        let shift = 0;
+        let result = 0;
+        do {
+            b = encoded.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+        } while (b >= 0x20);
+        let deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lat += deltaLat;
+
+        shift = 0;
+        result = 0;
+        do {
+            b = encoded.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+        } while (b >= 0x20);
+        let deltaLon = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        lng += deltaLon;
+
+        if (is3D) {
+            // elevation
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charCodeAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            let deltaEle = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            ele += deltaEle;
+            array.push([lng * 1e-5, lat * 1e-5, ele / 100]);
+        } else
+            array.push([lng * 1e-5, lat * 1e-5]);
+    }
+    // let end = new Date().getTime();
+    // console.log("decoded " + len + " coordinates in " + ((end - start) / 1000) + "s");
+    return array;
+};
+
+GHUtil.prototype.extractError = function (res, url) {
+    let msg;
+
+    if (res && res.data) {
+        msg = res.data;
+        if (msg.hints && msg.hints[0] && msg.hints[0].message)
+            msg = msg.hints[0].message;
+        else if (msg.message)
+            msg = msg.message;
+    } else {
+        msg = res;
+    }
+
+    return new Error(msg + " - for url " + url);
+};
+
+GHUtil.prototype.isArray = function (value) {
+    let stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object array]");
+};
+
+GHUtil.prototype.isObject = function (value) {
+    let stringValue = Object.prototype.toString.call(value);
+    return (stringValue.toLowerCase() === "[object object]");
+};
+
+GHUtil.prototype.isString = function (value) {
+    return (typeof value === 'string');
+};
+
+module.exports = GHUtil;
+},{}],39:[function(require,module,exports){
+let request = require('axios');
+
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperGeocoding = function (args, requestDefaults) {
+    this.defaults = {
+        debug: false,
+        locale: "en"
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
+
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/geocode';
+    this.timeout = args.timeout ? args.timeout : 10000;
+};
+
+GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
+    let qString = "locale=" + args.locale;
+
+    if (args.query) {
+        qString += "&q=" + encodeURIComponent(args.query);
+        if (args.location_bias)
+            qString += "&point=" + encodeURIComponent(args.location_bias.toString());
+        else if (args.point)
+            qString += "&point=" + encodeURIComponent(args.point.toString());
+    } else {
+        qString += "&reverse=true";
+        if (args.point)
+            qString += "&point=" + encodeURIComponent(args.point.toString());
+    }
+
+    if (args.debug)
+        qString += "&debug=true";
+
+    if (args.limit)
+        qString += "&limit=" + args.limit;
+
+    return qString;
+};
+
+GraphHopperGeocoding.prototype.doRequest = function (reqArgs) {
+    if (!reqArgs) reqArgs = {}
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let that = this;
+
+    return new Promise(function (resolve, reject) {
+        request
+            .get(url, {timeout: that.timeout})
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.data);
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+module.exports = GraphHopperGeocoding;
+},{"./GHUtil":38,"axios":1}],40:[function(require,module,exports){
+let request = require('axios');
+
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperIsochrone = function (args, requestDefaults) {
+    this.defaults = {
+        time_limit: 600,
+        distance_limit: 0,
+        buckets: 3,
+        profile: "car",
+        debug: false,
+        reverse_flow: false
+    };
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
+
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/isochrone';
+    this.timeout = args.timeout ? args.timeout : 30000;
+};
+
+GraphHopperIsochrone.prototype.getParametersAsQueryString = function (args) {
+    let qString = "point=" + args.point;
+    qString += "&time_limit=" + args.time_limit;
+    qString += "&distance_limit=" + args.distance_limit;
+    qString += "&buckets=" + args.buckets;
+    qString += "&profile=" + args.profile;
+    qString += "&reverse_flow=" + args.reverse_flow;
+
+    if (args.debug)
+        qString += "&debug=true";
+
+    return qString;
+};
+
+GraphHopperIsochrone.prototype.doRequest = function (reqArgs) {
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let that = this;
+
+    return new Promise(function (resolve, reject) {
+
+        request
+            .get(url, {timeout: that.timeout})
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.data);
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            })
+    });
+};
+
+module.exports = GraphHopperIsochrone;
+},{"./GHUtil":38,"axios":1}],41:[function(require,module,exports){
+let request = require('axios');
+
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperMapMatching = function (args, requestDefaults) {
+    this.defaults = {
+        profile: "car",
+        gps_accuracy: 20,
+        debug: false,
+        max_visited_nodes: 3000,
+        locale: "en",
+        points_encoded: true,
+        instructions: true,
+        elevation: true,
+        data_type: "json"
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
+
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/match';
+    this.timeout = args.timeout ? args.timeout : 100000;
+};
+
+GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
+    let qString = "locale=" + args.locale;
+    // TODO NOW: profile not yet supported in API
+    qString += "&vehicle=" + args.profile;
+    qString += "&gps_accuracy=" + args.gps_accuracy;
+    qString += "&max_visited_nodes=" + args.max_visited_nodes;
+    qString += "&type=" + args.data_type;
+    qString += "&instructions=" + args.instructions;
+    qString += "&points_encoded=" + args.points_encoded;
+    qString += "&elevation=" + args.elevation;
+
+    if (args.debug)
+        qString += "&debug=true";
+    return qString;
+};
+
+GraphHopperMapMatching.prototype.doRequest = function (content, reqArgs) {
+    if (!reqArgs) reqArgs = {}
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let timeout = this.timeout;
+
+    return new Promise(function (resolve, reject) {
+        request.post(url, content, {
+            timeout: timeout,
+            headers: {'Content-Type': 'application/xml'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+
+                    if (res.data.paths) {
+                        for (let i = 0; i < res.data.paths.length; i++) {
+                            let path = res.data.paths[i];
+                            // convert encoded polyline to geo json
+                            if (path.points_encoded) {
+                                let tmpArray = ghUtil.decodePath(path.points, reqArgs.elevation);
+                                path.points = {
+                                    "type": "LineString",
+                                    "coordinates": tmpArray
+                                };
+
+                                // for now delete this
+                                delete path.snapped_waypoints;
+                            }
+                        }
+                    }
+                    resolve(res.data);
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+module.exports = GraphHopperMapMatching;
+},{"./GHUtil":38,"axios":1}],42:[function(require,module,exports){
+let request = require('axios');
+
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperMatrix = function (args, requestDefaults) {
+    this.defaults = {
+        profile: "car",
+        debug: false,
+        out_arrays: ["times"],
+
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
+
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/matrix';
+    this.timeout = args.timeout ? args.timeout : 30000;
+};
+
+GraphHopperMatrix.prototype.doRequest = function (reqArgs) {
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+
+    if (!reqArgs.from_points && !reqArgs.to_points) {
+        reqArgs.from_points = reqArgs.points;
+        reqArgs.to_points = reqArgs.points;
+        delete reqArgs["points"];
+    }
+
+    let url = this.host + this.endpoint + "?key=" + this.key;
+    let that = this;
+
+    return new Promise(function (resolve, reject) {
+        request.post(url, reqArgs, {
+            timeout: that.timeout,
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                } else if (res) {
+                    resolve(res.data);
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+GraphHopperMatrix.prototype.toHtmlTable = function (to_points, from_points, doubleArray) {
+    let htmlOut = "<table border='1' cellpadding='10'>";
+
+    // header => to points
+    htmlOut += "<tr>";
+
+    // upper left corner:
+    htmlOut += "<td>&#8595; from &#92; to &#8594;</td>";
+
+    // header with to points
+    for (let idxTo in this.to_points) {
+        htmlOut += "<td><b>" + this.to_points[idxTo] + "</b></td>";
+    }
+    htmlOut += "</tr>";
+
+    for (let idxFrom in doubleArray) {
+        htmlOut += "<tr>";
+        htmlOut += "<td><b>" + this.from_points[idxFrom] + "</b></td>";
+        let res = doubleArray[idxFrom];
+        for (let idxTo in res) {
+            let mapsURL = "https://graphhopper.com/maps?"
+                + "point=" + encodeURIComponent(this.from_points[idxFrom])
+                + "&point=" + encodeURIComponent(this.to_points[idxTo])
+                + "&vehicle=" + this.vehicle;
+
+            htmlOut += "<td> <a href='" + mapsURL + "'>" + res[idxTo] + "</a> </td>";
+        }
+        htmlOut += "</tr>\n";
+    }
+    htmlOut += "</table>";
+    return htmlOut;
+};
+
+module.exports = GraphHopperMatrix;
+},{"./GHUtil":38,"axios":1}],43:[function(require,module,exports){
+let request = require('axios');
+
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperOptimization = function (args) {
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/vrp';
+    this.timeout = args.timeout ? args.timeout : 10000;
+    this.waitInMillis = args.waitInMillis ? args.waitInMillis : 1000;
+    this.postTimeout = args.postTimeout ? args.postTimeout : 10000;
+};
+
+GraphHopperOptimization.prototype.doTSPRequest = function () {
+    return this.doVRPRequest(1);
+};
+
+GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
+    let that = this;
+
+    let firstPoint = that.points[0];
+    let servicesArray = [];
+    for (let pointIndex in that.points) {
+        if (pointIndex < 1)
+            continue;
+        let point = that.points[pointIndex];
+        let obj = {
+            "id": "_" + pointIndex,
+            "type": "pickup",
+            "name": "maintenance " + pointIndex,
+            "address": {
+                "location_id": "_location_" + pointIndex,
+                "lon": point.lng,
+                "lat": point.lat
+            }
+        };
+        servicesArray.push(obj);
+    }
+
+    let list = [];
+    for (let i = 0; i < vehicles; i++) {
+        list.push({
+            "vehicle_id": "_vehicle_" + i,
+            "start_address": {
+                "location_id": "_start_location",
+                "lon": firstPoint.lng,
+                "lat": firstPoint.lat
+            },
+            "type_id": "_vtype_1"
+        });
+    }
+
+    let jsonInput = {
+        "algorithm": {
+            "problem_type": "min-max"
+        },
+        "vehicles": list,
+        "vehicle_types": [{
+            "type_id": "_vtype_1",
+            "profile": "car"
+        }],
+        "services": servicesArray
+
+    };
+    //console.log(jsonInput);
+
+    return that.doRequest(jsonInput);
+};
+
+GraphHopperOptimization.prototype.doRawRequest = function (jsonInput) {
+    let that = this;
+
+    return new Promise(function (resolve, reject) {
+        let postURL = that.host + that.endpoint + "/optimize?key=" + that.key;
+        request.post(postURL, jsonInput, {
+            timeout: that.postTimeout,
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, postURL));
+                } else if (res) {
+                    let solutionUrl = that.host + that.endpoint + "/solution/" + res.data.job_id + "?key=" + that.key;
+                    let timerRet;
+
+                    let pollTrigger = function () {
+                        // console.log("poll solution " + solutionUrl);
+                        request.get(solutionUrl, {timeout: that.timeout})
+                            .then(res => {
+                                if (res.status !== 200 || res.data === undefined) {
+                                    clearInterval(timerRet);
+                                    reject(ghUtil.extractError(res, solutionUrl));
+                                } else if (res) {
+                                    //console.log(res.body);
+                                    if (res.data.status === "finished") {
+                                        //console.log("finished");
+                                        clearInterval(timerRet);
+                                        resolve(res.data);
+                                    } else if (res.data.message) {
+                                        clearInterval(timerRet);
+                                        resolve(res.data);
+                                    }
+                                }
+                            });
+                    };
+
+                    if (that.waitInMillis > 0)
+                        timerRet = setInterval(pollTrigger, that.waitInMillis);
+                    else
+                        pollTrigger();
+
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, postURL));
+            });
+    });
+};
+
+GraphHopperOptimization.prototype.doRequest = function (jsonInput) {
+    let vehicleTypeProfileMap = {};
+    let vehicleTypeMap = {};
+    let vehicleProfileMap = {};
+    let serviceMap = {};
+    let shipmentMap = {};
+    let locationMap = {};
+    let hasGeometries = false;
+    let hasCustomCostMatrix = false;
+
+    if (jsonInput.cost_matrices && jsonInput.cost_matrices.length > 0)
+        hasCustomCostMatrix = true;
+
+    if (jsonInput.configuration && !hasCustomCostMatrix)
+        if (jsonInput.configuration.routing.calc_points === true)
+            hasGeometries = true;
+
+    if (!hasGeometries) {
+        if (!jsonInput.configuration && !hasCustomCostMatrix) {
+            jsonInput.configuration = {"routing": {"calc_points": true}};
+        }
+    }
+
+    if (jsonInput.vehicle_types) {
+        for (let typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
+            let type = jsonInput.vehicle_types[typeIndex];
+            vehicleTypeProfileMap[type.type_id] = type.profile;
+            vehicleTypeMap[type.type_id] = type;
+        }
+    }
+
+    if (jsonInput.services) {
+        for (let serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
+            let service = jsonInput.services[serviceIndex];
+            locationMap[service.address.location_id] = service.address;
+            serviceMap[service.id] = service;
+        }
+    }
+
+    if (jsonInput.shipments) {
+        for (let shipmentIndex = 0; shipmentIndex < jsonInput.shipments.length; shipmentIndex++) {
+            let shipment = jsonInput.shipments[shipmentIndex];
+            locationMap[shipment.pickup.address.location_id] = shipment.pickup.address;
+            locationMap[shipment.delivery.address.location_id] = shipment.delivery.address;
+            shipmentMap[shipment.id] = shipment;
+        }
+    }
+
+    let breakMap = {};
+    let vehicleMap = {};
+    if (jsonInput.vehicles) {
+        for (let vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
+            let vehicle = jsonInput.vehicles[vehicleIndex];
+            vehicleMap[vehicle.vehicle_id] = vehicle;
+            let profile = null;
+            if (vehicle.type_id !== null) {
+                profile = vehicleTypeProfileMap[vehicle.type_id];
+                if (profile !== null) {
+                    vehicleProfileMap[vehicle.vehicle_id] = profile;
+                } else {
+                    vehicleProfileMap[vehicle.vehicle_id] = "car";
+                }
+            } else
+                vehicleProfileMap[vehicle.vehicle_id] = "car";
+
+            if (vehicle.start_address) {
+                locationMap[vehicle.start_address.location_id] = vehicle.start_address;
+            }
+            if (vehicle.end_address) {
+                locationMap[vehicle.end_address.location_id] = vehicle.end_address;
+            }
+            if (vehicle.break) {
+                let break_id = vehicle.vehicle_id + "_break";
+                breakMap[break_id] = vehicle.break;
+            }
+        }
+    }
+
+    let promise = this.doRawRequest(jsonInput);
+    promise.then(function (json) {
+        if (json.solution) {
+            let sol = json.solution;
+            json.raw_solution = JSON.parse(JSON.stringify(sol));
+            sol["calc_points"] = hasGeometries;
+            for (let routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
+                let route = sol.routes[routeIndex];
+                let vehicleId = route.vehicle_id;
+                let profile = vehicleProfileMap[vehicleId];
+                route["profile"] = profile;
+                for (let actIndex = 0; actIndex < route.activities.length; actIndex++) {
+                    let act = route.activities[actIndex];
+                    act["address"] = locationMap[act.location_id];
+                    if (act.id) {
+                        let driverBreak = breakMap[act.id];
+                        // console.log(act.id + " " + driverBreak);
+                        if (driverBreak) {
+                            act["break"] = breakMap[act.id];
+                        } else if (serviceMap[act.id]) {
+                            act["service"] = serviceMap[act.id];
+                        } else if (shipmentMap[act.id]) {
+                            act["shipment"] = shipmentMap[act.id];
+                        }
+                    } else {
+                        let vehicle = vehicleMap[vehicleId];
+                        act["vehicle"] = vehicle;
+                        act["vehicle_type"] = vehicleTypeMap[vehicle.type_id];
+                    }
+                }
+            }
+            let unassignedServices = new Array();
+            for (let i = 0; i < sol.unassigned.services.length; i++) {
+                let serviceId = sol.unassigned.services[i];
+                unassignedServices.push(serviceMap[serviceId]);
+                unassignedServices.push(serviceMap[serviceId]);
+            }
+            sol["unassigned_services"] = unassignedServices;
+
+            let unassignedShipments = new Array();
+            for (let i = 0; i < sol.unassigned.shipments.length; i++) {
+                let shipmentId = sol.unassigned.shipments[i];
+                unassignedShipments.push(shipmentMap[shipmentId]);
+            }
+            sol["unassigned_shipments"] = unassignedShipments;
+        }
+        return json;
+    });
+    return promise;
+
+};
+
+module.exports = GraphHopperOptimization;
+},{"./GHUtil":38,"axios":1}],44:[function(require,module,exports){
+let request = require('axios');
+var GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
+
+GraphHopperRouting = function (args, requestDefaults) {
+    this.defaults = {
+        profile: "car",
+        debug: false,
+        locale: "en",
+        points_encoded: true,
+        instructions: true,
+        elevation: true,
+        optimize: "false"
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
+
+    // required API key
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/route';
+    this.timeout = args.timeout ? args.timeout : 10000;
+    this.turn_sign_map = args.turn_sign_map ? args.turn_sign_map : {
+        "-6": "leave roundabout",
+        "-3": "turn sharp left",
+        "-2": "turn left",
+        "-1": "turn slight left",
+        0: "continue",
+        1: "turn slight right",
+        2: "turn right",
+        3: "turn sharp right",
+        4: "finish",
+        5: "reached via point",
+        6: "enter roundabout"
+    };
+};
+
+/**
+ * Execute the routing request using the provided args.
+ */
+GraphHopperRouting.prototype.doRequest = function (reqArgs) {
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+    let url = this.host + this.endpoint + "?key=" + this.key;
+    let that = this;
+
+    return new Promise((resolve, reject) => {
+        request.post(url, reqArgs, {
+            timeout: that.timeout,
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                    return;
+                }
+                if (res.data.paths) {
+                    for (let i = 0; i < res.data.paths.length; i++) {
+                        let path = res.data.paths[i];
+                        // convert encoded polyline to geo json
+                        if (path.points_encoded) {
+                            let tmpArray = ghUtil.decodePath(path.points, reqArgs.elevation);
+                            path.points = {
+                                "type": "LineString", "coordinates": tmpArray
+                            };
+
+                            let tmpSnappedArray = ghUtil.decodePath(path.snapped_waypoints, reqArgs.elevation);
+                            path.snapped_waypoints = {
+                                "type": "LineString", "coordinates": tmpSnappedArray
+                            };
+                        }
+                        if (path.instructions) {
+                            for (let j = 0; j < path.instructions.length; j++) {
+                                // Add a LngLat to every instruction
+                                let interval = path.instructions[j].interval;
+                                // The second parameter of slice is non inclusive, therefore we have to add +1
+                                path.instructions[j].points = path.points.coordinates.slice([interval[0], interval[1] + 1]);
+                            }
+                        }
+                    }
+                }
+                resolve(res.data);
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+GraphHopperRouting.prototype.info = function () {
+    let that = this;
+
+    return new Promise((resolve, reject) => {
+        let url = that.host + "/info?key=" + that.key;
+
+        request.get(url, {timeout: that.timeout, headers: {'Content-Type': 'application/json'}})
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                    return;
+                }
+                resolve(res.data);
+            })
+            .catch(err => {
+                console.log(err)
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+GraphHopperRouting.prototype.i18n = function (args) {
+    let locale = args && args.locale ? args.locale : this.defaults.locale;
+    let that = this;
+
+    return new Promise((resolve, reject) => {
+        let url = that.host + "/i18n/" + locale + "?key=" + that.key;
+
+        request.get(url, {timeout: that.timeout, headers: {'Content-Type': 'application/json'}})
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, url));
+                    return;
+                }
+                resolve(res.data);
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
+            });
+    });
+};
+
+GraphHopperRouting.prototype.getTurnText = function (sign) {
+    return this.turn_sign_map[sign];
+};
+
+module.exports = GraphHopperRouting;
+},{"./GHUtil":38,"axios":1}],45:[function(require,module,exports){
+var GHUtil = require('./GHUtil.js');
+var GHInput = require('./GHInput.js');
+var GraphHopperGeocoding = require('./GraphHopperGeocoding.js');
+var GraphHopperIsochrone = require('./GraphHopperIsochrone.js');
+var GraphHopperMapMatching = require('./GraphHopperMapMatching.js');
+var GraphHopperMatrix = require('./GraphHopperMatrix.js');
+var GraphHopperOptimization = require('./GraphHopperOptimization.js');
+var GraphHopperRouting = require('./GraphHopperRouting.js');
+
+var GraphHopper = {
+    "Util": GHUtil,
+    "Input": GHInput,
+    "Geocoding": GraphHopperGeocoding,
+    "Isochrone": GraphHopperIsochrone,
+    "MapMatching": GraphHopperMapMatching,
+    "Optimization": GraphHopperOptimization,
+    "Routing": GraphHopperRouting,
+    "Matrix": GraphHopperMatrix
+};
+
+
+// define GraphHopper for Node module pattern loaders, including Browserify
+if (typeof module === 'object' && typeof module.exports === 'object') {
+    module.exports.GraphHopper = GraphHopper;
+
+// define GraphHopper as an AMD module
+} else if (typeof define === 'function' && define.amd) {
+    define(GraphHopper);
+}
+
+if (typeof window !== 'undefined') {
+    window.GraphHopper = GraphHopper;
+}
+},{"./GHInput.js":37,"./GHUtil.js":38,"./GraphHopperGeocoding.js":39,"./GraphHopperIsochrone.js":40,"./GraphHopperMapMatching.js":41,"./GraphHopperMatrix.js":42,"./GraphHopperOptimization.js":43,"./GraphHopperRouting.js":44}]},{},[45]);

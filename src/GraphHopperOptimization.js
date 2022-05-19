@@ -1,27 +1,15 @@
-var request = require('superagent');
-var Promise = require("bluebird");
+let request = require('axios');
 
-var GHUtil = require("./GHUtil");
-var ghUtil = new GHUtil();
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
 
 GraphHopperOptimization = function (args) {
-    this.points = [];
-    this.host = "https://graphhopper.com/api/1";
     this.key = args.key;
-    this.profile = args.profile;
-    this.basePath = '/vrp';
-    this.waitInMillis = 1000;
-    this.timeout = 10000;
-    this.postTimeout = 15000;
-    ghUtil.copyProperties(args, this);
-};
-
-GraphHopperOptimization.prototype.addPoint = function (input) {
-    this.points.push(input);
-};
-
-GraphHopperOptimization.prototype.clear = function () {
-    this.points.length = 0;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/vrp';
+    this.timeout = args.timeout ? args.timeout : 10000;
+    this.waitInMillis = args.waitInMillis ? args.waitInMillis : 1000;
+    this.postTimeout = args.postTimeout ? args.postTimeout : 10000;
 };
 
 GraphHopperOptimization.prototype.doTSPRequest = function () {
@@ -29,15 +17,15 @@ GraphHopperOptimization.prototype.doTSPRequest = function () {
 };
 
 GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
-    var that = this;
+    let that = this;
 
-    var firstPoint = that.points[0];
-    var servicesArray = [];
-    for (var pointIndex in that.points) {
+    let firstPoint = that.points[0];
+    let servicesArray = [];
+    for (let pointIndex in that.points) {
         if (pointIndex < 1)
             continue;
-        var point = that.points[pointIndex];
-        var obj = {
+        let point = that.points[pointIndex];
+        let obj = {
             "id": "_" + pointIndex,
             "type": "pickup",
             "name": "maintenance " + pointIndex,
@@ -50,8 +38,8 @@ GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
         servicesArray.push(obj);
     }
 
-    var list = [];
-    for (var i = 0; i < vehicles; i++) {
+    let list = [];
+    for (let i = 0; i < vehicles; i++) {
         list.push({
             "vehicle_id": "_vehicle_" + i,
             "start_address": {
@@ -63,15 +51,15 @@ GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
         });
     }
 
-    var jsonInput = {
+    let jsonInput = {
         "algorithm": {
             "problem_type": "min-max"
         },
         "vehicles": list,
         "vehicle_types": [{
-                "type_id": "_vtype_1",
-                "profile": this.profile
-            }],
+            "type_id": "_vtype_1",
+            "profile": "car"
+        }],
         "services": servicesArray
 
     };
@@ -80,73 +68,65 @@ GraphHopperOptimization.prototype.doVRPRequest = function (vehicles) {
     return that.doRequest(jsonInput);
 };
 
-GraphHopperOptimization.prototype.doRawRequest = function (jsonInput, reqArgs) {
-    var that = this;
+GraphHopperOptimization.prototype.doRawRequest = function (jsonInput) {
+    let that = this;
 
     return new Promise(function (resolve, reject) {
-        var args = ghUtil.clone(that);
-        if (reqArgs)
-            args = ghUtil.copyProperties(reqArgs, args);
+        let postURL = that.host + that.endpoint + "/optimize?key=" + that.key;
+        request.post(postURL, jsonInput, {
+            timeout: that.postTimeout,
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
+                    reject(ghUtil.extractError(res, postURL));
+                } else if (res) {
+                    let solutionUrl = that.host + that.endpoint + "/solution/" + res.data.job_id + "?key=" + that.key;
+                    let timerRet;
 
-        var url = args.host + args.basePath + "/optimize?key=" + args.key;
+                    let pollTrigger = function () {
+                        // console.log("poll solution " + solutionUrl);
+                        request.get(solutionUrl, {timeout: that.timeout})
+                            .then(res => {
+                                if (res.status !== 200 || res.data === undefined) {
+                                    clearInterval(timerRet);
+                                    reject(ghUtil.extractError(res, solutionUrl));
+                                } else if (res) {
+                                    //console.log(res.body);
+                                    if (res.data.status === "finished") {
+                                        //console.log("finished");
+                                        clearInterval(timerRet);
+                                        resolve(res.data);
+                                    } else if (res.data.message) {
+                                        clearInterval(timerRet);
+                                        resolve(res.data);
+                                    }
+                                }
+                            });
+                    };
 
-        request
-                .post(url)
-                .send(JSON.stringify(jsonInput))
-                .accept('application/json; charset=utf-8')
-                .type('application/json')
-                .timeout(args.postTimeout)
-                .end(function (err, res) {
-                    if (err || !res.ok) {
-                        reject(ghUtil.extractError(res, url));
-                    } else if (res) {
-                        var solutionUrl = args.host + args.basePath + "/solution/" + res.body.job_id + "?key=" + args.key;
-                        var timerRet;
+                    if (that.waitInMillis > 0)
+                        timerRet = setInterval(pollTrigger, that.waitInMillis);
+                    else
+                        pollTrigger();
 
-                        var pollTrigger = function () {
-                            // console.log("poll solution " + solutionUrl);
-                            request
-                                    .get(solutionUrl)
-                                    .accept('application/json')
-                                    .timeout(args.timeout)
-                                    .end(function (err, res) {
-                                        if (err || !res.ok || res.body === undefined) {
-                                            clearInterval(timerRet);
-                                            reject(ghUtil.extractError(res, url));
-                                        } else if (res) {
-                                            //console.log(res.body);
-                                            if (res.body.status === "finished") {
-                                                //console.log("finished");
-                                                clearInterval(timerRet);
-                                                resolve(res.body);
-                                            } else if (res.body.message) {
-                                                clearInterval(timerRet);
-                                                resolve(res.body);
-                                            }
-                                        }
-                                    });
-                        };
-
-                        if (that.waitInMillis > 0)
-                            timerRet = setInterval(pollTrigger, that.waitInMillis);
-                        else
-                            pollTrigger();
-
-                    }
-                });
+                }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, postURL));
+            });
     });
 };
 
-GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
-
-    var vehicleTypeProfileMap = {};
-    var vehicleTypeMap = {};
-    var vehicleProfileMap = {};
-    var serviceMap = {};
-    var shipmentMap = {};
-    var locationMap = {};
-    var hasGeometries = false;
-    var hasCustomCostMatrix = false;
+GraphHopperOptimization.prototype.doRequest = function (jsonInput) {
+    let vehicleTypeProfileMap = {};
+    let vehicleTypeMap = {};
+    let vehicleProfileMap = {};
+    let serviceMap = {};
+    let shipmentMap = {};
+    let locationMap = {};
+    let hasGeometries = false;
+    let hasCustomCostMatrix = false;
 
     if (jsonInput.cost_matrices && jsonInput.cost_matrices.length > 0)
         hasCustomCostMatrix = true;
@@ -162,37 +142,37 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
     }
 
     if (jsonInput.vehicle_types) {
-        for (var typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
-            var type = jsonInput.vehicle_types[typeIndex];
+        for (let typeIndex = 0; typeIndex < jsonInput.vehicle_types.length; typeIndex++) {
+            let type = jsonInput.vehicle_types[typeIndex];
             vehicleTypeProfileMap[type.type_id] = type.profile;
             vehicleTypeMap[type.type_id] = type;
         }
     }
 
     if (jsonInput.services) {
-        for (var serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
-            var service = jsonInput.services[serviceIndex];
+        for (let serviceIndex = 0; serviceIndex < jsonInput.services.length; serviceIndex++) {
+            let service = jsonInput.services[serviceIndex];
             locationMap[service.address.location_id] = service.address;
             serviceMap[service.id] = service;
         }
     }
 
     if (jsonInput.shipments) {
-        for (var shipmentIndex = 0; shipmentIndex < jsonInput.shipments.length; shipmentIndex++) {
-            var shipment = jsonInput.shipments[shipmentIndex];
+        for (let shipmentIndex = 0; shipmentIndex < jsonInput.shipments.length; shipmentIndex++) {
+            let shipment = jsonInput.shipments[shipmentIndex];
             locationMap[shipment.pickup.address.location_id] = shipment.pickup.address;
             locationMap[shipment.delivery.address.location_id] = shipment.delivery.address;
             shipmentMap[shipment.id] = shipment;
         }
     }
 
-    var breakMap = {};
-    var vehicleMap = {};
+    let breakMap = {};
+    let vehicleMap = {};
     if (jsonInput.vehicles) {
-        for (var vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
-            var vehicle = jsonInput.vehicles[vehicleIndex];
+        for (let vehicleIndex = 0; vehicleIndex < jsonInput.vehicles.length; vehicleIndex++) {
+            let vehicle = jsonInput.vehicles[vehicleIndex];
             vehicleMap[vehicle.vehicle_id] = vehicle;
-            var profile = null;
+            let profile = null;
             if (vehicle.type_id !== null) {
                 profile = vehicleTypeProfileMap[vehicle.type_id];
                 if (profile !== null) {
@@ -210,28 +190,28 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
                 locationMap[vehicle.end_address.location_id] = vehicle.end_address;
             }
             if (vehicle.break) {
-                var break_id = vehicle.vehicle_id + "_break";
+                let break_id = vehicle.vehicle_id + "_break";
                 breakMap[break_id] = vehicle.break;
             }
         }
     }
 
-    var promise = this.doRawRequest(jsonInput, reqArgs);
+    let promise = this.doRawRequest(jsonInput);
     promise.then(function (json) {
         if (json.solution) {
-            var sol = json.solution;
+            let sol = json.solution;
             json.raw_solution = JSON.parse(JSON.stringify(sol));
             sol["calc_points"] = hasGeometries;
-            for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
-                var route = sol.routes[routeIndex];
-                var vehicleId = route.vehicle_id;
-                var profile = vehicleProfileMap[vehicleId];
+            for (let routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
+                let route = sol.routes[routeIndex];
+                let vehicleId = route.vehicle_id;
+                let profile = vehicleProfileMap[vehicleId];
                 route["profile"] = profile;
-                for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
-                    var act = route.activities[actIndex];
+                for (let actIndex = 0; actIndex < route.activities.length; actIndex++) {
+                    let act = route.activities[actIndex];
                     act["address"] = locationMap[act.location_id];
                     if (act.id) {
-                        var driverBreak = breakMap[act.id];
+                        let driverBreak = breakMap[act.id];
                         // console.log(act.id + " " + driverBreak);
                         if (driverBreak) {
                             act["break"] = breakMap[act.id];
@@ -241,22 +221,23 @@ GraphHopperOptimization.prototype.doRequest = function (jsonInput, reqArgs) {
                             act["shipment"] = shipmentMap[act.id];
                         }
                     } else {
-                        var vehicle = vehicleMap[vehicleId];
+                        let vehicle = vehicleMap[vehicleId];
                         act["vehicle"] = vehicle;
                         act["vehicle_type"] = vehicleTypeMap[vehicle.type_id];
                     }
                 }
             }
-            var unassignedServices = new Array();
-            for (var i = 0; i < sol.unassigned.services.length; i++) {
-                var serviceId = sol.unassigned.services[i];
+            let unassignedServices = new Array();
+            for (let i = 0; i < sol.unassigned.services.length; i++) {
+                let serviceId = sol.unassigned.services[i];
+                unassignedServices.push(serviceMap[serviceId]);
                 unassignedServices.push(serviceMap[serviceId]);
             }
             sol["unassigned_services"] = unassignedServices;
 
-            var unassignedShipments = new Array();
-            for (var i = 0; i < sol.unassigned.shipments.length; i++) {
-                var shipmentId = sol.unassigned.shipments[i];
+            let unassignedShipments = new Array();
+            for (let i = 0; i < sol.unassigned.shipments.length; i++) {
+                let shipmentId = sol.unassigned.shipments[i];
                 unassignedShipments.push(shipmentMap[shipmentId]);
             }
             sol["unassigned_shipments"] = unassignedShipments;

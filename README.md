@@ -23,16 +23,10 @@ You can then use it like this:
 <script>
   window.onload = function() {
 
-    var ghRouting = new GraphHopper.Routing({
-      key: "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]",
-      vehicle: "car",
-      elevation: false
-    });
+    var ghRouting = new GraphHopper.Routing({key: "[Sign-up for free and get your own key:https://www.graphhopper.com/products/]"},
+      { profile: "car", elevation: false });
 
-    ghRouting.addPoint(new GHInput(47.400905, 8.534317));
-    ghRouting.addPoint(new GHInput(47.394108, 8.538265));
-
-    ghRouting.doRequest()
+    ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
       .then(function(json) {
         // Add your own result handling here
         console.log(json);
@@ -65,15 +59,11 @@ You can either require the whole client enabling you to use every GraphHopper AP
      var profile = "car";
  
      var host;
-     var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host, vehicle: profile, elevation: false});
+     var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host}, {profile: profile, elevation: false});
      // If you only need e.g. Routing, you can only require the needed parts
-     //var ghRouting = new GraphHopperRouting({key: defaultKey, host: host, vehicle: profile, elevation: false});
+     //var ghRouting = new GraphHopperRouting({key: defaultKey, host: host},{profile: profile, elevation: false});
  
-     // Setup your own Points
-     ghRouting.addPoint(new GHInput(47.400905, 8.534317));
-     ghRouting.addPoint(new GHInput(47.394108, 8.538265));
- 
-     ghRouting.doRequest()
+     ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
      .then(function(json){
         // Add your own result handling here
         console.log(json);

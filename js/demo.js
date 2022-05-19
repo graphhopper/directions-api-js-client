@@ -1,4 +1,4 @@
-var iconObject = L.icon({
+let iconObject = L.icon({
     iconUrl: './img/marker-icon.png',
     shadowSize: [50, 64],
     shadowAnchor: [4, 62],
@@ -17,7 +17,7 @@ $(document).ready(function (e) {
     function showTab(thisDiv) {
         thisDiv.parent().addClass("current");
         thisDiv.parent().siblings().removeClass("current");
-        var tab = thisDiv.attr("href");
+        let tab = thisDiv.attr("href");
         $(".tab-content").not(tab).css("display", "none");
         $(tab).fadeIn();
 
@@ -29,34 +29,29 @@ $(document).ready(function (e) {
         mapMatchingMap.invalidateSize(false);
     }
 
-    var host;// = "http://localhost:9000/api/1";
+    let host;// = "http://localhost:9000/api/1";
 
     //
     // Sign-up for free and get your own key: https://graphhopper.com/#directions-api
     //
-    var defaultKey = "c9b2b65d-be3d-4d96-b19c-48365a066ae3";
-    var profile = "car";
+    let defaultKey = "9db0a28e-4851-433f-86c7-94b8a695fb18";
 
     // create a routing client to fetch real routes, elevation.true is only supported for vehicle bike or foot
-    var ghRouting = new GraphHopper.Routing({key: defaultKey, host: host, vehicle: profile, elevation: false});
-    var ghGeocoding = new GraphHopper.Geocoding({
-        key: defaultKey,
-        host: host,
-        limit: 8,
-        locale: "en" /* currently fr, en, de and it are explicitely supported */
-    });
-    var ghMatrix = new GraphHopper.Matrix({key: defaultKey, host: host, vehicle: profile});
-    var ghOptimization = new GraphHopper.Optimization({key: defaultKey, host: host, profile: profile});
-    var ghIsochrone = new GraphHopper.Isochrone({key: defaultKey, host: host, vehicle: profile});
-    var ghMapMatching = new GraphHopper.MapMatching({key: defaultKey, host: host, vehicle: profile});
+    let ghRouting = new GraphHopper.Routing({key: defaultKey, host: host}, {elevation: false});
+    let ghGeocoding = new GraphHopper.Geocoding({ key: defaultKey, host: host},
+        { limit: 8, locale: "en" /* fr, en, de and it are supported */ });
+    let ghMatrix = new GraphHopper.Matrix({key: defaultKey, host: host});
+    let ghOptimization = new GraphHopper.Optimization({key: defaultKey, host: host});
+    let ghIsochrone = new GraphHopper.Isochrone({key: defaultKey, host: host});
+    let ghMapMatching = new GraphHopper.MapMatching({key: defaultKey, host: host});
 
 //    if (location.protocol === "file:") {
 //        ghOptimization.host = 'http://localhost:9000/api/1';
 //        ghOptimization.basePath = '/vrp';
 //    }
 
-    var overwriteExistingKey = function () {
-        var key = $("#custom_key_input").val();
+    let overwriteExistingKey = function () {
+        let key = $("#custom_key_input").val();
         if (key && key !== defaultKey) {
             $("#custom_key_enabled").show();
 
@@ -73,24 +68,24 @@ $(document).ready(function (e) {
     overwriteExistingKey();
     $("#custom_key_button").click(overwriteExistingKey);
 
-    var routingMap = createMap('routing-map');
+    let routingMap = createMap('routing-map');
     setupRoutingAPI(routingMap, ghRouting);
 
-    var vrpMap = createMap('vrp-map');
+    let vrpMap = createMap('vrp-map');
     setupRouteOptimizationAPI(vrpMap, ghOptimization, ghRouting);
 
-    var geocodingMap = createMap('geocoding-map');
+    let geocodingMap = createMap('geocoding-map');
     setupGeocodingAPI(geocodingMap, ghGeocoding);
 
     setupMatrixAPI(ghMatrix);
 
-    var isochroneMap = createMap('isochrone-map');
+    let isochroneMap = createMap('isochrone-map');
     setupIsochrone(isochroneMap, ghIsochrone);
 
-    var mapMatchingMap = createMap('map-matching-map');
+    let mapMatchingMap = createMap('map-matching-map');
     setupMapMatching(mapMatchingMap, ghMapMatching);
 
-    var tmpTab = window.location.hash;
+    let tmpTab = window.location.hash;
     if (!tmpTab)
         tmpTab = "#routing";
 
@@ -100,50 +95,51 @@ $(document).ready(function (e) {
 function setupRoutingAPI(map, ghRouting) {
     map.setView([52.521235, 13.3992], 12);
 
-    var instructionsDiv = $("#instructions");
+    let points = []
+    let instructionsDiv = $("#instructions");
     map.on('click', function (e) {
-        if (ghRouting.points.length > 1) {
-            ghRouting.clearPoints();
+        if (points.length > 1) {
+            points.length = 0;
             routingLayer.clearLayers();
         }
 
         L.marker(e.latlng, {icon: iconObject}).addTo(routingLayer);
-        ghRouting.addPoint(new GHInput(e.latlng.lat, e.latlng.lng));
-        if (ghRouting.points.length > 1) {
+
+        points.push([e.latlng.lng, e.latlng.lat]);
+        if (points.length > 1) {
             // ******************
             //  Calculate route! 
             // ******************
-            ghRouting.doRequest()
+            ghRouting.doRequest({points: points})
                 .then(function (json) {
-                    var path = json.paths[0];
+                    let path = json.paths[0];
                     routingLayer.addData({
                         "type": "Feature",
                         "geometry": path.points
                     });
-                    var outHtml = "Distance in meter:" + path.distance;
+                    let outHtml = "Distance in meter:" + path.distance;
                     outHtml += "<br/>Times in seconds:" + path.time / 1000;
-                    outHtml += "<br/><a href='" + ghRouting.getGraphHopperMapsLink() + "'>GraphHopper Maps</a>";
                     $("#routing-response").html(outHtml);
 
                     if (path.bbox) {
-                        var minLon = path.bbox[0];
-                        var minLat = path.bbox[1];
-                        var maxLon = path.bbox[2];
-                        var maxLat = path.bbox[3];
-                        var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                        let minLon = path.bbox[0];
+                        let minLat = path.bbox[1];
+                        let maxLon = path.bbox[2];
+                        let maxLat = path.bbox[3];
+                        let tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                         map.fitBounds(tmpB);
                     }
 
                     instructionsDiv.empty();
                     if (path.instructions) {
-                        var allPoints = path.points.coordinates;
-                        var listUL = $("<ol>");
+                        let allPoints = path.points.coordinates;
+                        let listUL = $("<ol>");
                         instructionsDiv.append(listUL);
-                        for (var idx in path.instructions) {
-                            var instr = path.instructions[idx];
+                        for (let idx in path.instructions) {
+                            let instr = path.instructions[idx];
 
                             // use 'interval' to find the geometry (list of points) until the next instruction
-                            var instruction_points = allPoints.slice(instr.interval[0], instr.interval[1]);
+                            let instruction_points = allPoints.slice(instr.interval[0], instr.interval[1]);
 
                             // use 'sign' to display e.g. equally named images
 
@@ -155,18 +151,18 @@ function setupRoutingAPI(map, ghRouting) {
 
                 })
                 .catch(function (err) {
-                    var str = "An error occured: " + err.message;
+                    let str = "An error occured: " + err.message;
                     $("#routing-response").text(str);
                 });
         }
     });
 
-    var instructionsHeader = $("#instructions-header");
+    let instructionsHeader = $("#instructions-header");
     instructionsHeader.click(function () {
         instructionsDiv.toggle();
     });
 
-    var routingLayer = L.geoJson().addTo(map);
+    let routingLayer = L.geoJson().addTo(map);
     routingLayer.options = {
         style: {color: "#00cc33", "weight": 5, "opacity": 0.6}
     };
@@ -186,9 +182,9 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             className: 'leaflet-div-icon'
         },
         createIcon: function () {
-            var div = document.createElement('div');
-            var img = this._createImg(this.options['iconUrl']);
-            var numdiv = document.createElement('div');
+            let div = document.createElement('div');
+            let img = this._createImg(this.options['iconUrl']);
+            let numdiv = document.createElement('div');
             numdiv.setAttribute("class", "number");
             numdiv.innerHTML = this.options['number'] || '';
             div.appendChild(img);
@@ -202,7 +198,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         }
     });
 
-    var addPointToMap = function (lat, lng, index) {
+    let addPointToMap = function (lat, lng, index) {
         index = parseInt(index);
         if (index === 0) {
             new L.Marker([lat, lng], {
@@ -224,12 +220,12 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         ghOptimization.addPoint(new GHInput(e.latlng.lat, e.latlng.lng));
     });
 
-    var routingLayer = L.geoJson().addTo(map);
+    let routingLayer = L.geoJson().addTo(map);
     routingLayer.options.style = function (feature) {
         return feature.properties && feature.properties.style;
     };
 
-    var clearMap = function () {
+    let clearMap = function () {
         ghOptimization.clear();
         routingLayer.clearLayers();
         ghRouting.clearPoints();
@@ -237,15 +233,15 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         $("#vrp-error").empty();
     };
 
-    var createSignupSteps = function () {
+    let createSignupSteps = function () {
         return "<div style='color:black'>To test this example <br/>"
             + "1. <a href='https://graphhopper.com/#directions-api'>sign up for free</a>,<br/>"
             + "2. log in and request a free standard package then <br/>"
             + "3. copy the API key to the text field in the upper right corner<div>";
     };
 
-    var getRouteStyle = function (routeIndex) {
-        var routeStyle;
+    let getRouteStyle = function (routeIndex) {
+        let routeStyle;
         if (routeIndex === 3) {
             routeStyle = {color: "cyan"};
         } else if (routeIndex === 2) {
@@ -261,10 +257,10 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         return routeStyle;
     };
 
-    var createGHCallback = function (routeStyle) {
+    let createGHCallback = function (routeStyle) {
         return function (json) {
-            for (var pathIndex = 0; pathIndex < json.paths.length; pathIndex++) {
-                var path = json.paths[pathIndex];
+            for (let pathIndex = 0; pathIndex < json.paths.length; pathIndex++) {
+                let path = json.paths[pathIndex];
                 routingLayer.addData({
                     "type": "Feature",
                     "geometry": path.points,
@@ -276,7 +272,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         };
     };
 
-    var optimizeError = function (err) {
+    let optimizeError = function (err) {
         $("#vrp-response").text(" ");
 
         if (err.message.indexOf("Too many locations") >= 0) {
@@ -288,8 +284,8 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
         console.error(err);
     };
 
-    var optimizeResponse = function (json) {
-        var sol = json.solution;
+    let optimizeResponse = function (json) {
+        let sol = json.solution;
         if (!sol)
             return;
 
@@ -298,19 +294,19 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
             + ", time: " + Math.floor(sol.time / 60) + "min "
             + ", costs: " + sol.costs);
 
-        var no_unassigned = sol.unassigned.services.length + sol.unassigned.shipments.length;
+        let no_unassigned = sol.unassigned.services.length + sol.unassigned.shipments.length;
         if (no_unassigned > 0)
             $("#vrp-error").append("<br/>unassigned jobs: " + no_unassigned);
 
         routingLayer.clearLayers();
-        for (var routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
-            var route = sol.routes[routeIndex];
+        for (let routeIndex = 0; routeIndex < sol.routes.length; routeIndex++) {
+            let route = sol.routes[routeIndex];
 
             // fetch real routes from graphhopper
             ghRouting.clearPoints();
-            var firstAdd;
-            for (var actIndex = 0; actIndex < route.activities.length; actIndex++) {
-                var add = route.activities[actIndex].address;
+            let firstAdd;
+            for (let actIndex = 0; actIndex < route.activities.length; actIndex++) {
+                let add = route.activities[actIndex].address;
                 ghRouting.addPoint(new GHInput(add.lat, add.lon));
 
                 if (!eqAddress(firstAdd, add))
@@ -320,24 +316,24 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
                     firstAdd = add;
             }
 
-            var ghCallback = createGHCallback(getRouteStyle(routeIndex));
+            let ghCallback = createGHCallback(getRouteStyle(routeIndex));
 
             ghRouting.doRequest({instructions: false})
                 .then(ghCallback)
                 .catch(function (err) {
-                    var str = "An error for the routing occurred: " + err.message;
+                    let str = "An error for the routing occurred: " + err.message;
                     $("#vrp-error").text(str);
                 });
         }
     };
 
-    var eqAddress = function (add1, add2) {
+    let eqAddress = function (add1, add2) {
         return add1 && add2
             && Math.floor(add1.lat * 1000000) === Math.floor(add2.lat * 1000000)
             && Math.floor(add1.lon * 1000000) === Math.floor(add2.lon * 1000000);
     };
 
-    var optimizeRoute = function () {
+    let optimizeRoute = function () {
         if (ghOptimization.points.length < 3) {
             $("#vrp-response").text("At least 3 points required but was: " + ghOptimization.points.length);
             return;
@@ -351,7 +347,7 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
     $("#vrp_clear_button").click(clearMap);
 
     // Increase version if one of the examples change, see #2
-    var exampleVersion = 2;
+    let exampleVersion = 2;
 
     $("#set_example_vrp").click(function () {
         $.getJSON("route-optimization-examples/vrp_lonlat_new.json?v=" + exampleVersion, function (jsonData) {
@@ -419,13 +415,13 @@ function setupRouteOptimizationAPI(map, ghOptimization, ghRouting) {
 function setupGeocodingAPI(map, ghGeocoding) {
     //  Find address    
     map.setView([51.505, -0.09], 13);
-    var iconObject = L.icon({
+    let iconObject = L.icon({
         iconUrl: './img/marker-icon.png',
         shadowSize: [50, 64],
         shadowAnchor: [4, 62],
         iconAnchor: [12, 40]
     });
-    var geocodingLayer = L.geoJson().addTo(map);
+    let geocodingLayer = L.geoJson().addTo(map);
     geocodingLayer.options = {
         style: {color: "#00cc33", "weight": 5, "opacity": 0.6}
     };
@@ -439,9 +435,9 @@ function setupGeocodingAPI(map, ghGeocoding) {
             className: 'leaflet-div-icon'
         },
         createIcon: function () {
-            var div = document.createElement('div');
-            var img = this._createImg(this.options['iconUrl']);
-            var numdiv = document.createElement('div');
+            let div = document.createElement('div');
+            let img = this._createImg(this.options['iconUrl']);
+            let numdiv = document.createElement('div');
             numdiv.setAttribute("class", "number");
             numdiv.innerHTML = this.options['number'] || '';
             div.appendChild(img);
@@ -451,27 +447,27 @@ function setupGeocodingAPI(map, ghGeocoding) {
         }
     });
 
-    var clearGeocoding = function () {
+    let clearGeocoding = function () {
         $("#geocoding-results").empty();
         $("#geocoding-error").empty();
         $("#geocoding-response").empty();
         geocodingLayer.clearLayers();
     };
 
-    var mysubmit = function () {
+    let mysubmit = function () {
         clearGeocoding();
 
         ghGeocoding.doRequest({query: textField.val()})
             .then(function (json) {
-                var listUL = $("<ol>");
+                let listUL = $("<ol>");
                 $("#geocoding-response").append("Locale:" + ghGeocoding.locale + "<br/>").append(listUL);
-                var minLon, minLat, maxLon, maxLat;
-                var counter = 0;
-                for (var hitIdx in json.hits) {
+                let minLon, minLat, maxLon, maxLat;
+                let counter = 0;
+                for (let hitIdx in json.hits) {
                     counter++;
-                    var hit = json.hits[hitIdx];
+                    let hit = json.hits[hitIdx];
 
-                    var str = counter + ". " + dataToText(hit);
+                    let str = counter + ". " + dataToText(hit);
                     $("<div>" + str + "</div>").appendTo(listUL);
                     new L.Marker(hit.point, {
                         icon: new L.NumberedDivIcon({iconUrl: './img/marker-icon-green.png', number: '' + counter})
@@ -489,7 +485,7 @@ function setupGeocodingAPI(map, ghGeocoding) {
                 }
 
                 if (minLat) {
-                    var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                    let tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                     map.fitBounds(tmpB);
                 }
             })
@@ -499,7 +495,7 @@ function setupGeocodingAPI(map, ghGeocoding) {
     };
 
     // reverse geocoding
-    var iconObject = L.icon({
+    iconObject = L.icon({
         iconUrl: './img/marker-icon.png',
         shadowSize: [50, 64],
         shadowAnchor: [4, 62],
@@ -511,11 +507,11 @@ function setupGeocodingAPI(map, ghGeocoding) {
 
         ghGeocoding.doRequest({point: e.latlng.lat + "," + e.latlng.lng})
             .then(function (json) {
-                var counter = 0;
-                for (var hitIdx in json.hits) {
+                let counter = 0;
+                for (let hitIdx in json.hits) {
                     counter++;
-                    var hit = json.hits[hitIdx];
-                    var str = counter + ". " + dataToText(hit);
+                    let hit = json.hits[hitIdx];
+                    let str = counter + ". " + dataToText(hit);
                     L.marker(hit.point, {icon: iconObject}).addTo(geocodingLayer).bindPopup(str).openPopup();
 
                     // only show first result for now
@@ -527,7 +523,7 @@ function setupGeocodingAPI(map, ghGeocoding) {
             });
     });
 
-    var textField = $("#geocoding_text_field");
+    let textField = $("#geocoding_text_field");
     textField.keypress(function (e) {
         if (e.which === 13) {
             mysubmit();
@@ -538,7 +534,7 @@ function setupGeocodingAPI(map, ghGeocoding) {
     $("#geocoding_search_button").click(mysubmit);
 
     function dataToText(data) {
-        var text = "";
+        let text = "";
         if (data.name)
             text += data.name;
 
@@ -584,12 +580,12 @@ function setupMatrixAPI(ghMatrix) {
 
         ghMatrix.doRequest()
             .then(function (json) {
-                var outHtml = "Distances in meters: <br/>" + ghMatrix.toHtmlTable(json.distances);
+                let outHtml = "Distances in meters: <br/>" + ghMatrix.toHtmlTable(json.distances);
                 outHtml += "<br/><br/>Times in seconds: <br/>" + ghMatrix.toHtmlTable(json.times);
                 $("#matrix-response").html(outHtml);
             })
             .catch(function (err) {
-                var str = "An error occured: " + err.message;
+                let str = "An error occured: " + err.message;
                 $("#matrix-error").text(str);
             });
 
@@ -599,11 +595,11 @@ function setupMatrixAPI(ghMatrix) {
 
 function setupIsochrone(map, ghIsochrone) {
     map.setView([37.44, -122.16], 12);
-    var isochroneLayer;
-    var inprogress = false;
+    let isochroneLayer;
+    let inprogress = false;
 
     map.on('click', function (e) {
-        var pointStr = e.latlng.lat + "," + e.latlng.lng;
+        let pointStr = e.latlng.lat + "," + e.latlng.lng;
 
         if (!inprogress) {
             inprogress = true;
@@ -615,8 +611,8 @@ function setupIsochrone(map, ghIsochrone) {
 
                     isochroneLayer = L.geoJson(json.polygons, {
                         style: function (feature) {
-                            var num = feature.properties.bucket;
-                            var color = (num % 2 === 0) ? "#00cc33" : "blue";
+                            let num = feature.properties.bucket;
+                            let color = (num % 2 === 0) ? "#00cc33" : "blue";
                             return {color: color, "weight": num + 2, "opacity": 0.6};
                         }
                     });
@@ -638,18 +634,18 @@ function setupIsochrone(map, ghIsochrone) {
 }
 
 function createMap(divId) {
-    var osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    let osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-    var omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/ghexamples-3646a190/tile', {
+    let omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/ghexamples-3646a190/tile', {
         layers: 'osm',
         attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
     });
 
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: osmAttr
     });
 
-    var map = L.map(divId, {layers: [omniscale]});
+    let map = L.map(divId, {layers: [omniscale]});
     L.control.layers({
         "Omniscale": omniscale,
         "OpenStreetMap": osm
@@ -659,7 +655,7 @@ function createMap(divId) {
 
 function setupMapMatching(map, mmClient) {
     map.setView([50.9, 13.4], 9);
-    var routeLayer = L.geoJson().addTo(map);
+    let routeLayer = L.geoJson().addTo(map);
     routeLayer.options = {
         // use style provided by the 'properties' entry of the geojson added by addDataToRoutingLayer
         style: function (feature) {
@@ -667,37 +663,34 @@ function setupMapMatching(map, mmClient) {
         }
     };
 
-    function mybind(key, url, vehicle) {
+    function mybind(key, url, profile) {
         $("#" + key).click(function (event) {
             $("#" + key).prop('disabled', true);
             $("#map-matching-response").text("downloading file ...");
             $.get(url, function (content) {
-                var dom = (new DOMParser()).parseFromString(content, 'text/xml');
-                var pathOriginal = toGeoJSON.gpx(dom);
+                let dom = (new DOMParser()).parseFromString(content, 'text/xml');
+                let pathOriginal = toGeoJSON.gpx(dom);
                 routeLayer.clearLayers();
                 pathOriginal.features[0].properties = {style: {color: "black", weight: 2, opacity: 0.9}};
                 routeLayer.addData(pathOriginal);
                 $("#map-matching-response").text("send file ...");
                 $("#map-matching-error").text("");
-                if (!vehicle)
-                    vehicle = "car";
-                mmClient.vehicle = vehicle;
-                mmClient.doRequest(content)
+                mmClient.doRequest(content, {profile: profile})
                     .then(function (json) {
-                        $("#map-matching-response").text("calculated map matching");
-                        var matchedPath = json.paths[0];
-                        var geojsonFeature = {
+                        $("#map-matching-response").text("calculated map matching for " + profile);
+                        let matchedPath = json.paths[0];
+                        let geojsonFeature = {
                             type: "Feature",
                             geometry: matchedPath.points,
                             properties: {style: {color: "#00cc33", weight: 6, opacity: 0.4}}
                         };
                         routeLayer.addData(geojsonFeature);
                         if (matchedPath.bbox) {
-                            var minLon = matchedPath.bbox[0];
-                            var minLat = matchedPath.bbox[1];
-                            var maxLon = matchedPath.bbox[2];
-                            var maxLat = matchedPath.bbox[3];
-                            var tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                            let minLon = matchedPath.bbox[0];
+                            let minLat = matchedPath.bbox[1];
+                            let maxLon = matchedPath.bbox[2];
+                            let maxLat = matchedPath.bbox[3];
+                            let tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
                             map.fitBounds(tmpB);
                         }
                         $("#" + key).prop('disabled', false);
