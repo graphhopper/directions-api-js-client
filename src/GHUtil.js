@@ -1,9 +1,9 @@
-var GHUtil = function () {
+let GHUtil = function () {
 };
 
 GHUtil.prototype.clone = function (obj) {
-    var newObj = {};
-    for (var prop in obj) {
+    let newObj = {};
+    for (let prop in obj) {
         if (obj.hasOwnProperty(prop)) {
             newObj[prop] = obj[prop];
         }
@@ -11,37 +11,24 @@ GHUtil.prototype.clone = function (obj) {
     return newObj;
 };
 
-GHUtil.prototype.copyProperties = function (args, argsInto) {
-    if (!args)
-        return argsInto;
-
-    for (var prop in args) {
-        if (args.hasOwnProperty(prop) && args[prop] !== undefined) {
-            argsInto[prop] = args[prop];
-        }
-    }
-
-    return argsInto;
-};
-
 GHUtil.prototype.decodePath = function (encoded, is3D) {
-    var len = encoded.length;
-    var index = 0;
-    var array = [];
-    var lat = 0;
-    var lng = 0;
-    var ele = 0;
+    let len = encoded.length;
+    let index = 0;
+    let array = [];
+    let lat = 0;
+    let lng = 0;
+    let ele = 0;
 
     while (index < len) {
-        var b;
-        var shift = 0;
-        var result = 0;
+        let b;
+        let shift = 0;
+        let result = 0;
         do {
             b = encoded.charCodeAt(index++) - 63;
             result |= (b & 0x1f) << shift;
             shift += 5;
         } while (b >= 0x20);
-        var deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        let deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
         lat += deltaLat;
 
         shift = 0;
@@ -51,7 +38,7 @@ GHUtil.prototype.decodePath = function (encoded, is3D) {
             result |= (b & 0x1f) << shift;
             shift += 5;
         } while (b >= 0x20);
-        var deltaLon = ((result & 1) ? ~(result >> 1) : (result >> 1));
+        let deltaLon = ((result & 1) ? ~(result >> 1) : (result >> 1));
         lng += deltaLon;
 
         if (is3D) {
@@ -63,22 +50,22 @@ GHUtil.prototype.decodePath = function (encoded, is3D) {
                 result |= (b & 0x1f) << shift;
                 shift += 5;
             } while (b >= 0x20);
-            var deltaEle = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            let deltaEle = ((result & 1) ? ~(result >> 1) : (result >> 1));
             ele += deltaEle;
             array.push([lng * 1e-5, lat * 1e-5, ele / 100]);
         } else
             array.push([lng * 1e-5, lat * 1e-5]);
     }
-    // var end = new Date().getTime();
+    // let end = new Date().getTime();
     // console.log("decoded " + len + " coordinates in " + ((end - start) / 1000) + "s");
     return array;
 };
 
 GHUtil.prototype.extractError = function (res, url) {
-    var msg;
+    let msg;
 
-    if (res && res.body) {
-        msg = res.body;
+    if (res && res.data) {
+        msg = res.data;
         if (msg.hints && msg.hints[0] && msg.hints[0].message)
             msg = msg.hints[0].message;
         else if (msg.message)
@@ -91,12 +78,12 @@ GHUtil.prototype.extractError = function (res, url) {
 };
 
 GHUtil.prototype.isArray = function (value) {
-    var stringValue = Object.prototype.toString.call(value);
+    let stringValue = Object.prototype.toString.call(value);
     return (stringValue.toLowerCase() === "[object array]");
 };
 
 GHUtil.prototype.isObject = function (value) {
-    var stringValue = Object.prototype.toString.call(value);
+    let stringValue = Object.prototype.toString.call(value);
     return (stringValue.toLowerCase() === "[object object]");
 };
 

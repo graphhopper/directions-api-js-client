@@ -1,6 +1,6 @@
 {
   "name": "graphhopper-js-api-client",
-  "version": "0.13.0",
+  "version": "5.0.0",
   "description": "A Javascript Client for GraphHopper",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
@@ -12,23 +12,16 @@
     "bundleProduction": "browserify -g uglifyify src/main-template.js | derequire > dist/graphhopper-client.js",
     "test": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine"
   },
-  "browserify": {
-    "transform": [
-      "browserify-swap"
-    ]
-  },
   "dependencies": {
-    "bluebird": "3.5.5",
-    "superagent": "5.0.6"
+    "axios": "0.27.2"
   },
   "devDependencies": {
-    "browserify": "16.2.3",
-    "browserify-swap": "0.2.2",
+    "browserify": "17.0.0",
     "derequire": "2.0.6",
     "jasmine": "3.4.0",
     "jshint": "2.10.2",
     "uglifyify": "5.0.2",
-    "watchify": "3.11.1"
+    "watchify": "4.0.0"
   },
   "repository": {
     "type": "git",

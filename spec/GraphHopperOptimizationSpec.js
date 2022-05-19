@@ -1,5 +1,5 @@
-var GraphHopperOptimization = require('../src/GraphHopperOptimization');
-var ghOptimization = new GraphHopperOptimization({key: key, vehicle: profile});
+let GraphHopperOptimization = require('../src/GraphHopperOptimization');
+let ghOptimization = new GraphHopperOptimization({key: key});
 
 describe("Optimization Test", function () {
     it("Get results", function (done) {

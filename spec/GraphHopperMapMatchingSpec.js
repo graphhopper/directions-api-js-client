@@ -1,5 +1,5 @@
 var GraphHopperMapMatching = require('../src/GraphHopperMapMatching');
-var ghMapMatching = new GraphHopperMapMatching({key: key, vehicle: "bike"});
+var ghMapMatching = new GraphHopperMapMatching({key: key}, {profile: "bike"});
 
 var bikeGPX;
 
@@ -9,7 +9,7 @@ describe("Map Matching Test", function () {
             .then(function (json) {
                 expect(json.paths.length).toBeGreaterThan(0);
                 var dist = json.map_matching.distance;
-                expect(dist).toBeGreaterThan(62000);
+                expect(dist).toBeGreaterThan(61000);
                 expect(dist).toBeLessThan(67000);
                 expect(json.paths.length).toBeGreaterThan(0);
                 done();

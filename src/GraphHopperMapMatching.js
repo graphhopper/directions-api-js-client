@@ -1,80 +1,72 @@
-var request = require('superagent');
-var Promise = require("bluebird");
+let request = require('axios');
 
-var GHUtil = require("./GHUtil");
-var ghUtil = new GHUtil();
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
 
-GraphHopperMapMatching = function (args) {
-    this.host = "https://graphhopper.com/api/1";
-    this.vehicle = "car";
-    this.gps_accuracy = 20;
-    this.max_visited_nodes = 3000;
-    this.debug = false;
-    this.data_type = 'json';
-    this.locale = 'en';
-    this.points_encoded = true;
-    this.instructions = true;
-    this.elevation = true;
-    this.basePath = '/match';
-    this.timeout = 100000;
+GraphHopperMapMatching = function (args, requestDefaults) {
+    this.defaults = {
+        profile: "car",
+        gps_accuracy: 20,
+        debug: false,
+        max_visited_nodes: 3000,
+        locale: "en",
+        points_encoded: true,
+        instructions: true,
+        elevation: true,
+        data_type: "json"
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
 
-    ghUtil.copyProperties(args, this);
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/match';
+    this.timeout = args.timeout ? args.timeout : 100000;
 };
 
 GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
-    var qString = "locale=" + args.locale;
-
-    if (args.debug)
-        qString += "&debug=true";
-
+    let qString = "locale=" + args.locale;
+    // TODO NOW: profile not yet supported in API
+    qString += "&vehicle=" + args.profile;
     qString += "&gps_accuracy=" + args.gps_accuracy;
     qString += "&max_visited_nodes=" + args.max_visited_nodes;
     qString += "&type=" + args.data_type;
+    qString += "&instructions=" + args.instructions;
+    qString += "&points_encoded=" + args.points_encoded;
+    qString += "&elevation=" + args.elevation;
 
-    if (args.instructions)
-        qString += "&instructions=" + args.instructions;
-
-    if (args.points_encoded)
-        qString += "&points_encoded=" + args.points_encoded;
-
-    if (args.elevation)
-        qString += "&elevation=" + args.elevation;
-
-    if (args.vehicle)
-        qString += "&vehicle=" + args.vehicle;
-
+    if (args.debug)
+        qString += "&debug=true";
     return qString;
 };
 
 GraphHopperMapMatching.prototype.doRequest = function (content, reqArgs) {
-    var that = this;
+    if (!reqArgs) reqArgs = {}
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let timeout = this.timeout;
 
     return new Promise(function (resolve, reject) {
-        var args = ghUtil.clone(that);
-        if (reqArgs)
-            args = ghUtil.copyProperties(reqArgs, args);
-
-        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args);
-        if (args.key)
-            url += "&key=" + args.key;
-
-        request
-            .post(url)
-            .send(content)
-            .accept('application/json')
-            .type('application/xml')
-            .timeout(args.timeout)
-            .end(function (err, res) {
-                if (err || !res.ok) {
+        request.post(url, content, {
+            timeout: timeout,
+            headers: {'Content-Type': 'application/xml'}
+        })
+            .then(res => {
+                if (res.status !== 200) {
                     reject(ghUtil.extractError(res, url));
                 } else if (res) {
 
-                    if (res.body.paths) {
-                        for (var i = 0; i < res.body.paths.length; i++) {
-                            var path = res.body.paths[i];
+                    if (res.data.paths) {
+                        for (let i = 0; i < res.data.paths.length; i++) {
+                            let path = res.data.paths[i];
                             // convert encoded polyline to geo json
                             if (path.points_encoded) {
-                                var tmpArray = ghUtil.decodePath(path.points, that.elevation);
+                                let tmpArray = ghUtil.decodePath(path.points, reqArgs.elevation);
                                 path.points = {
                                     "type": "LineString",
                                     "coordinates": tmpArray
@@ -85,8 +77,11 @@ GraphHopperMapMatching.prototype.doRequest = function (content, reqArgs) {
                             }
                         }
                     }
-                    resolve(res.body);
+                    resolve(res.data);
                 }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
             });
     });
 };

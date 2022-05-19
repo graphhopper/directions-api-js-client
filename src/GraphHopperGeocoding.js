@@ -1,29 +1,26 @@
-var request = require('superagent');
-var Promise = require("bluebird");
+let request = require('axios');
 
-var GHUtil = require("./GHUtil");
-var ghUtil = new GHUtil();
+let GHUtil = require("./GHUtil");
+let ghUtil = new GHUtil();
 
-GraphHopperGeocoding = function (args) {
-    // prefer results from a certain location (type: GHInput)
-    this.location_bias;
-    // the query
-    this.query;
-    this.host = "https://graphhopper.com/api/1";
-    this.debug = false;
-    this.locale = "en";
-    this.basePath = '/geocode';
-    this.timeout = 10000;
+GraphHopperGeocoding = function (args, requestDefaults) {
+    this.defaults = {
+        debug: false,
+        locale: "en"
+    }
+    if (requestDefaults)
+        Object.keys(requestDefaults).forEach(key => {
+            this.defaults[key] = requestDefaults[key];
+        });
 
-    ghUtil.copyProperties(args, this);
-};
-
-GraphHopperGeocoding.prototype.clearLocation = function () {
-    this.location_bias = undefined;
+    this.key = args.key;
+    this.host = args.host ? args.host : "https://graphhopper.com/api/1";
+    this.endpoint = args.endpoint ? args.endpoint : '/geocode';
+    this.timeout = args.timeout ? args.timeout : 10000;
 };
 
 GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
-    var qString = "locale=" + args.locale;
+    let qString = "locale=" + args.locale;
 
     if (args.query) {
         qString += "&q=" + encodeURIComponent(args.query);
@@ -47,25 +44,25 @@ GraphHopperGeocoding.prototype.getParametersAsQueryString = function (args) {
 };
 
 GraphHopperGeocoding.prototype.doRequest = function (reqArgs) {
-    var that = this;
+    if (!reqArgs) reqArgs = {}
+    Object.keys(this.defaults).forEach(key => {
+        if (!reqArgs[key]) reqArgs[key] = this.defaults[key];
+    });
+    let url = this.host + this.endpoint + "?" + this.getParametersAsQueryString(reqArgs) + "&key=" + this.key;
+    let that = this;
 
-    return new Promise(function(resolve, reject) {
-        var args = ghUtil.clone(that);
-        if (reqArgs)
-            args = ghUtil.copyProperties(reqArgs, args);
-
-        var url = args.host + args.basePath + "?" + that.getParametersAsQueryString(args) + "&key=" + args.key;
-
+    return new Promise(function (resolve, reject) {
         request
-            .get(url)
-            .accept('application/json')
-            .timeout(args.timeout)
-            .end(function (err, res) {
-                if (err || !res.ok) {
+            .get(url, {timeout: that.timeout})
+            .then(res => {
+                if (res.status !== 200) {
                     reject(ghUtil.extractError(res, url));
                 } else if (res) {
-                    resolve(res.body);
+                    resolve(res.data);
                 }
+            })
+            .catch(err => {
+                reject(ghUtil.extractError(err.response, url));
             });
     });
 };

@@ -1,5 +1,5 @@
-var GraphHopperIsochrone = require('../src/GraphHopperIsochrone');
-var ghIsochrone = new GraphHopperIsochrone({key: key, vehicle: profile});
+let GraphHopperIsochrone = require('../src/GraphHopperIsochrone');
+let ghIsochrone = new GraphHopperIsochrone({key: key}, {profile: profile});
 
 
 describe("Isochrone Test", function () {
