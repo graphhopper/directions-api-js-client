@@ -44,7 +44,7 @@ GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
         qString += "&vehicle=" + args.vehicle;
     
     if (args.details)
-        qString += "&details=" + this.flatParameter('details', args.details);
+        qString += this.flatParameter('details', args.details);
 
     return qString;
 };
