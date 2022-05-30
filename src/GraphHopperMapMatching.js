@@ -42,8 +42,35 @@ GraphHopperMapMatching.prototype.getParametersAsQueryString = function (args) {
 
     if (args.vehicle)
         qString += "&vehicle=" + args.vehicle;
+    
+    if (args.details)
+        qString += "&details=" + this.flatParameter('details', args.details);
 
     return qString;
+};
+
+GraphHopperMapMatching.prototype.flatParameter = function (key, val) {
+    var url = "";
+    var arr;
+    var keyIndex;
+
+    if (ghUtil.isObject(val)) {
+        arr = Object.keys(val);
+        for (keyIndex in arr) {
+            var objKey = arr[keyIndex];
+            url += this.flatParameter(key + "." + objKey, val[objKey]);
+        }
+        return url;
+
+    } else if (ghUtil.isArray(val)) {
+        arr = val;
+        for (keyIndex in arr) {
+            url += this.flatParameter(key, arr[keyIndex]);
+        }
+        return url;
+    }
+
+    return "&" + encodeURIComponent(key) + "=" + encodeURIComponent(val);
 };
 
 GraphHopperMapMatching.prototype.doRequest = function (content, reqArgs) {
