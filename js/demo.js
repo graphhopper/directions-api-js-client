@@ -711,7 +711,7 @@ function setupMapMatching(map, mmClient) {
         });//click
     }
 
-    var host = "https://raw.githubusercontent.com/graphhopper/directions-api-js-client/master/map-matching-examples";
+    let host = "https://graphhopper.com/api/1/examples/map-matching-examples";
     mybind("bike_example1", host + "/bike.gpx", "bike");
     mybind("car_example1", host + "/car.gpx", "car");
 }
