@@ -87,7 +87,13 @@ GHUtil.prototype.extractError = function (res, url) {
         msg = res;
     }
 
-    return new Error(msg);
+    const error = new Error(msg);
+    
+    if(res && res.body && res.body.hints) {
+        error.hints = res?.body?.hints;
+    }
+    
+    return error;
 };
 
 GHUtil.prototype.isArray = function (value) {
