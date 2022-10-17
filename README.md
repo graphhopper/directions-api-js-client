@@ -70,7 +70,7 @@ You need [the optimization client](./src/GraphHopperOptimization.js).
 
 ### GraphHopper Isochrone API
 
-![GraphHopper Isochrone API screenshot](https://raw.githubusercontent.com/graphhopper/directions-api/master/img/isochrone-example.png)
+![GraphHopper Isochrone API screenshot](https://github.com/graphhopper/directions-api-js-client/blob/master/img/screenshot-isochrone.png)
 
 You need [the isochrone client](./src/GraphHopperIsochrone.js)
 
