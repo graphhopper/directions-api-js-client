@@ -20,7 +20,7 @@
     "derequire": "2.1.1",
     "jasmine": "3.4.0",
     "jshint": "2.13.6",
-    "uglifyify": "5.0.0",
+    "uglifyify": "5.0.2",
     "watchify": "4.0.0"
   },
   "repository": {
