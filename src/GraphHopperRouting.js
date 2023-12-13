@@ -2,7 +2,7 @@ let request = require('axios');
 var GHUtil = require("./GHUtil");
 let ghUtil = new GHUtil();
 
-GraphHopperRouting = function (args, requestDefaults) {
+let GraphHopperRouting = function (args, requestDefaults) {
     this.defaults = {
         profile: "car",
         debug: false,
