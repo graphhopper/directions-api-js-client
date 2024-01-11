@@ -13,7 +13,7 @@
     "test": "JASMINE_CONFIG_PATH=spec/jasmine.json jasmine"
   },
   "dependencies": {
-    "axios": "0.27.2"
+    "axios": "1.6.5"
   },
   "devDependencies": {
     "browserify": "17.0.0",
