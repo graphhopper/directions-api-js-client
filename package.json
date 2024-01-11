@@ -1,6 +1,6 @@
 {
   "name": "graphhopper-js-api-client",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "description": "A Javascript Client for GraphHopper",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
