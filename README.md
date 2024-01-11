@@ -1,12 +1,6 @@
 # JavaScript client for the Directions API
 
-[![Build Status](https://travis-ci.com/graphhopper/directions-api-js-client.svg?branch=master)](https://travis-ci.org/graphhopper/directions-api-js-client)
-
-This project offers JavaScript clients and examples for the [GraphHopper Directions API](https://graphhopper.com).
-
-**Try the live examples [here](https://graphhopper.com/api/1/examples/).**
-
-Also see how we integrated the Routing and the Geocoding API to build a fully featured maps application called [GraphHopper Maps](https://graphhopper.com/maps/)
+This project offers JavaScript clients for the [GraphHopper Directions API](https://www.graphhopper.com).
 
 ## Getting Started
 
@@ -42,12 +36,6 @@ In order to run the tests, you have to register for a key on [GraphHopper](https
 Either set your key as environment variable using `export GHKEY=YOUR_KEY` or set your key in `spec/helpers/config.js`.
 You can run all tests via `npm test`. 
 If you only want to run a single spec file, you can use the `--spec` option, e.g., `npm test --spec spec/GraphHopperRoutingSpec.js`.
-
-## Dependencies
-
-The API depends on superagent and bluebird which are packaged into the graphhopper-client.js.
-
-The demo uses a couple of dependencies, but they are not required for requests to the API.
 
 ## Integrate the APIs in your application
 
@@ -95,9 +83,7 @@ You need [the map matching client](./src/GraphHopperMapMatching.js) and the
 
 ## Releasing a new Version to NPM
 
-Releasing a new version to NPM is easy.
-
-Set the version you like to publish in the `package.json`. It's important to understand, that every version can only be published once and cannot be overwritten.
+Set the version you like to publish in the `package.json`. Every version can only be published once and cannot be overwritten.
 
 Tag the commit you like to publish for example like this:
 ```
@@ -106,7 +92,7 @@ git tag <tag> <commit-hash>
 git push origin --tags
 ```
 
-Travis will then build and publish the commit to NPM.
+GitHub will then build and publish the commit to NPM.
 
 ## License
 
