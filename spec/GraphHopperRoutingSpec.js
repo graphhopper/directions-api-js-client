@@ -54,8 +54,8 @@ describe("Simple Route", function () {
                 expect(details).toBeDefined();
                 var edgeId = details.edge_id;
                 var averageSpeed = details.average_speed;
-                expect(edgeId.length).toBeGreaterThan(25);
-                expect(edgeId.length).toBeLessThan(75);
+                expect(edgeId.length).toBeGreaterThan(50);
+                expect(edgeId.length).toBeLessThan(95);
                 expect(averageSpeed.length).toBeGreaterThan(5);
                 expect(averageSpeed.length).toBeLessThan(15);
                 done();
