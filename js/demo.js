@@ -643,18 +643,12 @@ function setupIsochrone(map, ghIsochrone) {
 function createMap(divId) {
     let osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-    let omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/ghexamples-3646a190/tile', {
-        layers: 'osm',
-        attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
-    });
-
     let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: osmAttr
     });
 
-    let map = L.map(divId, {layers: [omniscale]});
+    let map = L.map(divId, {layers: [osm]});
     L.control.layers({
-        "Omniscale": omniscale,
         "OpenStreetMap": osm
     }).addTo(map);
     return map;
