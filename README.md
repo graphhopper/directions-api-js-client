@@ -20,11 +20,11 @@ window.onload = function() {
   let ghRouting = new GraphHopper.Routing({key: defaultKey}, {profile:"car", elevation: false});
 
   ghRouting.doRequest({points:[[8.534317, 47.400905], [8.538265, 47.394108]]})
-    .then(function(json){
+    .then(json => {
        // Add your own result handling here
        console.log(json);
     })
-    .catch(function(err){
+    .catch(err => {
        console.error(err.message);
     });
 };
@@ -89,7 +89,7 @@ Tag the commit you like to publish for example like this:
 ```
 git log # get the commit hash of the commit you want to tag
 git tag <tag> <commit-hash>
-git push origin --tags
+git push origin --tag <tag>
 ```
 
 GitHub will then build and publish the commit to NPM.
