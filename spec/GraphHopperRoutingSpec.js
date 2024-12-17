@@ -26,7 +26,7 @@ describe("Simple Route", function () {
                 var fastestDistance = json.paths[0].distance;
                 // Shortest is not prepared with CH
                 ghRouting.doRequest({
-                    points: [[13.207455, 52.303545], [13.28599, 52.314093]], "ch.disable": true,
+                    points: [[13.208442,52.290501], [13.283243,52.3153]], "ch.disable": true,
                     "custom_model": {distance_influence: 500}
                 })
                     .then(function (json2) {
