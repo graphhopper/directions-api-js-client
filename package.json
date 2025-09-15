@@ -1,6 +1,6 @@
 {
   "name": "@graphhopper/directions-api-js-client",
-  "version": "8.0.4",
+  "version": "8.0.5",
   "description": "A Javascript Client for the GraphHopper Directions API",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
