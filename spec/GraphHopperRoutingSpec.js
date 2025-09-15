@@ -154,7 +154,7 @@ describe("i18n Test", function () {
 
         ghRouting.i18n()
             .then(function (json) {
-                expect(json.en['web.hike']).toEqual('Hike');
+                expect(json.en['web.hike']).toEqual('Hiking');
                 done();
             })
             .catch(function (err) {
