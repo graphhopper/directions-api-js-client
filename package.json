@@ -1,7 +1,7 @@
 {
   "name": "graphhopper-js-api-client",
-  "version": "7.6.3",
-  "description": "A Javascript Client for GraphHopper",
+  "version": "7.6.4",
+  "description": "A Javascript Client for the GraphHopper Directions API",
   "author": "GraphHopper Community",
   "license": "Apache-2.0",
   "main": "dist/graphhopper-client.js",
