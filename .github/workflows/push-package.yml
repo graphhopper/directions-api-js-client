@@ -1,5 +1,7 @@
 name: Publish to GitHub Packages
-on: release
+on:
+  release:
+    types: [published]  # Only run when actually published
 
 jobs:
   publish:
