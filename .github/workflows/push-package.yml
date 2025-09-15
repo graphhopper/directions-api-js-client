@@ -13,7 +13,7 @@ jobs:
       - run: export GHKEY=${{ secrets.GHKEY }}; npm test
       - name: Publish
         run: |
-          npm run build
+          npm run bundle
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_JS_ORG_ACCESS_TOKEN }}
