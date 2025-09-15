@@ -11,6 +11,9 @@ jobs:
           node-version: 20
       - run: npm install
       - run: export GHKEY=${{ secrets.GHKEY }}; npm test
-      - uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: |
+          npm run build
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_JS_ORG_ACCESS_TOKEN }}
