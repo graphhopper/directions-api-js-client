@@ -8,14 +8,14 @@ This project offers JavaScript clients for the [GraphHopper Directions API](http
 
 Install the lib with npm:
 
-```npm install @graphhopper/graphhopper-js-api-client --save```
+```npm install @graphhopper/directions-api-js-client --save```
 
-Notice the @graphhopper organization since 15th September 2025.
+Note the different package name in the @graphhopper organization since 15th September 2025.
 
 You can either require the whole client enabling you to use every GraphHopper API, but you can also only require the pieces you need.
 
 ```javascript
-require('graphhopper-js-api-client');
+require('@graphhopper/directions-api-js-client');
  
 window.onload = function() {
   let defaultKey = "[Sign-up for free and get your own key: https://www.graphhopper.com/products/]";
