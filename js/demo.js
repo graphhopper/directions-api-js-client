@@ -643,18 +643,12 @@ function setupIsochrone(map, ghIsochrone) {
 function createMap(divId) {
     let osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-    let omniscale = L.tileLayer.wms('https://maps.omniscale.net/v1/ghexamples-3646a190/tile', {
-        layers: 'osm',
-        attribution: osmAttr + ', &copy; <a href="http://maps.omniscale.com/">Omniscale</a>'
-    });
-
     let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: osmAttr
     });
 
-    let map = L.map(divId, {layers: [omniscale]});
+    let map = L.map(divId, {layers: [osm]});
     L.control.layers({
-        "Omniscale": omniscale,
         "OpenStreetMap": osm
     }).addTo(map);
     return map;
@@ -671,47 +665,48 @@ function setupMapMatching(map, mmClient) {
     };
 
     function mybind(key, url, profile) {
-        $("#" + key).click(function (event) {
+        $("#" + key).click(event => {
             $("#" + key).prop('disabled', true);
             $("#map-matching-response").text("downloading file ...");
-            $.get(url, function (content) {
-                let dom = (new DOMParser()).parseFromString(content, 'text/xml');
-                let pathOriginal = toGeoJSON.gpx(dom);
-                routeLayer.clearLayers();
-                pathOriginal.features[0].properties = {style: {color: "black", weight: 2, opacity: 0.9}};
-                routeLayer.addData(pathOriginal);
-                $("#map-matching-response").text("send file ...");
-                $("#map-matching-error").text("");
-                mmClient.doRequest(content, {profile: profile})
-                    .then(function (json) {
-                        $("#map-matching-response").text("calculated map matching for " + profile);
-                        let matchedPath = json.paths[0];
-                        let geojsonFeature = {
-                            type: "Feature",
-                            geometry: matchedPath.points,
-                            properties: {style: {color: "#00cc33", weight: 6, opacity: 0.4}}
-                        };
-                        routeLayer.addData(geojsonFeature);
-                        if (matchedPath.bbox) {
-                            let minLon = matchedPath.bbox[0];
-                            let minLat = matchedPath.bbox[1];
-                            let maxLon = matchedPath.bbox[2];
-                            let maxLat = matchedPath.bbox[3];
-                            let tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
-                            map.fitBounds(tmpB);
-                        }
-                        $("#" + key).prop('disabled', false);
-                    })
-                    .catch(function (err) {
-                        $("#map-matching-response").text("");
-                        $("#map-matching-error").text(err.message);
-                        $("#" + key).prop('disabled', false);
-                    });//doRequest
-            });// get
+            fetch(url).then(response => {
+                response.text().then((content) => {
+                    let dom = (new DOMParser()).parseFromString(content, 'text/xml');
+                    let pathOriginal = toGeoJSON.gpx(dom);
+                    routeLayer.clearLayers();
+                    pathOriginal.features[0].properties = {style: {color: "black", weight: 2, opacity: 0.9}};
+                    routeLayer.addData(pathOriginal);
+                    $("#map-matching-response").text("send file ...");
+                    $("#map-matching-error").text("");
+                    mmClient.doRequest(content, {profile: profile})
+                        .then(function (json) {
+                            $("#map-matching-response").text("calculated map matching for " + profile);
+                            let matchedPath = json.paths[0];
+                            let geojsonFeature = {
+                                type: "Feature",
+                                geometry: matchedPath.points,
+                                properties: {style: {color: "#00cc33", weight: 6, opacity: 0.4}}
+                            };
+                            routeLayer.addData(geojsonFeature);
+                            if (matchedPath.bbox) {
+                                let minLon = matchedPath.bbox[0];
+                                let minLat = matchedPath.bbox[1];
+                                let maxLon = matchedPath.bbox[2];
+                                let maxLat = matchedPath.bbox[3];
+                                let tmpB = new L.LatLngBounds(new L.LatLng(minLat, minLon), new L.LatLng(maxLat, maxLon));
+                                map.fitBounds(tmpB);
+                            }
+                            $("#" + key).prop('disabled', false);
+                        })
+                        .catch(function (err) {
+                            $("#map-matching-response").text("");
+                            $("#map-matching-error").text(err.message);
+                            $("#" + key).prop('disabled', false);
+                        });//doRequest
+                })// get
+            })
         });//click
     }
 
-    let host = "https://graphhopper.com/api/1/examples/map-matching-examples";
-    mybind("bike_example1", host + "/bike.gpx", "bike");
-    mybind("car_example1", host + "/car.gpx", "car");
+    mybind("bike_example1", "/map-matching-examples/bike.gpx", "bike");
+    mybind("car_example1", "/map-matching-examples/car.gpx", "car");
 }

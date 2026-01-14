@@ -77,7 +77,7 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
                                 // Add a LngLat to every instruction
                                 let interval = path.instructions[j].interval;
                                 // The second parameter of slice is non inclusive, therefore we have to add +1
-                                path.instructions[j].points = path.points.coordinates.slice([interval[0], interval[1] + 1]);
+                                path.instructions[j].points = path.points.coordinates.slice(interval[0], interval[1] + 1);
                             }
                         }
                     }
