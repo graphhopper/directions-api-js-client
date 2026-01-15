@@ -48,9 +48,9 @@ GraphHopperRouting.prototype.doRequest = function (reqArgs) {
     let that = this;
 
     return new Promise((resolve, reject) => {
-        axios.defaults.withCredentials = false
         axios.post(url, reqArgs, {
             timeout: that.timeout,
+            withCredentials: false,
             headers: {'Content-Type': 'application/json', Authorization: null}
         })
             .then(res => {
@@ -97,7 +97,11 @@ GraphHopperRouting.prototype.info = function () {
     return new Promise((resolve, reject) => {
         let url = that.host + "/info?key=" + that.key;
 
-        axios.get(url, {timeout: that.timeout, headers: {'Content-Type': 'application/json'}})
+        axios.get(url, {
+            timeout: that.timeout,
+            withCredentials: false,
+            headers: {'Content-Type': 'application/json', Authorization: null}
+        })
             .then(res => {
                 if (res.status !== 200) {
                     reject(ghUtil.extractError(res, url));
@@ -119,7 +123,11 @@ GraphHopperRouting.prototype.i18n = function (args) {
     return new Promise((resolve, reject) => {
         let url = that.host + "/i18n/" + locale + "?key=" + that.key;
 
-        axios.get(url, {timeout: that.timeout, headers: {'Content-Type': 'application/json'}})
+        axios.get(url, {
+            timeout: that.timeout,
+            withCredentials: false,
+            headers: {'Content-Type': 'application/json', Authorization: null}
+        })
             .then(res => {
                 if (res.status !== 200) {
                     reject(ghUtil.extractError(res, url));
