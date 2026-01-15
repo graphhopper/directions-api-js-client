@@ -91,4 +91,4 @@ GHUtil.prototype.isString = function (value) {
     return (typeof value === 'string');
 };
 
-module.exports = GHUtil;
+export default GHUtil;
