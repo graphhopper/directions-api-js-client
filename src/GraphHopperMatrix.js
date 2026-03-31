@@ -1,4 +1,4 @@
-let request = require('axios');
+let request = require('./gh-request');
 
 let GHUtil = require("./GHUtil");
 let ghUtil = new GHUtil();
